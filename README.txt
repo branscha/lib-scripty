@@ -13,7 +13,7 @@ By adding a number of commands the programmer has a scripting language that work
 business domain.
 
 Characteristics:
- * Optimised for interactive use by the end user and easy extesibility by the programmer.
+ * Optimised for interactive use by the end user and easy extensibility by the programmer.
  * Programming in the small.
  * Scripts in the business domain.
 

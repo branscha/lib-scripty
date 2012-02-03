@@ -28,7 +28,7 @@ import com.sdicons.repl.parser.Pair;
  * There are 3 types of parameters in a variable argument list.
  * 1. Fixed (always required) arguments, each argument has its own type.
  * 2. Variable length. These all have the same type. These cannot be pairs.
- *    It is the same type that can occur min to max times. A repitition of the same type.
+ *    It is the same type that can occur min to max times. A repetition of the same type.
  *    Eg. a list of 1 or more integers.
  * 3. Named (optional or required). These are pairs at the end of the command line.
  *    The named parameters can have a default value.
