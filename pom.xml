@@ -28,7 +28,7 @@
     <groupId>com.sdicons</groupId>
     <artifactId>scripty</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>2.0-SNAPSHOT</version>
     <name>Scripty an Embeddable Scripting Language</name>
 
 	<developers>
