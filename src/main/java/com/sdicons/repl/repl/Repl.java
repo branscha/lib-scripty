@@ -1,6 +1,6 @@
 /*
  * Scripty Programming Language
- * Copyright (C) 2010-2011 Bruno Ranschaert, S.D.I.-Consulting BVBA
+ * Copyright (C) 2010-2012 Bruno Ranschaert, S.D.I.-Consulting BVBA
  * http://www.sdi-consulting.be
  * mailto://info@sdi-consulting.be
  *
@@ -21,21 +21,10 @@
 
 package com.sdicons.repl.repl;
 
+import com.sdicons.scripty.parser.*;
+
 import java.io.*;
 import java.util.List;
-import java.util.Map;
-
-import com.sdicons.repl.cmdlib.ExitCmd;
-import com.sdicons.repl.cmdlib.FileChooserCmd;
-import com.sdicons.repl.cmdlib.LoadCmd;
-import com.sdicons.repl.cmdlib.PrintCmd;
-import com.sdicons.repl.cmdlib.RecEditCmd;
-import com.sdicons.repl.cmdlib.StrCmd;
-import com.sdicons.repl.cmdlib.UuidCmd;
-import com.sdicons.repl.cmdlib.FileChooserCmd.FileChooserMode;
-import com.sdicons.repl.cmdlib.FileChooserCmd.FileChooserType;
-import com.sdicons.repl.cmdlib.StrCmd.StrCmdType;
-import com.sdicons.repl.parser.*;
 
 /**
  * The Repl understands a simplified lisp syntax, only strings and lists can be expressed
@@ -55,6 +44,7 @@ import com.sdicons.repl.parser.*;
  * </ul>
  *
  */
+@Deprecated
 public class Repl
 implements IRepl
 {
@@ -194,20 +184,20 @@ implements IRepl
         }
     }
 
-    public static void main(String[] aArgs)
-    {
-        Repl lRepl = new Repl(System.in, System.out, System.out);
-        lRepl.registerCommand("print", new PrintCmd());
-        // For demo purposes only.
-        lRepl.registerCommand("uuid", new UuidCmd());
-        lRepl.registerCommand("choose-file", new FileChooserCmd(FileChooserType.files, FileChooserMode.open));
-        lRepl.registerCommand("choose-dir", new FileChooserCmd(FileChooserType.dirs, FileChooserMode.open));
-        lRepl.registerCommand("exit", new ExitCmd());
-        lRepl.registerCommand("load", new LoadCmd(LoadCmd.LoadCmdType.load));
-        lRepl.registerCommand("edit-rec", new RecEditCmd());
-        lRepl.registerCommand("format", new StrCmd(StrCmdType.strFormat));
-        lRepl.start();
-    }
+//    public static void main(String[] aArgs)
+//    {
+//        Repl lRepl = new Repl(System.in, System.out, System.out);
+//        lRepl.registerCommand("print", new PrintCmd());
+//        // For demo purposes only.
+//        lRepl.registerCommand("uuid", new UuidCmd());
+//        lRepl.registerCommand("choose-file", new FileChooserCmd(FileChooserType.files, FileChooserMode.open));
+//        lRepl.registerCommand("choose-dir", new FileChooserCmd(FileChooserType.dirs, FileChooserMode.open));
+//        lRepl.registerCommand("exit", new ExitCmd());
+//        lRepl.registerCommand("load", new LoadCmd(LoadCmd.LoadCmdType.load));
+//        lRepl.registerCommand("edit-rec", new RecEditCmd());
+//        lRepl.registerCommand("format", new StrCmd(StrCmdType.strFormat));
+//        lRepl.start();
+//    }
 
     public void start()
     {
@@ -277,25 +267,6 @@ implements IRepl
     public void setPrompt(String prompt)
     {
         this.prompt = prompt;
-    }
-
-    public Map<String, ICommand> dumpCommands()
-    {
-        return eval.dumpCommands();
-    }
-
-    public void registerCommand(String aName, ICommand aCmd)
-    {
-        eval.registerCommand(aName, aCmd);
-    }
-
-    public void registerMacro(String aName, IMacro aMacro)
-    {
-        eval.registerMacro(aName, aMacro);
-    }
-    public Map<String, IMacro> dumpMacros()
-    {
-        return eval.dumpMacros();
     }
 
     public Object exec(String anExpression)

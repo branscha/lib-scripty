@@ -4,7 +4,7 @@
   (if (> $n 0)
      (progn
          (dohanoi (- $n 1) $u $from $to)
-         (print  move $from --> $to)
+         (println  move $from --> $to)
          (dohanoi (- $n 1) $to $u $from))))
 
 (defun hanoi (n)

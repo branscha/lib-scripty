@@ -19,28 +19,27 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.type;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
 
-@Deprecated
-public interface IRepl
+public class StringType
+implements ITypeSpec
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    public static final StringType STRING_TYPE = new StringType();
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public String getSpecName()
+    {
+        return "String";
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public Object guard(Object aArg, IContext aCtx) 
+    throws TypeSpecException
+    {
+        if(aArg instanceof String) return aArg;
+        else
+        {
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+        }
+    }
 }

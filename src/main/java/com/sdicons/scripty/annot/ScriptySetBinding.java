@@ -19,28 +19,16 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.annot;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Deprecated
-public interface IRepl
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ScriptySetBinding
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
-
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public String value();
 }

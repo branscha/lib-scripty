@@ -19,28 +19,27 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.map;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
-
-@Deprecated
-public interface IRepl
+public class ArgMappingException
+extends Exception
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    public ArgMappingException()
+    {
+    }
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public ArgMappingException(String message)
+    {
+        super(message);
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
+    public ArgMappingException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public ArgMappingException(Throwable cause)
+    {
+        super(cause);
+    }
 }

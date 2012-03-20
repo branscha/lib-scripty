@@ -19,28 +19,23 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.map;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
 
-@Deprecated
-public interface IRepl
+public class DefResultMapping
+implements IResultMapping
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private String binding;
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public DefResultMapping(String aBinding)
+    {
+        binding = aBinding;
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public void map(Object aResult, IContext aContext)
+    throws ResultMappingException
+    {
+        aContext.defBinding(binding, aResult);
+    }
 }

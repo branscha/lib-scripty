@@ -19,28 +19,43 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.repl;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
-
-@Deprecated
-public interface IRepl
+public class ReplEngineException
+extends Exception
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private int line = 1;
+    private int column = 1;
+    
+    public ReplEngineException()
+    {
+        super();
+    }
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public ReplEngineException(int aLine, int aColumn, String message)
+    {        
+        super(message);
+        line = aLine;
+        column = aColumn;
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
+    public ReplEngineException(int aLine, int aColumn, String message, Throwable cause)
+    {
+        super(message, cause);
+        line = aLine;
+        column = aColumn;
+    }
 
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public ReplEngineException(int aLine, int aColumn, Throwable cause)
+    {        
+        super(cause);
+        line = aLine;
+        column = aColumn;
+    }
+
+    @Override
+    public String getMessage()
+    {
+        return String.format("ERROR: On line %d column %d.\n%s", line, column, super.getMessage());
+    }
 }

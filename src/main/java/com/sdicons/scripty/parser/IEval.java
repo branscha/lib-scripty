@@ -19,28 +19,22 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.parser;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
-
-@Deprecated
-public interface IRepl
+public interface IEval
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
-
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
+    IContext getContext();
     void setContext(IContext context);
 
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
+    Object eval(Object aExpr)
     throws CommandException;
+
+    Object eval(Object aExpr, IContext aContext)
+    throws CommandException;
+    
+    public void setCommandRepo(CommandRepository aRepo);
+    CommandRepository getCommandRepo();
+    
+    public void setMacroRepo(CommandRepository aRepo);
+    CommandRepository getMacroRepo();
 }

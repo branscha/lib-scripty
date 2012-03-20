@@ -1,6 +1,6 @@
 /*
  * Scripty Programming Language
- * Copyright (C) 2010-2011 Bruno Ranschaert, S.D.I.-Consulting BVBA
+ * Copyright (C) 2010-2012 Bruno Ranschaert, S.D.I.-Consulting BVBA
  * http://www.sdi-consulting.be
  * mailto://info@sdi-consulting.be
  *
@@ -24,18 +24,15 @@ package com.sdicons.repl.repl;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.sdicons.repl.cmdlib.ExitCmd;
-import com.sdicons.repl.cmdlib.PrintCmd;
-import com.sdicons.repl.cmdlib.UuidCmd;
-
+@Deprecated
 public class ReplFactory implements IReplFactory
 {
     public IRepl createRepl(InputStream aIn, OutputStream aOut)
     {
         IRepl lRepl =  new Repl(aIn, aOut, aOut);
-        lRepl.registerCommand("echo", new PrintCmd());
-        lRepl.registerCommand("uuid", new UuidCmd());
-        lRepl.registerCommand("exit", new ExitCmd());  
+//        lRepl.registerCommand("echo", new PrintCmd());
+//        lRepl.registerCommand("uuid", new UuidCmd());
+//        lRepl.registerCommand("exit", new ExitCmd());
         return lRepl;
     }
 }

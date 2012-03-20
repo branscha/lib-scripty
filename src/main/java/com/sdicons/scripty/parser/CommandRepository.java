@@ -19,28 +19,35 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.parser;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
+import java.util.HashMap;
+import java.util.Map;
 
-@Deprecated
-public interface IRepl
+/**
+ * A collection of commands (or macro's). Scripty uses these libraries to lookup macro's and commands.
+ */
+public class CommandRepository
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+	protected Map<String, ICommand> commands = new HashMap<String, ICommand>();
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+	public ICommand getCommand(String aName)
+	{
+		return commands.get(aName);
+	}
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
+	public boolean hasCommand(String aName)
+	{
+		return commands.containsKey(aName);
+	}
 
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+	public void registerCommand(String aName, ICommand aCommand)
+    {
+		commands.put(aName, aCommand);
+	}
+
+    public Map<String, ICommand> dumpCommands()
+    {
+        return  new HashMap<String, ICommand>(commands);
+    }
 }

@@ -19,28 +19,41 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.type;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
 
-@Deprecated
-public interface IRepl
+public class InstanceOrBinding 
+implements ITypeSpec
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private ITypeSpec innerSpec;
+    
+    public InstanceOrBinding(ITypeSpec aSpec)
+    {
+        innerSpec = aSpec;
+    }
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public Object guard(Object aArg, IContext aCtx) 
+    throws TypeSpecException
+    {
+        try
+        {
+            if(aArg instanceof String && aCtx.isBound((String) aArg))
+            {
+                aArg = aCtx.getBinding((String) aArg);
+            }      
+            return innerSpec.guard(aArg, aCtx);
+        }
+        catch (TypeSpecException e)
+        {
+            // Convert the exception from the inner type spec to 
+            // our own message. We hijack the exception here.
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg), e);
+        }
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public String getSpecName()
+    {
+        return "Binding or " + innerSpec.getSpecName();
+    }
 }

@@ -19,28 +19,38 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.parser;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
-
-@Deprecated
-public interface IRepl
+/**
+ * A Pair is an <b>immutable</b> basic type returned by the parser.
+ * It is immutable by design, because it is a parser artifact. It does not have to 
+ * be copied during evaluation.
+ *
+ */
+public class Pair
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private Object left;
+    private Object right;
+    
+    public Pair(Object left, Object right)
+    {
+        super();
+        this.left = left;
+        this.right = right;
+    }
+    
+    public Object getLeft()
+    {
+        return left;
+    }
+    public Object getRight()
+    {
+        return right;
+    }
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    @Override
+    public String toString()
+    {
+        return "pair(" + (left==null?"null":left.toString()) + "," + (right==null?"null":right.toString()) + ")";
+    }    
 }

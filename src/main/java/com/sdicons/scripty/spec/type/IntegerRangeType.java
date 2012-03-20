@@ -19,28 +19,33 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.type;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
 
-@Deprecated
-public interface IRepl
+public class IntegerRangeType implements ITypeSpec
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private int from;
+    private int to;
+    private IntegerType intSpec = new IntegerType();
+    
+    public IntegerRangeType(int aFrom, int aTo)
+    {
+        from = aFrom;
+        to = aTo;
+    }
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public String getSpecName()
+    {
+        return String.format("IntegerRange %d...%d", from, to);
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public Object guard(Object aArg, IContext aCtx) 
+    throws TypeSpecException
+    {
+        final Integer lInt = (Integer) intSpec.guard(aArg, aCtx);
+        if(lInt < from || lInt > to)
+            throw new TypeSpecException(String.format("Value out of range. Expected type '%s' and received an incompatible type '%s' value '%s'.", getSpecName(), aArg.getClass().getCanonicalName(), aArg.toString()));
+        else return lInt;
+    }
 }

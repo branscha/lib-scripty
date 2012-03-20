@@ -19,28 +19,33 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.map;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
+import com.sdicons.scripty.parser.IEval;
 
-@Deprecated
-public interface IRepl
+public class BindingMapping
+implements IArgMapping
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private String binding;
+    private boolean excIfNull;
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public BindingMapping(String aBinding, boolean aExcIfNull)
+    {
+        binding = aBinding;
+        excIfNull = aExcIfNull;
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
+    public Object map(IEval aEval, IContext aContext, Object aArgs)
+    throws ArgMappingException
+    {
+        if(aContext.isBound(binding)) return aContext.getBinding(binding);
+        else if(excIfNull) throw new ArgMappingException("... no such binding ...");
+        else return null;
+    }
 
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public void setOffset(int aOffset)
+    {
+        // Nop.
+    }
 }

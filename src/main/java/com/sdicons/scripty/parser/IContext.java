@@ -19,28 +19,24 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.parser;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
+import java.util.Map;
 
-@Deprecated
-public interface IRepl
+public interface IContext 
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
-
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    // Changes an existing binding.
+    // The change can occur at a nested level.
+	public void setBinding(String aKey, Object aValue) 
+	throws CommandException;
+	// Define a  binding in the current context. The value can be null.
+	// The new binding will always be at the top level.
+    public void defBinding(String aKey, Object aValue);
+    
+	public Object getBinding(String aKey);
+	public boolean isBound(String aKey);
+    public void removeBinding(String aKey);
+    public IContext getRootContext();
+    
+    public Map<String, Object> dumpBindings();
 }

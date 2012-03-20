@@ -1,6 +1,6 @@
 /*
  * Scripty Programming Language
- * Copyright (C) 2010-2011 Bruno Ranschaert, S.D.I.-Consulting BVBA
+ * Copyright (C) 2010-2012 Bruno Ranschaert, S.D.I.-Consulting BVBA
  * http://www.sdi-consulting.be
  * mailto://info@sdi-consulting.be
  *
@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+@Deprecated
 public class ReplServer 
 {
     private ServerSocket server;

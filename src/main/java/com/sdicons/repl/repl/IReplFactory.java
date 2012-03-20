@@ -1,6 +1,6 @@
 /*
  * Scripty Programming Language
- * Copyright (C) 2010-2011 Bruno Ranschaert, S.D.I.-Consulting BVBA
+ * Copyright (C) 2010-2012 Bruno Ranschaert, S.D.I.-Consulting BVBA
  * http://www.sdi-consulting.be
  * mailto://info@sdi-consulting.be
  *
@@ -28,6 +28,7 @@ import java.io.OutputStream;
  * Used for the repl server so that it can generate new repl's as 
  * it is contacted by the clients.
  */
+@Deprecated
 public interface IReplFactory
 {
     public IRepl createRepl(InputStream aIn, OutputStream aOut);

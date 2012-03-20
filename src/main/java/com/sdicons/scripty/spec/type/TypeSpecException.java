@@ -19,28 +19,30 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.type;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
-
-@Deprecated
-public interface IRepl
+public class TypeSpecException 
+extends Exception
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private static final long serialVersionUID = 1503359288485760391L;
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public TypeSpecException()
+    {
+        super();
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
+    public TypeSpecException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public TypeSpecException(String message)
+    {
+        super(message);
+    }
+
+    public TypeSpecException(Throwable cause)
+    {
+        super(cause);
+    }
 }

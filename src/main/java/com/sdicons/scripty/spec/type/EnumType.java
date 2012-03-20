@@ -19,28 +19,41 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.type;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
 
-@Deprecated
-public interface IRepl
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class EnumType
+implements ITypeSpec
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private List<String> values = new ArrayList<String>();
+    
+    public EnumType(List<String> aValues)
+    {
+        values.addAll(aValues);
+    }
+    
+    public EnumType(String ... aValues)
+    {
+        values.addAll(Arrays.asList(aValues));
+    }
+    
+    public Object guard(Object aArg, IContext aCtx)
+    throws TypeSpecException
+    {
+       if(aArg == null || !values.contains(aArg.toString()))
+       {
+           throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+       }
+       return aArg.toString();
+    }
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public String getSpecName()
+    {
+        return String.format("Enum %s", values.toString());
+    }
 }

@@ -19,28 +19,30 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.cmdlib;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
-
-@Deprecated
-public interface IRepl
-{
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
-
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+public class CmdUtil
+{    
+    /**
+     * Concatenate error messages from nested exceptions to get an error message that contains
+     * as much information as possible.
+     * 
+     * @param e An exception.
+     * @return An exception message that is the concatenation of all embedded exception messages.
+     */
+    public static String concatExceptionMessages(Throwable e)
+    {
+        final StringBuilder lBuilder = new StringBuilder();
+        if(e.getMessage() != null) lBuilder.append(e.getMessage());
+        if(e.getCause() != null) lBuilder.append("\n");
+        Throwable t = e;
+        while (t.getCause() != null)
+        {
+            t = t.getCause();
+            if(t.getMessage() != null)
+                lBuilder.append(t.getMessage());
+            if(t.getCause() != null) lBuilder.append("\n");
+        }
+        return lBuilder.toString();
+    }
 }

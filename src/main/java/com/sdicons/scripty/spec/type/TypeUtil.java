@@ -19,28 +19,27 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.type;
 
-import com.sdicons.scripty.parser.CommandException;
-import com.sdicons.scripty.parser.IContext;
-
-@Deprecated
-public interface IRepl
+public class TypeUtil
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
-
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public static final String msgExpectedOther(String aExpected, Object aObj)
+    {
+        String lMsg;
+        if(aObj == null)
+            lMsg = String.format("Expected type '%s' and received null value.", aExpected);
+        else
+            lMsg = String.format("Expected type '%s' and received incompatible type '%s' value '%s'.", aExpected, aObj.getClass().getCanonicalName(), aObj.toString());
+        return lMsg;
+    }
+    
+    public static final String msgBadRepr(String aExpected, String aRepr)
+    {
+        String lMsg;
+        if(aRepr == null)
+            lMsg = String.format("Expected type '%s' and received null value.", aExpected);
+        else
+            lMsg = String.format("Expected type '%s' and received incompatible string representation '%s'.", aExpected, aRepr);
+        return lMsg;
+    }
 }

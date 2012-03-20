@@ -19,28 +19,41 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.type;
 
-import com.sdicons.scripty.parser.CommandException;
+import java.math.BigInteger;
+
 import com.sdicons.scripty.parser.IContext;
 
-@Deprecated
-public interface IRepl
+public class BigIntegerType 
+implements ITypeSpec<BigInteger>
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    public String getSpecName()
+    {        
+        return "BigInteger";
+    }
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    public BigInteger guard(Object aArg, IContext aCtx) 
+    throws TypeSpecException
+    {
+        if(aArg instanceof BigInteger)
+        {
+            return (BigInteger) aArg;            
+        }
+        else if (aArg instanceof String || aArg instanceof Number)
+        {
+            try
+            {      
+                return new BigInteger(aArg.toString());
+            }
+            catch (NumberFormatException e)
+            {                
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+            }            
+        }
+        else
+        {
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+        }
+    }
 }

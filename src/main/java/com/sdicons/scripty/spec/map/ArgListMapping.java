@@ -19,28 +19,32 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.map;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
+import com.sdicons.scripty.parser.IEval;
 
-@Deprecated
-public interface IRepl
+import java.util.ArrayList;
+import java.util.List;
+
+public class ArgListMapping
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
-
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
-
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
-
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+    private List<IArgMapping> mappings = new ArrayList<IArgMapping>();
+    
+    public void addArgMapping(IArgMapping aArgMapping)
+    {
+        mappings.add(aArgMapping);
+    }
+    
+    public Object[] map(IEval aEval, IContext aContext, Object[] aArgs)
+    throws ArgMappingException
+    {
+        Object[] lMapped = new Object[mappings.size()];
+        int i = 0;
+        for(IArgMapping lMapping : mappings)
+        {
+            lMapped[i++] = lMapping.map(aEval, aContext, aArgs);
+        }
+        return lMapped;
+    }
 }

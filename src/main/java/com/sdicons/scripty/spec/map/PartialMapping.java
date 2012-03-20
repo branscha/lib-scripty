@@ -19,28 +19,44 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sdicons.repl.repl;
+package com.sdicons.scripty.spec.map;
 
-import com.sdicons.scripty.parser.CommandException;
 import com.sdicons.scripty.parser.IContext;
+import com.sdicons.scripty.parser.IEval;
 
-@Deprecated
-public interface IRepl
+import java.util.Arrays;
+
+public class PartialMapping
+implements IArgMapping
 {
-    // Change the prompt.
-    public String getPrompt();
-    public void setPrompt(String aPrompt);
+    private int from;
+    private int length;
 
-    // Starting and stopping the repl.
-    public void start();
-    public void stop();
+    public PartialMapping(int aFrom, int aLength)
+    {
+        from = aFrom;
+        length = aLength;
+    }
 
-    // Access the context.
-    public IContext getContext();
-    void setContext(IContext context);
+    public Object map(IEval aEval, IContext aContext, Object aArgs)
+    throws ArgMappingException
+    {
+        // TODO TODO
+        // Add code for lists/collections
 
-    // Execute a command. The expression language is not specified here, it can be
-    // whatever the implementation offers.
-    public Object exec(String anExpression)
-    throws CommandException;
+        Object[] lArgs = (Object[]) aArgs;
+        int lLength = 0;
+        if(length < 0)
+        {
+            lLength = lArgs.length - from;
+            if(lLength <= 0) lLength = 0;
+        }
+        
+        return Arrays.copyOfRange(lArgs, from, from + lLength);
+    }
+
+    public void setOffset(int aOffset)
+    {
+       from = from + aOffset;
+    }
 }
