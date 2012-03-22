@@ -53,7 +53,7 @@ import java.util.*;
 @ScriptyLibrary(name="Lisp", type=ScriptyLibraryType.STATIC)
 @ScriptyNamedArgLists(
         std={
-                @ScriptyStdArgList(name="1object", fixed={@ScriptyArg(name="arg", type="Any")}),
+                @ScriptyStdArgList(name="1object", fixed={@ScriptyArg(name="arg", type="Any nullAllowed=true")}),
                 @ScriptyStdArgList(name="1list/+elements", fixed={@ScriptyArg(name="arg", type="ListOf(Any) minLength=1")}),
                 @ScriptyStdArgList(name="1list/*elements", fixed={@ScriptyArg(name="arg", type="ListOf(Any)")}),
                 @ScriptyStdArgList(name="list+object", fixed={@ScriptyArg(name="lst", type="ListOf(Any)"), @ScriptyArg(name="obj", type="Any")}),
@@ -78,7 +78,7 @@ public class ListLibrary
     public static List createList(@ScriptyParam("elements") Object[] aElements)
     {
         List lResult = new ArrayList(aElements.length);
-        for(int i = 0; i < aElements.length; i++) lResult.add(aElements[i]);
+        Collections.addAll(lResult, aElements);
         return lResult;
     }
 
@@ -130,7 +130,7 @@ public class ListLibrary
     @ScriptyRefArgList(ref="list+objects")
     public static List unshift(@ScriptyParam("lst") List aList, @ScriptyParam("objs") Object[] aElements)
     {
-        for(int i = 0; i < aElements.length; i++) aList.add(0, aElements[i]);
+        for (final Object aElement : aElements) aList.add(0, aElement);
         return aList;
     }
 
@@ -161,9 +161,9 @@ public class ListLibrary
     public static List append(@ScriptyParam("lists") Object[] aLists)
     {
         final List<Object> lResult = new ArrayList<Object>();
-        for (int i = 0; i < aLists.length; i++)
+        for (final Object aList : aLists)
         {
-            List lPart = (List) aLists[i];
+            List lPart = (List) aList;
             lResult.addAll(lPart);
         }
         return lResult;

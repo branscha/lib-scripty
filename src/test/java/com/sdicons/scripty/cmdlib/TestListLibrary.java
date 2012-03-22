@@ -28,6 +28,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestListLibrary
@@ -113,6 +114,15 @@ public class TestListLibrary
     throws ProcessorException
     {
         Object lResult = scripty.process("list? abc");
+        Assert.assertTrue(Boolean.FALSE.equals(lResult));
+    }
+
+    @Test
+    // The 'list?' should not blow up on null values.
+    public void isList5()
+    throws ProcessorException
+    {
+        Object lResult = scripty.process("list? $null");
         Assert.assertTrue(Boolean.FALSE.equals(lResult));
     }
 
@@ -241,6 +251,7 @@ public class TestListLibrary
     }
 
     @Test
+    // We test the side effect of cons, viz. it changes the original list.
     public void cons1()
     throws ProcessorException
     {
@@ -254,6 +265,8 @@ public class TestListLibrary
     }
 
     @Test
+    // We test the side effect of pop, viz. it changes
+    // the original list.
     public void pop1()
     throws ProcessorException
     {
@@ -269,6 +282,8 @@ public class TestListLibrary
     }
 
     @Test
+    // We test the main functionality of pop, viz. it returns
+    // the last element.
     public void pop2()
     throws ProcessorException
     {
@@ -294,6 +309,94 @@ public class TestListLibrary
         Assert.assertTrue("2".equals(((List) lResult).get(4)));
     }
 
-    // append
+    @Test
+    // We test the main functionality of the append.
+    public void append1()
+    throws ProcessorException
+    {
+        Object lResult = scripty.process(
+                "(let " +
+                    " (lst1=(list 1 2 3) lst2=(list 4 5 6) lst3=(list 7 8 9)) " +
+                    " (append $lst1 $lst2 $lst3)" +
+                ")");
+        Assert.assertTrue(lResult instanceof List);
+        List lList = (List) lResult;
+        Assert.assertTrue(lList.size() == 9);
+        for (int i = 1; i < 10; i++) Assert.assertTrue(lList.contains("" + i));
+    }
 
+    @Test
+    // The original lists should be unmodified.
+    // Here we check out lst1 and see if it remained unchanged.
+    public void append2()
+    throws ProcessorException
+    {
+        Object lResult = scripty.process(
+                "(let " +
+                        " (lst1=(list 1 2 3) lst2=(list 4 5 6) lst3=(list 7 8 9)) " +
+                        " (progn (append $lst1 $lst2 $lst3) $lst1)" +
+                        ")");
+        Assert.assertTrue(lResult instanceof List);
+        List lList = (List) lResult;
+        Assert.assertTrue(lList.size() == 3);
+        for (int i = 1; i < 4; i++) Assert.assertTrue(lList.contains("" + i));
+    }
+
+    @Test
+    // Main functionality of 'size' on a normal list.
+    public void size1()
+    throws ProcessorException
+    {
+        Object lResult = scripty.process(
+                "(let " +
+                        " (lst1=(list 1 2 3 4 5 6 7 8 9)) " +
+                        " (size $lst1)" +
+                        ")");
+        Assert.assertTrue("9".equals(lResult));
+    }
+
+    @Test
+    // The empty list should have size 0.
+    public void size2()
+    throws ProcessorException
+    {
+        Object lResult = scripty.process(
+                "(let " +
+                        " (lst1='()) " +
+                        " (size $lst1)" +
+                        ")");
+        Assert.assertTrue("0".equals(lResult));
+    }
+
+    @Test
+    // Test the main dup functionality.
+    public void dup()
+    throws ProcessorException
+    {
+        // Prepare a list with 1000 elements.
+        final List lOrig = new ArrayList();
+        for(int i = 0; i < 1000; i++) lOrig.add(i);
+
+        // Duplicate it.
+        scripty.getContext().defBinding("lst", lOrig);
+        Object lResult = scripty.process("dup $lst");
+
+        // Test that it is equals but not the same.
+        Assert.assertTrue(lResult.equals(lOrig));
+        Assert.assertTrue(lResult != lOrig);
+    }
+
+    @Test
+    // 'null?' should not blow up on null values.
+    //
+    public void isNull()
+    throws ProcessorException
+    {
+        // Duplicate it.
+        scripty.getContext().defBinding("one", null);
+        scripty.getContext().defBinding("two", "abc");
+        
+        Assert.assertTrue( (Boolean) scripty.process("null? $one"));
+        Assert.assertFalse( (Boolean) scripty.process("null? $two"));
+    }
 }
