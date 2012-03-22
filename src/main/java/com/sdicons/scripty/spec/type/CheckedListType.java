@@ -23,6 +23,7 @@ package com.sdicons.scripty.spec.type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.sdicons.scripty.parser.IContext;
 
@@ -69,10 +70,14 @@ implements ITypeSpec
         else if (max >= 0 && lListArg.size() > max)
             throw new TypeSpecException(String.format("Too many elements in the list. There should be at most %d elements.", max));
 
-        final List lResult = new ArrayList(lListArg.size());
-        for(Object lObj: lListArg)
-            lResult.add(spec.guard(lObj, aCtx));
+        final ListIterator lIter = lListArg.listIterator();
+        while(lIter.hasNext())
+        {
+            Object lObj = lIter.next();
+            lIter.remove();
+            lIter.add(spec.guard(lObj, aCtx));
+        }
 
-        return lResult;
+        return lListArg;
     }
 }

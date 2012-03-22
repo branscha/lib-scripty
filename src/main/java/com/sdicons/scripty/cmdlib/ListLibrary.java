@@ -36,7 +36,7 @@ import java.util.*;
  *    <li><b>list?</b> A test to see if the argument is a list or not. The other command types are only applicable if this test turns out positive.</li>
  *    <li><b>empty?</b> A test to see if the list is empty.</li>
  *    <li><b>member?</b> A test to see if an element is part of the list or not. <code>(member? &lt;list> &lt;el>)</code></li>
- *    <li><b>car</b> The first element of the list.</li>
+ *    <li><b>car</b> The first element of the list. Non destructible on the original.</li>
  *    <li><b>cdr</b> A copy of the list without the first element. Non destructible on the original.</li>
  *    <li><b>pop</b> Get the element at the end of the list. Modifies the list and returns the element.</li>
  *    <li><b>shift</b> Get the first element of the list and modifies the list. It returns the element.</li>
@@ -57,7 +57,8 @@ import java.util.*;
                 @ScriptyStdArgList(name="1list/+elements", fixed={@ScriptyArg(name="arg", type="ListOf(Any) minLength=1")}),
                 @ScriptyStdArgList(name="1list/*elements", fixed={@ScriptyArg(name="arg", type="ListOf(Any)")}),
                 @ScriptyStdArgList(name="list+object", fixed={@ScriptyArg(name="lst", type="ListOf(Any)"), @ScriptyArg(name="obj", type="Any")}),
-                @ScriptyStdArgList(name="object+list", fixed={@ScriptyArg(name="obj", type="Any"), @ScriptyArg(name="lst", type="ListOf(Any)")})
+                @ScriptyStdArgList(name="object+list", fixed={@ScriptyArg(name="obj", type="Any"), @ScriptyArg(name="lst", type="ListOf(Any)")}),
+                @ScriptyStdArgList(name="object+object", fixed={@ScriptyArg(name="obj", type="Any"), @ScriptyArg(name="lst", type="Any")})
         },
         var={
                 @ScriptyVarArgList(name="list+objects", fixed={@ScriptyArg(name="lst", type="ListOf(Any)")}, vararg=@ScriptyArg(name="objs", type="Any"), minLength=1),
@@ -70,7 +71,6 @@ public class ListLibrary
     // Prevent instantiation.
     private ListLibrary()
     {
-
     }
 
     @ScriptyCommand(name = "list")
@@ -135,8 +135,8 @@ public class ListLibrary
     }
 
     @ScriptyMacro(name = "cons")
-    @ScriptyRefArgList(ref = "object+list")
-    public static List cons(@ScriptyParam("obj") Object aEl, @ScriptyParam("lst") List aList)
+    @ScriptyRefArgList(ref = "object+object")
+    public static List cons(@ScriptyParam("obj") Object aEl, @ScriptyParam("lst") Object aList)
     {
         return Arrays.asList("unshift", aList, aEl);
     }
