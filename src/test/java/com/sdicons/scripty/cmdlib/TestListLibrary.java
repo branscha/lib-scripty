@@ -44,6 +44,7 @@ public class TestListLibrary
     }
 
     @Test
+    // 'list' without arguments should create an empty list.
     public void createList1()
     throws ProcessorException
     {
@@ -53,6 +54,7 @@ public class TestListLibrary
     }
 
     @Test
+    // Standard case to create a list.
     public void createList2()
     throws ProcessorException
     {
@@ -62,6 +64,7 @@ public class TestListLibrary
     }
 
     @Test
+    // An empty list should test as empty.
     public void isEmpty1()
     throws ProcessorException
     {
@@ -70,6 +73,7 @@ public class TestListLibrary
     }
 
     @Test
+    // A non-empty list should not be empty.
     public void isEmpty2()
     throws ProcessorException
     {
@@ -78,6 +82,7 @@ public class TestListLibrary
     }
 
     @Test(expected = ProcessorException.class)
+    // 'empty?' without arguments should throw an exception.
     public void isEmpty3()
     throws ProcessorException
     {
@@ -86,6 +91,7 @@ public class TestListLibrary
     }
 
     @Test(expected = ProcessorException.class)
+    // 'list?' without argument should throw an exception.
     public void isList1()
     throws ProcessorException
     {
@@ -94,6 +100,7 @@ public class TestListLibrary
     }
 
     @Test
+    // Normal case, test that a list is a list.
     public void isList2()
     throws ProcessorException
     {
@@ -102,6 +109,7 @@ public class TestListLibrary
     }
 
     @Test
+    // An empty list is a list as well.
     public void isList3()
     throws ProcessorException
     {
@@ -110,6 +118,7 @@ public class TestListLibrary
     }
 
     @Test
+    // A string is not a list.
     public void isList4()
     throws ProcessorException
     {
@@ -295,6 +304,7 @@ public class TestListLibrary
     }
 
     @Test
+    // We test for the side efffect of 'push' by pushing on the list, then returning the original list.
     public void push1()
     throws ProcessorException
     {
