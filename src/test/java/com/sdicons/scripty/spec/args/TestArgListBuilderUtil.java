@@ -33,6 +33,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.math.BigDecimal;
+
 public class TestArgListBuilderUtil
 {
     private ScriptyStreamProcessor scripty;
@@ -60,7 +62,6 @@ public class TestArgListBuilderUtil
         {
             return aArg;
         }
-        
     }
     
     @Test
@@ -92,5 +93,34 @@ public class TestArgListBuilderUtil
         scripty.addLibraryClasses(AnyTypeLibrary.class);
         Object lResult = scripty.process("go2 $null");
         Assert.assertTrue(null == lResult);
+    }
+    
+    public static class NumericTypes
+    {
+        @ScriptyCommand(name="do-bigdecimal")
+        @ScriptyStdArgList(fixed={@ScriptyArg(name="arg", type="BigDecimal")})
+        public Object doBigDecimal(@ScriptyParam("arg")BigDecimal aNr)
+        {
+            return aNr;
+        }
+    }
+    
+    @Test
+    public void testBigDecimal1()
+    throws ExtensionException, ProcessorException
+    {
+        scripty.addLibraryClasses(NumericTypes.class);
+        Object lResult=scripty.process("do-bigdecimal 123.456") ;
+        Assert.assertTrue(lResult instanceof BigDecimal);
+        Assert.assertEquals(new BigDecimal("123.456"), lResult);
+    }
+
+    @Test(expected = ProcessorException.class)
+    public void testBigDecimal2()
+    throws ExtensionException, ProcessorException
+    {
+        scripty.addLibraryClasses(NumericTypes.class);
+        Object lResult=scripty.process("do-bigdecimal abc") ;
+        Assert.fail();
     }
 }
