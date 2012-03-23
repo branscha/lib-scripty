@@ -21,81 +21,54 @@
 
 package com.sdicons.scripty;
 
-import com.sdicons.scripty.annot.ScriptyCommand;
-import com.sdicons.scripty.annot.ScriptyLibrary;
-import com.sdicons.scripty.annot.ScriptyLibraryType;
 import com.sdicons.scripty.cmdlib.ListLibrary;
 import com.sdicons.scripty.cmdlib.LoadLibrary;
 import com.sdicons.scripty.cmdlib.MathLibrary;
+import com.sdicons.scripty.spec.type.BigDecimalType;
+import com.sdicons.scripty.spec.type.ITypeSpec;
+import com.sdicons.scripty.spec.type.TypeSpecException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestHanoi
+import java.math.BigDecimal;
+
+public class TestFib
 {
-    private PrintPlusCmd printer;
     private ScriptyStreamProcessor scripty;
-
-    @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
-    public static class PrintPlusCmd
-    {
-        private int counter = 0;
-
-        @ScriptyCommand
-        public void print()
-        {
-            counter ++;
-        }
-
-        @ScriptyCommand
-        public void println()
-        {
-            counter++;
-        }
-
-        public int getCounter()
-        {
-            return counter;
-        }
-
-        public void reset()
-        {
-            counter = 0;
-        }
-    }
 
     @Before
     public void setup()
     throws ExtensionException, ProcessorException
     {
         scripty = new ScriptyStreamProcessor();
-        printer = new PrintPlusCmd();
-
         scripty.addLibraryClasses(LoadLibrary.class, MathLibrary.class, ListLibrary.class);
-        scripty.addLibraryInstances(printer);
-
-        scripty.process("(load cp:/hanoi.lsp)");
+        scripty.process("(load cp:/fib.lsp)");
     }
 
-    public int hanoi(int n)
-    throws  ProcessorException
+    private ITypeSpec bdspec = new BigDecimalType();
+
+    public BigDecimal fib(int n)
+    throws ProcessorException, TypeSpecException
     {
-        printer.reset();
-        scripty.process(String.format("(hanoi %d)", n));
-        return printer.getCounter();
+        Object lResult = scripty.process(String.format("(fib %d)", n));
+        return (BigDecimal) bdspec.guard(lResult, scripty.getContext());
+    }
+
+    public BigDecimal fib2(int n)
+    throws ProcessorException, TypeSpecException
+    {
+        Object lResult = scripty.process(String.format("(fib2 %d)", n));
+        return (BigDecimal) bdspec.guard(lResult, scripty.getContext());
     }
 
     @Test
-    public void hanoi()
-    throws ProcessorException
+    public void fib()
+    throws ProcessorException, TypeSpecException
     {
-        Assert.assertEquals(1, hanoi(1));
-        Assert.assertEquals(3, hanoi(2));
-        Assert.assertEquals(7, hanoi(3));
-        Assert.assertEquals(15, hanoi(4));
-        Assert.assertEquals(31, hanoi(5));
-        Assert.assertEquals(63, hanoi(6));
-        Assert.assertEquals(127, hanoi(7));
-        Assert.assertEquals(255, hanoi(8));
+        for(int i = 2; i < 20; i++)
+        {
+            Assert.assertEquals(fib(i).floatValue(), fib2(i).floatValue(), 0.0001);
+        }
     }
 }

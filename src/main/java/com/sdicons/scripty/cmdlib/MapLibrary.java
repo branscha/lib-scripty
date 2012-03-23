@@ -48,7 +48,6 @@ import java.util.Set;
 @ScriptyNamedArgLists(
         std={
                 @ScriptyStdArgList(name = "single map", fixed={@ScriptyArg(name="arg", type="Instance java.util.Map nullAllowed=false" )})
-                
         }
 )
 public class MapLibrary
@@ -85,7 +84,7 @@ public class MapLibrary
     }
 
     @ScriptyCommand(name="map?")
-    @ScriptyStdArgList(fixed={@ScriptyArg(name="arg", type="Any")})
+    @ScriptyStdArgList(fixed={@ScriptyArg(name="arg", type="Any nullAllowed=true")})
     public static boolean isMap(@ScriptyParam("arg") Object aArg)
     {
         return aArg instanceof Map;

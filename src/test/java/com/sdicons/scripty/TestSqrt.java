@@ -21,9 +21,6 @@
 
 package com.sdicons.scripty;
 
-import com.sdicons.scripty.annot.ScriptyCommand;
-import com.sdicons.scripty.annot.ScriptyLibrary;
-import com.sdicons.scripty.annot.ScriptyLibraryType;
 import com.sdicons.scripty.cmdlib.ListLibrary;
 import com.sdicons.scripty.cmdlib.LoadLibrary;
 import com.sdicons.scripty.cmdlib.MathLibrary;
@@ -31,71 +28,35 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestHanoi
+import java.math.BigDecimal;
+
+public class TestSqrt
 {
-    private PrintPlusCmd printer;
     private ScriptyStreamProcessor scripty;
-
-    @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
-    public static class PrintPlusCmd
-    {
-        private int counter = 0;
-
-        @ScriptyCommand
-        public void print()
-        {
-            counter ++;
-        }
-
-        @ScriptyCommand
-        public void println()
-        {
-            counter++;
-        }
-
-        public int getCounter()
-        {
-            return counter;
-        }
-
-        public void reset()
-        {
-            counter = 0;
-        }
-    }
 
     @Before
     public void setup()
     throws ExtensionException, ProcessorException
     {
         scripty = new ScriptyStreamProcessor();
-        printer = new PrintPlusCmd();
-
         scripty.addLibraryClasses(LoadLibrary.class, MathLibrary.class, ListLibrary.class);
-        scripty.addLibraryInstances(printer);
-
-        scripty.process("(load cp:/hanoi.lsp)");
+        scripty.process("(load cp:/sqrt.lsp)");
     }
 
-    public int hanoi(int n)
+    public BigDecimal sqrt(double n)
     throws  ProcessorException
     {
-        printer.reset();
-        scripty.process(String.format("(hanoi %d)", n));
-        return printer.getCounter();
+        Object lResult = scripty.process(String.format("(sqrt %s)", n));
+        return (BigDecimal) lResult;
     }
 
     @Test
-    public void hanoi()
+    public void sqrt()
     throws ProcessorException
     {
-        Assert.assertEquals(1, hanoi(1));
-        Assert.assertEquals(3, hanoi(2));
-        Assert.assertEquals(7, hanoi(3));
-        Assert.assertEquals(15, hanoi(4));
-        Assert.assertEquals(31, hanoi(5));
-        Assert.assertEquals(63, hanoi(6));
-        Assert.assertEquals(127, hanoi(7));
-        Assert.assertEquals(255, hanoi(8));
+        Assert.assertEquals(10.0, sqrt(100).floatValue(), 0.0001);
+        Assert.assertEquals(351.36306, sqrt(123456).floatValue(), 0.0001);
+        Assert.assertEquals(2, sqrt(4).floatValue(), 0.0001);
+        Assert.assertEquals(1.77258, sqrt(Math.PI).floatValue(), 0.0001);
     }
 }

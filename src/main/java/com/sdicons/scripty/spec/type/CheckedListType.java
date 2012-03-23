@@ -70,14 +70,30 @@ implements ITypeSpec
         else if (max >= 0 && lListArg.size() > max)
             throw new TypeSpecException(String.format("Too many elements in the list. There should be at most %d elements.", max));
 
-        final ListIterator lIter = lListArg.listIterator();
-        while(lIter.hasNext())
+        try
         {
-            Object lObj = lIter.next();
-            lIter.remove();
-            lIter.add(spec.guard(lObj, aCtx));
+            // The list is modified in-place
+            //
+            final ListIterator lIter = lListArg.listIterator();
+            while(lIter.hasNext())
+            {
+                Object lObj = lIter.next();
+                lIter.remove();
+                lIter.add(spec.guard(lObj, aCtx));
+            }
+            return lListArg;
         }
-
-        return lListArg;
+        catch (UnsupportedOperationException e)
+        {
+            // We could not modify the list in-place ...
+            // We recover by creating a new one in this case.
+            //
+            final List lNewList = new ArrayList(lListArg.size());
+            for(Object lArg: lListArg)
+            {
+                lNewList.add(spec.guard(lArg, aCtx));
+            }
+            return lNewList;
+        }
     }
 }

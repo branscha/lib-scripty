@@ -69,37 +69,84 @@ public class ArgListBuilderUtil
         private static FixedArg FIXED_CLASSNAME = new FixedArg(new StringType());
         private static VarArg VAR_STRING = new VarArg(new StringType());
 
+        private static StdArgList NOARGS = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
+
         @ScriptyCommand(name="BigDecimal")
-        public static TypeTuple bigDecimalType()
+        public static TypeTuple bigDecimalType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return BIGDECIMAL_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return BIGDECIMAL_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
 
         @ScriptyCommand(name="Integer")
-        public static TypeTuple integerType()
+        public static TypeTuple integerType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-           return INTEGER_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return INTEGER_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
         
         @ScriptyCommand(name="BigInteger")
-        public static TypeTuple bigIntegerType()
+        public static TypeTuple bigIntegerType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return BIGINTEGER_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return BIGINTEGER_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
         
         @ScriptyCommand(name="Boolean")
-        public static TypeTuple booleanType()
+        public static TypeTuple booleanType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return BOOLEAN_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return BOOLEAN_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
         
         @ScriptyCommand(name="Byte")
-        public static TypeTuple byteType()
+        public static TypeTuple byteType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return BYTE_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return BYTE_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
         
-        // type="ListOf (Integer) min=0 max=20"
+        // type="ListOf (Integer) minLength=0 maxLength=20"
         private static StdArgList LISTOF_ARGLIST = new StdArgList(new FixedArg[]{FIXED_TYPE}, new OptionalArg[]{}, new NamedArg[]{NAMED_MINLEN, NAMED_MAXLEN});
         
         @ScriptyCommand(name="ListOf")
@@ -132,15 +179,33 @@ public class ArgListBuilderUtil
         }
 
         @ScriptyCommand(name="Double")
-        public static TypeTuple doubleType()
+        public static TypeTuple doubleType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return DOUBLE_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return DOUBLE_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
 
         @ScriptyCommand(name="Float")
-        public static TypeTuple floatType()
+        public static TypeTuple floatType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return FLOAT_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return FLOAT_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
 
         // type="InstanceOrBinding (Integer)"
@@ -220,7 +285,6 @@ public class ArgListBuilderUtil
             {
                 throw new CommandException(e.getMessage());
             }
-
         }
 
         // type="IngegerRange min=0 max=10"
@@ -244,21 +308,48 @@ public class ArgListBuilderUtil
         }
 
         @ScriptyCommand(name="Long")
-        public static TypeTuple longType()
+        public static TypeTuple longType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return LONG_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return LONG_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
 
         @ScriptyCommand(name="Short")
-        public static TypeTuple shortType()
+        public static TypeTuple shortType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return SHORT_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return SHORT_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
 
         @ScriptyCommand(name="String")
-        public static TypeTuple stringType()
+        public static TypeTuple stringType(Object[] aArgs, IContext aCtx)
+        throws CommandException
         {
-            return STRING_TUPLE;
+            try
+            {
+                NOARGS.guard(aArgs, aCtx);
+                return STRING_TUPLE;
+            }
+            catch (ArgSpecException e)
+            {
+                throw new CommandException(e.getMessage());
+            }
         }
 
         // type="OneOf (Integer) (Long) (BigDecimal)"
@@ -335,7 +426,8 @@ public class ArgListBuilderUtil
             }
         }
 
-
+        // A series of string constants.
+        // type="Enum Uno Duo Tres"
         private static VarArgList ENUM_ARGLIST = new VarArgList(new FixedArg[]{}, VAR_STRING, 1, -1, new NamedArg[]{});
         
         @ScriptyCommand(name="Enum")
@@ -448,7 +540,7 @@ public class ArgListBuilderUtil
             } 
             catch (ReplEngineException e)
             {
-                throw new ArgSpecException(String.format("Badly formed type expression '%s' encountered.", lArgType));
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
             }
         }
         
@@ -479,7 +571,7 @@ public class ArgListBuilderUtil
             }
             catch (ReplEngineException e)
             {
-                throw new ArgSpecException(String.format("Badly formed type expression '%s' encountered.", lArgType));
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -510,7 +602,7 @@ public class ArgListBuilderUtil
             }
             catch (ReplEngineException e)
             {
-                throw new ArgSpecException(String.format("Badly formed type expression '%s' encountered.", lArgType));
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -559,7 +651,7 @@ public class ArgListBuilderUtil
             }
             catch (ReplEngineException e)
             {
-                throw new ArgSpecException(String.format("Badly formed type expression '%s' encountered.", lArgType));
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -588,7 +680,7 @@ public class ArgListBuilderUtil
             }
             catch (ReplEngineException e)
             {
-                throw new ArgSpecException(String.format("Badly formed type expression '%s' encountered.", lArgType));
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
             }
         }
         
@@ -610,7 +702,7 @@ public class ArgListBuilderUtil
             }
             catch (ReplEngineException e)
             {
-                throw new ArgSpecException(String.format("Badly formed type expression '%s' encountered.", lArgType));
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
             }
 
         }

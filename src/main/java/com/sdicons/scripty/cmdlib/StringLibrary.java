@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 @ScriptyLibrary(name="String", type=ScriptyLibraryType.STATIC)
 @ScriptyNamedArgLists(
         std={
-                @ScriptyStdArgList(name = "1object", fixed={@ScriptyArg(name="arg", type="Any")}),
+                @ScriptyStdArgList(name = "1object", fixed={@ScriptyArg(name="arg", type="Any nullAllowed=true")}),
                 @ScriptyStdArgList(name = "1string", fixed={@ScriptyArg(name="arg", type="String")}),
                 @ScriptyStdArgList(name = "2strings", fixed={@ScriptyArg(name="arg1", type="String"), @ScriptyArg(name="arg2", type="String")})
         },
@@ -43,7 +43,7 @@ public class StringLibrary
 {
     @ScriptyCommand(name="str?")
     @ScriptyRefArgList(ref = "1object")
-    public static boolean isString(@ScriptyParam("arg") String aArg)
+    public static boolean isString(@ScriptyParam("arg") Object aArg)
     {
         return aArg instanceof String;
     }
