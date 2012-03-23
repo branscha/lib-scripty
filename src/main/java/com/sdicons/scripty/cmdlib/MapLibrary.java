@@ -57,7 +57,7 @@ public class MapLibrary
     throws CommandException
     {
         {
-            Map lMap = new HashMap();
+            Map<Object, Object> lMap = new HashMap<Object, Object>();
             for(int i = 1; i < aArgs.length; i++)
             {
                 if(aArgs[i] instanceof String)
@@ -71,7 +71,7 @@ public class MapLibrary
                 }
                 else if(aArgs[i] instanceof Map)
                 {
-                    lMap.putAll((Map) aArgs[i]);
+                    lMap.putAll((Map<?,?>) aArgs[i]);
                 }
                 else
                 {
@@ -92,7 +92,7 @@ public class MapLibrary
 
     @ScriptyCommand(name="map-set")
     @ScriptyStdArgList(fixed={@ScriptyArg(name="map", type="Instance java.util.Map nullAllowed=false"), @ScriptyArg(name="key", type="Any nullAllowed=false"), @ScriptyArg(name="value", type="Any")})
-    public static Map mapSet(@ScriptyParam("map") Map aMap, @ScriptyParam("key") Object aKey, @ScriptyParam("value") Object aValue)
+    public static Map mapSet(@ScriptyParam("map") Map<Object, Object> aMap, @ScriptyParam("key") Object aKey, @ScriptyParam("value") Object aValue)
     {
         aMap.put(aKey, aValue);
         return aMap;
