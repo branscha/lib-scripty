@@ -34,7 +34,7 @@ public class TestEvalTrace
 {
     @Test
     public void testTrace()
-    throws CommandException, ExtensionException
+    throws CommandException, ExtensionException, InterruptedException
     {
         Parser parser = new Parser();
         Eval2 eval = new Eval2();
@@ -55,6 +55,7 @@ public class TestEvalTrace
         }
         System.out.println(trace.getStack());
 
+        Thread.sleep(500);
         Object lResult = trace.getResult();
         Assert.assertEquals(new BigDecimal("6"), lResult);
         //trace.terminate();

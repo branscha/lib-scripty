@@ -85,7 +85,7 @@ public class BeanLibrary
     {
         // Resolve the path.
         final Resolution lRes = resolve( aPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("ERROR: Cannot show filtered.");
+        if(! filter(lRes)) throw new CommandException("Cannot show filtered.");
         // Render the target object.
         final Object lVal = lRes.getVal();
         render(lVal, aWriter);
@@ -103,7 +103,7 @@ public class BeanLibrary
     {
         // Resolve the path.
         final Resolution lRes = resolve(aPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("ERROR: Cannot cat filtered.");
+        if(! filter(lRes)) throw new CommandException("Cannot cat filtered.");
         final Object lVal = lRes.getVal();
         aWriter.println(lVal == null ? "null" : lVal.toString());
         return lVal;
@@ -121,7 +121,7 @@ public class BeanLibrary
     {
         // Resolve the path.
         final Resolution lRes = resolve(aPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("ERROR: Cannot rslv filtered.");
+        if(! filter(lRes)) throw new CommandException("Cannot rslv filtered.");
         else return lRes.getVal();
     }
 
@@ -139,7 +139,7 @@ public class BeanLibrary
         {
             final String lPath = guardStringOther(aArgs);
             final Resolution lRes = resolve(lPath, aCtx);
-            if(! filter(lRes)) throw new CommandException("ERROR: Cannot call filtered.");
+            if(! filter(lRes)) throw new CommandException("Cannot call filtered.");
             final Object lTarget = lRes.getVal();
 
             Object[] lArgs = new Object[aArgs.length - 3];
@@ -165,7 +165,7 @@ public class BeanLibrary
         }
         catch (Exception e)
         {
-            throw new CommandException("ERROR: invocation failed.\n" + e.getMessage(), e);
+            throw new CommandException("Invocation failed.\n" + e.getMessage(), e);
         }
     }
 
@@ -178,11 +178,11 @@ public class BeanLibrary
     {
         final String lPath = guardStringOther(aArgs);
         final Resolution lRes = resolve(lPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("ERROR: Cannot update filtered.");
+        if(! filter(lRes)) throw new CommandException("Cannot update filtered.");
         for(int i = 2; i < aArgs.length; i++)
         {
             if(!(aArgs[i] instanceof Pair))
-                throw new CommandException("ERROR: pair expected.");
+                throw new CommandException("Pair expected.");
             Pair lPair = (Pair) aArgs[i];
             update(lRes.getVal(), lPair.getLeft(), lPair.getRight());
         }
@@ -280,7 +280,7 @@ public class BeanLibrary
             if(lCtx.isBound(lPiece))
                 return resolveCanonical(aPieces, aCurrPiece + 1, lCtx.getBinding(lPiece));
             else
-                throw new CommandException(String.format("ERROR: Cannot find '%s' in context.", lPiece));
+                throw new CommandException(String.format("Cannot find '%s' in context.", lPiece));
         }
         else if(aBase instanceof Map && lIdx < 0)
         {
@@ -407,7 +407,7 @@ public class BeanLibrary
         int lIdx = -1;
 
         if(aProp instanceof String) lPropName = (String) aProp;
-        else throw new CommandException("ERROR: Don't know what to do with non-string keys ... (for now).");
+        else throw new CommandException("Don't know what to do with non-string keys ... (for now).");
 
         try
         {
@@ -424,9 +424,9 @@ public class BeanLibrary
         {
             final List lTargetList = (List) aTarget;
             if(lIdx < 0)
-                throw new CommandException("ERROR: Modifying list should use an index.");
+                throw new CommandException("Modifying list should use an index.");
             if(lIdx >= lTargetList.size())
-                throw new CommandException("ERROR: Array index out of range.");
+                throw new CommandException("Array index out of range.");
 
             // TODO: catch errors on this one.
             lTargetList.set(lIdx, aVal);
@@ -438,9 +438,9 @@ public class BeanLibrary
             {
                 // Array access.
                 if(lIdx < 0)
-                    throw new CommandException("ERROR: Modifying array should use an index.");
+                    throw new CommandException("Modifying array should use an index.");
                 if(lIdx >= Array.getLength(aTarget))
-                    throw new CommandException("ERROR: Array index out of range.");
+                    throw new CommandException("Array index out of range.");
 
                 // TODO: catch errors on this one.
                 Array.set(aTarget, lIdx, aVal);
@@ -458,7 +458,7 @@ public class BeanLibrary
                         {
                             Method lMeth = lProp.getWriteMethod();
                             if(lMeth == null)
-                                throw new CommandException("ERROR: property cannot be written.");
+                                throw new CommandException("Property cannot be written.");
 
                             if(lProp.getPropertyType() != aVal.getClass() && aVal instanceof String)
                             {
@@ -471,7 +471,7 @@ public class BeanLibrary
                 }
                 catch (Exception e)
                 {
-                    throw new CommandException("ERROR: " + e.getMessage(), e);
+                    throw new CommandException(e.getMessage(), e);
                 }
             }
         }

@@ -459,7 +459,7 @@ public class ArgListBuilderUtil
         } 
         catch (ExtensionException e)
         {
-            throw new Error("Internal Scripty Error: could not initialize the internal type system.");
+            throw new Error("Internal Scripty error, could not initialize the internal type system.");
         }
     }
     

@@ -62,7 +62,7 @@ public class PairLibrary
     throws CommandException
     {
         if(aArgs.length != 2 || !(aArgs[1] instanceof Pair))
-            throw new CommandException(String.format("ERROR: Command '%s' expects a single argument of type pair.", aArgs[0]));
+            throw new CommandException(String.format("Command '%s' expects a single argument of type pair.", aArgs[0]));
         return (Pair) aArgs[1];
     }
 
@@ -70,7 +70,7 @@ public class PairLibrary
     throws CommandException
     {
         if(aArgs.length != 2)
-            throw new CommandException(String.format("ERROR: Command '%s' expects a single argument.", aArgs[0]));
+            throw new CommandException(String.format("Command '%s' expects a single argument.", aArgs[0]));
         return aArgs[1];
     }
 }

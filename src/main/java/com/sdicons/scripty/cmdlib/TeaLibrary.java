@@ -69,7 +69,7 @@ public class TeaLibrary
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new CommandException("ERROR: Cannot calculate MD5 hash.");
+            throw new CommandException("Cannot calculate MD5 hash.");
         }
     }
     

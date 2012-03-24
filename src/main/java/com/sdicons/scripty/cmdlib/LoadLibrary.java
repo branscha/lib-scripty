@@ -97,7 +97,7 @@ public class LoadLibrary
                 }
                 catch (ReplEngineException e)
                 {
-                    final String lMsg = String.format("ERROR: While loading '%s'.\n%s", lLoader.toString(), e.getMessage());
+                    final String lMsg = String.format("While loading '%s'.\n%s", lLoader.toString(), e.getMessage());
                     throw new CommandException(lMsg);
                 }
                 finally
@@ -156,7 +156,7 @@ public class LoadLibrary
             }
             catch (FileNotFoundException e)
             {
-                throw new CommandException(String.format("ERROR: Exception while opening the file: '%s'.\n%s",file.getAbsolutePath(), e.getMessage()), e);
+                throw new CommandException(String.format("Exception while opening the file: '%s'.\n%s",file.getAbsolutePath(), e.getMessage()), e);
             }
         }
 

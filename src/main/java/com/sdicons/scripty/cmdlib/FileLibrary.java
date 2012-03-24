@@ -71,7 +71,7 @@ public class FileLibrary
         if (aFileRepr instanceof File) lFile = (File) aFileRepr;
         else lFile = resolveFile((String) aFileRepr);
         if (!lFile.isDirectory())
-            throw new CommandException(String.format("ERROR: Cannot go to '%s', it is not a directory.", lFile));
+            throw new CommandException(String.format("Cannot go to '%s', it is not a directory.", lFile));
         else currentDirectory = lFile;
         return lFile;
     }
@@ -91,7 +91,7 @@ public class FileLibrary
             return lCurDir;
         } catch (IOException e)
         {
-            throw new CommandException(String.format("ERROR: Cannot calculate the canonical name for '%s'.", lCurDir), e);
+            throw new CommandException(String.format("Cannot calculate the canonical name for '%s'.", lCurDir), e);
         }
 
     }
@@ -135,7 +135,7 @@ public class FileLibrary
             else lFile = resolveFile((String) aFileRepr);
 
             if (!lFile.isDirectory())
-                throw new CommandException(String.format("ERROR: Cannot show '%s', it is not a directory.", lFile));
+                throw new CommandException(String.format("Cannot show '%s', it is not a directory.", lFile));
 
             // Calculate the grep pattern.
             Pattern lPattern = Pattern.compile(aGrep);
@@ -198,7 +198,7 @@ public class FileLibrary
             return lResultList.toArray();
         } catch (IOException e)
         {
-            throw new CommandException(String.format("ERROR: Internal error.\n%s", e.getMessage()), e);
+            throw new CommandException(String.format("Internal error.\n%s", e.getMessage()), e);
         }
     }
 
@@ -248,7 +248,7 @@ public class FileLibrary
         boolean lResult = lFrom.renameTo(lTo);
 
         if (!lResult)
-            throw new CommandException("ERROR: Rename failure.");
+            throw new CommandException("Rename failure.");
         return lTo;
     }
 

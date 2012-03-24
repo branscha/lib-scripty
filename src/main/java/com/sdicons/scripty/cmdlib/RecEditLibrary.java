@@ -43,7 +43,7 @@ public class RecEditLibrary
     public static List recEdit(@ScriptyParam("fields") List<String> aPropNames, @ScriptyParam("values") List<Object> aPropVals)
     throws CommandException
     {
-        if(aPropNames.size() != aPropVals.size()) throw new CommandException("ERROR: Nr. of property names and values is different.");
+        if(aPropNames.size() != aPropVals.size()) throw new CommandException("Nr. of property names and values is different.");
 
         String[] lPropNamesArr = new String[aPropNames.size()];
         Object[] lPropValArr = new Object[aPropVals.size()];

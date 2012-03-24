@@ -731,12 +731,12 @@ implements Eval2.IFrameHandler
 
                 if("eval".equals(lCmdName))
                 {
-                    if(lLstSize != 2) throw new CommandException("ERROR: The 'eval' form should have a single argument.", aStack);
+                    if(lLstSize != 2) throw new CommandException("The 'eval' form should have a single argument.", aStack);
                     aStack.push(lData[1], lCtx);
                 }
                 else if("eq".equals(lCmdName))
                 {
-                    if(lLstSize != 3) throw new CommandException("ERROR: The 'eq' form should have two arguments.", aStack);
+                    if(lLstSize != 3) throw new CommandException("The 'eq' form should have two arguments.", aStack);
                     Object lArg1 = lData[1];
                     Object lArg2 = lData[2];
                     Boolean lResult;
@@ -748,17 +748,17 @@ implements Eval2.IFrameHandler
                 }
                 else if("bound?".equals(lCmdName))
                 {
-                    if(lLstSize != 2) throw new CommandException("ERROR: The 'bound?' form should have a single argument.", aStack);
+                    if(lLstSize != 2) throw new CommandException("The 'bound?' form should have a single argument.", aStack);
                     if(lData[1] instanceof String)
                     {
                         String lName = (String) lData[1];
                         aFrame.setResult(lCtx.isBound(lName));
                     }
-                    else throw new CommandException("ERROR: The 'bound?' form should have a single string argument.", aStack);
+                    else throw new CommandException("The 'bound?' form should have a single string argument.", aStack);
                 }
                 else if("progn".equals(lCmdName))
                 {
-                    if(lLstSize < 2) throw new CommandException("ERROR: The 'progn' form should have at least one argument.", aStack);
+                    if(lLstSize < 2) throw new CommandException("The 'progn' form should have at least one argument.", aStack);
                     aFrame.setResult(lData[lData.length - 1]);
                 }
                 else if("funcall".equals(lCmdName))
@@ -768,7 +768,7 @@ implements Eval2.IFrameHandler
                     // This is the real deal (whereas the other constructs should be seen as syntactic sugar).
 
                     // Quick test on the number of arguments.
-                    if(lLstSize < 2) throw new CommandException("ERROR: The 'funcall' form should have the format (funcall name <args>).", aStack);
+                    if(lLstSize < 2) throw new CommandException("The 'funcall' form should have the format (funcall name <args>).", aStack);
                     // Test the function name / lambda.
                     final Object lName = lData[1];
 
@@ -785,15 +785,15 @@ implements Eval2.IFrameHandler
                     {
                         // We have to do a lookup.
                         Object lFunCandidate = lCtx.getBinding((String) lName);
-                        if(!(lFunCandidate instanceof Lambda)) throw new CommandException(String.format("ERROR: Function \"%s\" was not found in the context.", lName), aStack);
+                        if(!(lFunCandidate instanceof Lambda)) throw new CommandException(String.format("Function \"%s\" was not found in the context.", lName), aStack);
                         lFun = (Lambda) lFunCandidate;
                     }
                     else
                     {
                         // Trouble.
                         // We found something in the beginning of the list that does not evaluate to a lambda name or a lambda itself.
-                        if(lName == null) throw new CommandException("ERROR: The first argument in the 'funcall' form should evaluate to a string or a lambda, but we received 'null'.", aStack);
-                        throw new CommandException(String.format("ERROR: The first argument in the 'funcall' form should evaluate to a string or a lambda.\n Received an instance of class '%s'.", lName.getClass().getCanonicalName()), aStack);
+                        if(lName == null) throw new CommandException("The first argument in the 'funcall' form should evaluate to a string or a lambda, but we received 'null'.", aStack);
+                        throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.\n Received an instance of class '%s'.", lName.getClass().getCanonicalName()), aStack);
                     }
 
                     // Context that binds the parameters to the arguments in addition to the lexical context.
@@ -830,7 +830,7 @@ implements Eval2.IFrameHandler
                         try {lPrinter.close(); lBos.close(); } catch (IOException ignored) {}
 
                         // Re-throw the exception with more information.
-                        throw new CommandException(String.format("ERROR: Command '%s' failed.\n%s", lCmdName, lMsg), e, aStack);
+                        throw new CommandException(String.format("Command '%s' failed.\n%s", lCmdName, lMsg), e, aStack);
                     }
                 }
                 else if(lCtx.isBound(lCmdName) && lCtx.getBinding(lCmdName) instanceof Lambda)
@@ -842,7 +842,7 @@ implements Eval2.IFrameHandler
                 }
                 else
                 {
-                    throw new CommandException(String.format("ERROR: Command or form '%s' does not exist.", lCmdName), aStack);
+                    throw new CommandException(String.format("Command or form '%s' does not exist.", lCmdName), aStack);
                 }
             }
             else if(lCmdCandidate instanceof Lambda)
@@ -855,14 +855,14 @@ implements Eval2.IFrameHandler
             else
             {
                 // Error, name of the command should be a string or a lambda.
-                if(lCmdCandidate == null) throw new CommandException(String.format("ERROR: The command name should evaluate to a string or a lambda. Found null."), aStack);
-                else throw new CommandException(String.format("ERROR: The command name should evaluate to a string or a lambda.\nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
+                if(lCmdCandidate == null) throw new CommandException(String.format("The command name should evaluate to a string or a lambda. Found null."), aStack);
+                else throw new CommandException(String.format("The command name should evaluate to a string or a lambda.\nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
             }
         }
         else
         {
             // Error, the list does not contain a command.
-            throw new CommandException(String.format("ERROR: The expression '%s' cannot be executed.", lLstExpr), aStack);
+            throw new CommandException(String.format("The expression '%s' cannot be executed.", lLstExpr), aStack);
         }
     }
 }
@@ -879,7 +879,7 @@ implements Eval2.IFrameHandler
         // If it is a quoted list, we don't evaluate its elements, the result is again, the list.
         // In this way you can use lists as data structures and not as a function call.
         // It is a special form because it influences the way the expression is (not) evaluated, it is non-standard.
-        if(lLstSize != 2) throw new CommandException("ERROR: The 'quote' form should have the format (quote <expr>).", aStack);
+        if(lLstSize != 2) throw new CommandException("The 'quote' form should have the format (quote <expr>).", aStack);
     }
 
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
@@ -902,7 +902,7 @@ implements Eval2.IFrameHandler
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
-        if(lLstSize < 3 || lLstSize > 4) throw new CommandException("ERROR: The 'if' form should have the format (if <bool-expr> <then-expr> [<else-expr>]).", aStack);
+        if(lLstSize < 3 || lLstSize > 4) throw new CommandException("The 'if' form should have the format (if <bool-expr> <then-expr> [<else-expr>]).", aStack);
 
         // Allocate frame space.
         aFrame.allocateData(2);
@@ -951,7 +951,7 @@ implements Eval2.IFrameHandler
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
-        if(lLstSize < 2 || lLstSize > 3) throw new CommandException("ERROR: The 'while' form should have the format (while <bool-expr> [<expr>]).", aStack);
+        if(lLstSize < 2 || lLstSize > 3) throw new CommandException("The 'while' form should have the format (while <bool-expr> [<expr>]).", aStack);
 
         // Allocate frame space. One location for the conditional expression and one for the body evaluation.
         aFrame.allocateData(2);
@@ -1016,7 +1016,7 @@ implements Eval2.IFrameHandler
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
-        if(lLstSize <= 1) throw new CommandException("ERROR: The 'and' form should have the format (and <bool-expr>+).", aStack);
+        if(lLstSize <= 1) throw new CommandException("The 'and' form should have the format (and <bool-expr>+).", aStack);
 
         //Allocate frame space. We allocate enough space to evaluate all arguments.
         aFrame.allocateData(lLstSize - 1);
@@ -1076,7 +1076,7 @@ implements Eval2.IFrameHandler
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
-        if(lLstSize <= 1) throw new CommandException("ERROR: The 'or' form should have the format (and <bool-expr>+).", aStack);
+        if(lLstSize <= 1) throw new CommandException("The 'or' form should have the format (and <bool-expr>+).", aStack);
 
         // Allocate frame space. We allocate enough space to evaluate all arguments.
         aFrame.allocateData(lLstSize - 1);
@@ -1137,7 +1137,7 @@ implements Eval2.IFrameHandler
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
-        if(lLstSize != 2) throw new CommandException("ERROR: The 'not' form should have the format (not <bool-expr>).", aStack);
+        if(lLstSize != 2) throw new CommandException("The 'not' form should have the format (not <bool-expr>).", aStack);
         // We allocate enough space to evaluate our expression.
         aFrame.allocateData(1);
     }
@@ -1181,20 +1181,20 @@ implements Eval2.IFrameHandler
             case 0:
                 Object lPairCand = lLstExpr.get(1);
                 if(!(lPairCand instanceof Pair))
-                    throw new CommandException(String.format("ERROR: The '%s' form should have the format (%s name value).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
+                    throw new CommandException(String.format("The '%s' form should have the format (%s name value).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
                 Pair lPair = (Pair) lPairCand;
                 aStack.push(lPair.getLeft(), lCtx);
                 return;
             case 1:
                 lPairCand = lLstExpr.get(1);
                 if(!(lPairCand instanceof Pair))
-                    throw new CommandException(String.format("ERROR: The '%s' form should have the format (%s name value).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
+                    throw new CommandException(String.format("The '%s' form should have the format (%s name value).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
                  lPair = (Pair) lPairCand;
                 aStack.push(lPair.getRight(), lCtx);
                 return;
             default:
                 // Check the type of the name.
-                if(!(lData[0] instanceof String)) throw new CommandException(String.format("ERROR: The first argument in the '%s' form should evaluate to a string.", lLstExpr.get(0)), aStack);
+                if(!(lData[0] instanceof String)) throw new CommandException(String.format("The first argument in the '%s' form should evaluate to a string.", lLstExpr.get(0)), aStack);
                 final String lNameRepr = (String) lData[0];
 
                 if("set".equals(lLstExpr.get(0))) lCtx.setBinding(lNameRepr, lData[1]);
@@ -1232,7 +1232,7 @@ implements Eval2.IFrameHandler
             default:
                 // Check the type of the name.
                 if(!(lData[0] instanceof String))
-                    throw new CommandException(String.format("ERROR: The first argument in the '%s' form should evaluate to a string.", lLstExpr.get(0)), aStack);
+                    throw new CommandException(String.format("The first argument in the '%s' form should evaluate to a string.", lLstExpr.get(0)), aStack);
                 final String lNameRepr = (String) lData[0];
 
                 if("set".equals(lLstExpr.get(0))) lCtx.setBinding(lNameRepr, lData[1]);
@@ -1273,7 +1273,7 @@ implements Eval2.IFrameHandler
         }
         else
         {
-            throw new CommandException(String.format("ERROR: The '%s' form should have the format (%s name value).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
+            throw new CommandException(String.format("The '%s' form should have the format (%s name value).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
         }
     }
 
@@ -1295,12 +1295,12 @@ implements Eval2.IFrameHandler
         final int lLstSize = lLstExpr.size();
         final IContext lCtx = aFrame.getCtx();
 
-        if(lLstSize != 3) throw new CommandException(String.format("ERROR: The '%s' form should have the format (%s ((name val)...) expr).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
+        if(lLstSize != 3) throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).",lLstExpr.get(0), lLstExpr.get(0)), aStack);
         final Object lBindings = lLstExpr.get(1);
 
         // Check the type of the list of bindings.
         if(!(lBindings instanceof List))
-            throw new CommandException(String.format("ERROR: The '%s' form should have the format (%s ((name val)...) expr).\nThe first parameter should be a list of bindings but encountered an instance of type '%s'.",lLstExpr.get(0), lLstExpr.get(0), lBindings==null?"null":lBindings.getClass().getCanonicalName()), aStack);
+            throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).\nThe first parameter should be a list of bindings but encountered an instance of type '%s'.",lLstExpr.get(0), lLstExpr.get(0), lBindings==null?"null":lBindings.getClass().getCanonicalName()), aStack);
 
         // Allocate space for all new bindings and also the expression.
         aFrame.allocateData(((List)lBindings).size() + 1);
@@ -1346,7 +1346,7 @@ implements Eval2.IFrameHandler
                     //
                     final List lBindingList = (List) lBinding;
                     if(lBindingList.size() != 2)
-                        throw new CommandException(String.format("ERROR: The 'let' form should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list of length 2 of the form (var val)."), aStack);
+                        throw new CommandException(String.format("The 'let' form should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list of length 2 of the form (var val)."), aStack);
                     lKey = lBindingList.get(0);
                     lValExpr = lBindingList.get(1);
                 }
@@ -1360,13 +1360,13 @@ implements Eval2.IFrameHandler
                 }
 
                 if(!(lKey instanceof String))
-                    throw new CommandException(String.format("ERROR: The 'let' special should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list  of the form (var val).\nThe first element should be a string but encountered an instance of type '%s'.", lKey==null?"null":lKey.getClass().getCanonicalName()), aStack);
+                    throw new CommandException(String.format("The 'let' special should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list  of the form (var val).\nThe first element should be a string but encountered an instance of type '%s'.", lKey==null?"null":lKey.getClass().getCanonicalName()), aStack);
 
                 aStack.push(new Pair(lKey, lValExpr), lCtx);
             }
             else
             {
-                throw new CommandException(String.format("ERROR: The 'let' form should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list or a string or a pair but encountered an instance of type '%s'.", lBinding==null?"null":lBinding.getClass().getCanonicalName()), aStack);
+                throw new CommandException(String.format("The 'let' form should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list or a string or a pair but encountered an instance of type '%s'.", lBinding==null?"null":lBinding.getClass().getCanonicalName()), aStack);
             }
         }
         else if(lDataPtr == (lData.length - 1))
@@ -1405,7 +1405,7 @@ implements Eval2.IFrameHandler
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
-        if(lLstSize != 2) throw new CommandException("ERROR: The 'get' form should have the format (get name).", aStack);
+        if(lLstSize != 2) throw new CommandException("The 'get' form should have the format (get name).", aStack);
         // Allocate one.
         aFrame.allocateData(1);
     }
@@ -1426,7 +1426,7 @@ implements Eval2.IFrameHandler
         {
             // Pick up the result.
             // Check the type of the name.
-            if(!(lData[0] instanceof String)) throw new CommandException("ERROR: The first argument in the 'get' form should evaluate to a string.", aStack);
+            if(!(lData[0] instanceof String)) throw new CommandException("The first argument in the 'get' form should evaluate to a string.", aStack);
             aFrame.setResult(lCtx.getBinding((String) lData[0]));
         }
     }
@@ -1452,16 +1452,16 @@ implements Eval2.IFrameHandler
         final IContext lCtx = aFrame.getCtx();
 
         //Quick test on the number of arguments.
-        if(lLstSize != 3) throw new CommandException("ERROR: The 'lambda' form should have the format (lambda (<params>) <expr>).", aStack);
+        if(lLstSize != 3) throw new CommandException("The 'lambda' form should have the format (lambda (<params>) <expr>).", aStack);
         // Parameters are *not* evaluated ...
         final Object lParams = lLstExpr.get(1);
         final Object lBody = lLstExpr.get(2);
 
         // Do some checking.
-        if(lParams == null || !(lParams instanceof List)) throw new CommandException("ERROR: The first argument in the 'lambda' form should evaluate to a list of parameters.", aStack);
+        if(lParams == null || !(lParams instanceof List)) throw new CommandException("The first argument in the 'lambda' form should evaluate to a list of parameters.", aStack);
         List lParamList = (List) lParams;
-        for(Object lParam:lParamList) if(!(lParam instanceof String)) throw new CommandException("ERROR: The first argument in the 'lambda' form, the parameter list,  should evaluate to a list of strings.", aStack);
-        if(lBody == null) throw new CommandException("ERROR: The second argument in the 'lambda' form should be an expression.", aStack);
+        for(Object lParam:lParamList) if(!(lParam instanceof String)) throw new CommandException("The first argument in the 'lambda' form, the parameter list,  should evaluate to a list of strings.", aStack);
+        if(lBody == null) throw new CommandException("The second argument in the 'lambda' form should be an expression.", aStack);
 
         // Construct the lambda.
         final String[] lStrArgs = new String[lParamList.size()];
@@ -1481,7 +1481,7 @@ implements Eval2.IFrameHandler
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
-        if(lLstSize != 4) throw new CommandException("ERROR: The 'defun' form should have the format (defun name (<params>) <expr>).", aStack);
+        if(lLstSize != 4) throw new CommandException("The 'defun' form should have the format (defun name (<params>) <expr>).", aStack);
 
         // One location to evaluate our lambda macro.
         aFrame.allocateData(1);
@@ -1506,11 +1506,11 @@ implements Eval2.IFrameHandler
         if(lDataPtr == 0)
         {
             // Do some checking.
-            if(lName == null || !(lName instanceof String)) throw new CommandException("ERROR: The first argument in the 'defun' form should evaluate to a string.", aStack);
-            if(lParams == null || !(lParams instanceof List)) throw new CommandException("ERROR: The second argument in the 'defun' form should evaluate to a list of parameters.", aStack);
+            if(lName == null || !(lName instanceof String)) throw new CommandException("The first argument in the 'defun' form should evaluate to a string.", aStack);
+            if(lParams == null || !(lParams instanceof List)) throw new CommandException("The second argument in the 'defun' form should evaluate to a list of parameters.", aStack);
             final List lParamList = (List) lParams;
-            for(Object lParam:lParamList) if(!(lParam instanceof String)) throw new CommandException("ERROR: The second argument in the 'defun' form, the parameter list,  should evaluate to a list of strings.", aStack);
-            if(lBody == null) throw new CommandException("ERROR: The third argument in the 'defun' form should be an expression.", aStack);
+            for(Object lParam:lParamList) if(!(lParam instanceof String)) throw new CommandException("The second argument in the 'defun' form, the parameter list,  should evaluate to a list of strings.", aStack);
+            if(lBody == null) throw new CommandException("The third argument in the 'defun' form should be an expression.", aStack);
 
             // Create a lambda macro.
             final List<Object> lLambdaMacro = new ArrayList<Object>(3);
@@ -1539,7 +1539,7 @@ implements Eval2.IFrameHandler
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
-        if(lLstSize != 2) throw new CommandException("ERROR: The 'timer' form should have the format (timer expr).", aStack);
+        if(lLstSize != 2) throw new CommandException("The 'timer' form should have the format (timer expr).", aStack);
 
         // Allocate a single slot for the expression we have to time and another slot for the start time.
         aFrame.allocateData(2);
@@ -1628,7 +1628,7 @@ implements Eval2.IFrameHandler
             catch(Exception e)
             {
                 // A non-CommandException is converted into a command exception here.
-                throw new CommandException(String.format("ERROR: Macro '%s' failed.\n%s", lLstExpr.get(0), e.getMessage()), aStack);
+                throw new CommandException(String.format("Macro '%s' failed.\n%s", lLstExpr.get(0), e.getMessage()), aStack);
             }
         }
         else

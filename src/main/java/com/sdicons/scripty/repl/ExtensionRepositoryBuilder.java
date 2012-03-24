@@ -107,7 +107,7 @@ implements IExtensions
         final String lName = aStdLst.name();
         if(lName.length() == 0)
         {
-            final String lMsg = String.format("ERROR: Class '%s' contains an unnamed standard argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
+            final String lMsg = String.format("Class '%s' contains an unnamed standard argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
             throw new ExtensionException(lMsg);
         }
 
@@ -120,7 +120,7 @@ implements IExtensions
         }
         catch (ArgSpecException e)
         {
-            final String lMsg = String.format("ERROR: Class '%s' contains a standard argument list specification '%s' with errors.\n%s", aClass.getName(), aStdLst.name(), e.getMessage());
+            final String lMsg = String.format("Class '%s' contains a standard argument list specification '%s' with errors.\n%s", aClass.getName(), aStdLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
@@ -131,7 +131,7 @@ implements IExtensions
         final String lName = aVarLst.name();
         if(lName.length() == 0)
         {
-            final String lMsg = String.format("ERROR: Class '%s' contains an unnamed variable argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
+            final String lMsg = String.format("Class '%s' contains an unnamed variable argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
             throw new ExtensionException(lMsg);
         }
 
@@ -144,7 +144,7 @@ implements IExtensions
         }
         catch (ArgSpecException e)
         {
-            final String lMsg = String.format("ERROR: Class '%s' contains a variable argument list specification '%s' with errors.\n%s", aClass.getName(), aVarLst.name(), e.getMessage());
+            final String lMsg = String.format("Class '%s' contains a variable argument list specification '%s' with errors.\n%s", aClass.getName(), aVarLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
@@ -168,7 +168,7 @@ implements IExtensions
         if(lNamedArgListsAnnot != null) lClassAnnotCounter++;
         if(lClassAnnotCounter > 1)
         {
-            final String lMsg = String.format("ERROR: Class '%s' contains more than one argument list spefification. Use @ScriptyNamedArgLists to associate multiple argument list specifications with a single class.", aClass.getName());
+            final String lMsg = String.format("Class '%s' contains more than one argument list spefification. Use @ScriptyNamedArgLists to associate multiple argument list specifications with a single class.", aClass.getName());
             throw new ExtensionException(lMsg);
         }
         
@@ -211,7 +211,7 @@ implements IExtensions
             ScriptyDefBinding lDefBinding = lMethod.getAnnotation(ScriptyDefBinding.class);
             if(lSetBinding != null && lDefBinding != null)
             {
-                final String lMsg = String.format("ERROR: Class '%s' has a macro/command method '%s' is annotated with both def/set binding of the result to the context.", aClass.getName(), lMethod.getName());
+                final String lMsg = String.format("Class '%s' has a macro/command method '%s' is annotated with both def/set binding of the result to the context.", aClass.getName(), lMethod.getName());
                 throw new ExtensionException(lMsg);
             }
 
@@ -241,7 +241,7 @@ implements IExtensions
             if(lRefArgListAnnot != null) lArgListCounter++;            
             if(lArgListCounter > 1)
             {
-                final String lMsg = String.format("ERROR: Class '%s' has a macro/command method '%s' with more than one argument list specification.", aClass.getName(), lMethod.getName());
+                final String lMsg = String.format("Class '%s' has a macro/command method '%s' with more than one argument list specification.", aClass.getName(), lMethod.getName());
                 throw new ExtensionException(lMsg);
             }
 
@@ -256,7 +256,7 @@ implements IExtensions
                 }
                 else
                 {
-                    final String lMsg = String.format("ERROR: Class '%s' has a macro/command method '%s' with a reference to a named argument list '%s' which does not exist.", aClass, lMethod.getName(), lRef);
+                    final String lMsg = String.format("Class '%s' has a macro/command method '%s' with a reference to a named argument list '%s' which does not exist.", aClass, lMethod.getName(), lRef);
                     throw new ExtensionException(lMsg);
                 }
             }
@@ -276,7 +276,7 @@ implements IExtensions
                 } 
                 catch (ArgSpecException e)
                 {
-                    final String lMsg = String.format("ERROR: While processing a standard argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                    final String lMsg = String.format("While processing a standard argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
             }
@@ -296,7 +296,7 @@ implements IExtensions
                 }
                 catch (ArgSpecException e)
                 {
-                    final String lMsg = String.format("ERROR: While processing a variable argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                    final String lMsg = String.format("While processing a variable argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
             }
@@ -330,7 +330,7 @@ implements IExtensions
                 }
                 catch (ArgMappingException e)
                 {
-                    final String lMsg = String.format("ERROR: While constructing the argument mapping for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                    final String lMsg = String.format("While constructing the argument mapping for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
 
@@ -369,7 +369,7 @@ implements IExtensions
             }
 
             if(lLibraryType == ScriptyLibraryType.STATIC)
-                throw new ExtensionException(String.format("ERROR: Class '%s' is marked as a static library, but an instance was added.", lLib.getClass().getName()));
+                throw new ExtensionException(String.format("Class '%s' is marked as a static library, but an instance was added.", lLib.getClass().getName()));
             
             addLibrary(lLibraryName, lLib, lLib.getClass());
         }

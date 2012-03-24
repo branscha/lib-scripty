@@ -76,7 +76,7 @@ public class MapLibrary
                 else
                 {
                     Object lCulprit = aArgs[i];
-                    throw new CommandException(String.format("ERROR: Command '%s' expects zero or more string or pairs.\nArgument %d is of type '%s'.", aArgs[0], i, lCulprit==null?"null":lCulprit.getClass().getCanonicalName()));
+                    throw new CommandException(String.format("Command '%s' expects zero or more string or pairs.\nArgument %d is of type '%s'.", aArgs[0], i, lCulprit==null?"null":lCulprit.getClass().getCanonicalName()));
                 }
             }
             return lMap;
@@ -104,7 +104,7 @@ public class MapLibrary
     throws CommandException
     {
         if(!aMap.containsKey(aKey))
-            throw new CommandException(String.format("ERROR: The property '%s' does not exist.", aKey));
+            throw new CommandException(String.format("The property '%s' does not exist.", aKey));
         return aMap.get(aKey);
     }
 

@@ -54,7 +54,7 @@ public class FileDialogLibrary
     {
         // Not available in head less mode.
         if(GraphicsEnvironment.isHeadless())
-            throw new CommandException("ERROR: Java VM is running in headless mode.");
+            throw new CommandException("Java VM is running in headless mode.");
 
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(aTitle);

@@ -42,7 +42,7 @@ public class EditLibrary
     {
         // Not available in head less mode.
         if(GraphicsEnvironment.isHeadless())
-            throw new CommandException("ERROR: Java VM is running in headless mode.");
+            throw new CommandException("Java VM is running in headless mode.");
 
         JFrame lParent = null;
         final EditDialog lDiag = new EditDialog(lParent, aTitle, aContent);

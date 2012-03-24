@@ -105,7 +105,7 @@ public class MathLibrary
         }
         catch (ArithmeticException e)
         {
-            throw new CommandException("ERROR: Expected an integer as second argument, the power has to be an integer.");
+            throw new CommandException("Expected an integer as second argument, the power has to be an integer.");
         }
     }
 

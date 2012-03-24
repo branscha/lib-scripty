@@ -52,7 +52,7 @@ implements IContext
     {
         if(main.isBound(aKey)) main.setBinding(aKey, aValue);
         else if (backing.isBound(aKey)) backing.setBinding(aKey, aValue);
-        else throw new CommandException(String.format("ERROR: There is no binding for '%s' in the context.", aKey==null?"null":aKey));
+        else throw new CommandException(String.format("There is no binding for '%s' in the context.", aKey==null?"null":aKey));
     }
 
 	public boolean isBound(String aKey)
