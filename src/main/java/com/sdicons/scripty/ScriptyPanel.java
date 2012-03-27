@@ -40,16 +40,17 @@ public class ScriptyPanel
 extends JPanel
 {
     private static class PanelEngine 
-    extends ScriptyCapable
-    {
-    }
-    
+    extends ScriptyCapable { }
+
     private PanelEngine engine = new PanelEngine();
+    private JSplitPane splitter;
+    private boolean horizontalLayout = false;
 
     public ScriptyPanel()
     {
         this.setLayout(new BorderLayout());
-        init();
+        splitter = new JSplitPane(horizontalLayout?JSplitPane.HORIZONTAL_SPLIT:JSplitPane.VERTICAL_SPLIT);
+        buildPanel();
     }
     
     public ScriptyPanel(ScriptyCapable aFacade)
@@ -58,12 +59,29 @@ extends JPanel
         engine.setReplEngine(aFacade.getReplEngine());
     }
 
-//    public ScriptyCapable asScriptyCapable()
-//    {
-//        return engine;
-//    }
-    
-    private void init()
+    public boolean isHorizontalLayout() 
+    {
+        return horizontalLayout;
+    }
+
+    public void setHorizontalLayout() 
+    {
+        this.horizontalLayout = true;
+        if(splitter != null) splitter.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+    }
+
+    public boolean isVerticalLayout()
+    {
+        return !horizontalLayout;
+    }
+
+    public void setVerticalLayout()
+    {
+        this.horizontalLayout = false;
+        if(splitter != null) splitter.setOrientation(JSplitPane.VERTICAL_SPLIT);
+    }
+
+    private void buildPanel()
     {
         final JToolBar lToolBar = new JToolBar();
         this.add(lToolBar, BorderLayout.NORTH);
@@ -75,48 +93,47 @@ extends JPanel
         lOutScroller.setBorder(new TitledBorder("Output"));
         final TextPaneWriter lWriter = new TextPaneWriter(lOutputPane);
 
-        final JTextArea lInputPane = new JTextArea();
+        final JTextPane lInputPane = new JTextPane();
         final JScrollPane lInScroller = new JScrollPane(lInputPane);
         lInScroller.setBackground(Color.white);
         lInScroller.setBorder(new TitledBorder("Command Panel"));
 
-        final JSplitPane lSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        lSplitter.add(lInScroller, JSplitPane.TOP);
-        lSplitter.add(lOutScroller, JSplitPane.BOTTOM);
-        this.add(lSplitter);
+        splitter.add(lInScroller, JSplitPane.TOP);
+        splitter.add(lOutScroller, JSplitPane.BOTTOM);
+        this.add(splitter);
 
         final SimpleAttributeSet lErrAttrs = new SimpleAttributeSet();
         lErrAttrs.addAttribute(StyleConstants.CharacterConstants.Bold, Boolean.TRUE);
         lErrAttrs.addAttribute(StyleConstants.CharacterConstants.Italic, Boolean.TRUE);
         StyleConstants.setForeground(lErrAttrs, Color.RED);
 
-        Action lExecuteAction = new AbstractAction("Run")
+        final Action lExecuteAction = new AbstractAction("Run")
         {
             public void actionPerformed(ActionEvent e)
             {
-                JFrame lFrame = (JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, ScriptyPanel.this);
+                // Find top level frame.
+                final JFrame lFrame = (JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, ScriptyPanel.this);
 
                 try
                 {
+                    // Set wait cursor.
                     lFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    String lCmd = lInputPane.getText();
-
+                    //
+                    final String lCmd = lInputPane.getText();
                     engine.getReplEngine().startNonInteractive(new StringReader(lCmd), new PrintWriter(lWriter), new PrintWriter(lWriter));
+                    // 
                     lInputPane.grabFocus();
                     lInputPane.selectAll();
                 }
                 catch (Exception e1)
                 {
-                    Document lDoc = lOutputPane.getDocument();
                     try
                     {
+                        final Document lDoc = lOutputPane.getDocument();
                         lDoc.insertString(lDoc.getLength(), e1.getMessage() + "\n", lErrAttrs);
                         lOutputPane.setCaretPosition(lOutputPane.getDocument().getLength());
                     }
-                    catch (BadLocationException e2)
-                    {
-                        e2.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
+                    catch (BadLocationException ignored) { }
                 }
                 finally
                 {
@@ -125,7 +142,7 @@ extends JPanel
             }
         };
 
-        Action lClearAction = new AbstractAction("Clear")
+        final Action lClearAction = new AbstractAction("Clear")
         {
             public void actionPerformed(ActionEvent e)
             {
@@ -136,11 +153,12 @@ extends JPanel
         this.addComponentListener(new ComponentAdapter()
         {
             boolean firstTime = true;
-            public void componentResized(ComponentEvent e) {
-                if(firstTime)
+            public void componentResized(ComponentEvent e)
+            {
+                if (firstTime)
                 {
-                    firstTime=false;
-                    lSplitter.setDividerLocation(1 - 1.0/1.618);
+                    firstTime = false;
+                    splitter.setDividerLocation(1 - 1.0 / 1.618);
                 }
             }
         });
@@ -155,11 +173,13 @@ extends JPanel
         lInputPane.grabFocus();
     }
 
-    private static class TextPaneWriter extends Writer
+    private static class TextPaneWriter
+    extends Writer
     {
         private final JTextPane textArea;
 
-        public TextPaneWriter(final JTextPane textArea) {
+        public TextPaneWriter(final JTextPane textArea) 
+        {
             this.textArea = textArea;
         }
 
@@ -170,17 +190,16 @@ extends JPanel
         public void close(){ }
 
         @Override
-        public void write(final char[] cbuf, final int off, final int len) throws IOException {
-            Document lDoc = textArea.getDocument();
+        public void write(final char[] cbuf, final int off, final int len) 
+        throws IOException 
+        {
+            final Document lDoc = textArea.getDocument();
             try
             {
                 lDoc.insertString(lDoc.getLength(), new String(cbuf, off, len), null);
                 textArea.setCaretPosition(textArea.getDocument().getLength());
             }
-            catch (BadLocationException e)
-            {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            catch (BadLocationException ignored) { }
         }
     }
 }

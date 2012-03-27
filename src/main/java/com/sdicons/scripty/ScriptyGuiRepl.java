@@ -21,9 +21,6 @@
 
 package com.sdicons.scripty;
 
-import com.sdicons.scripty.cmdlib.MathLibrary;
-import com.sdicons.scripty.cmdlib.PrintLibrary;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -33,6 +30,8 @@ public class ScriptyGuiRepl
 extends ScriptyCapable    
 {
     private JFrame frame;
+    private String title = "Scripty";
+    private ScriptyPanel scriptyPanel;
 
     public ScriptyGuiRepl()
     {
@@ -43,9 +42,20 @@ extends ScriptyCapable
         super(aFacade);
     }
 
-    private ScriptyPanel buildGuiConsole()
+    public String getTitle()
     {
-        frame = new JFrame("Test");
+        return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+        if(frame != null) frame.setTitle(title);
+    }
+
+    private void buildGuiConsole()
+    {
+        frame = new JFrame(title);
 
         // Install the closing mechanism on the frame when the user
         // wants to close the frame by clicking the X button.
@@ -65,10 +75,9 @@ extends ScriptyCapable
         // Set the window size and location.
         frame.setLocation((lScreenRect.width - lFrameRect.width) / 2,(lScreenRect.height - lFrameRect.height) / 2);
         frame.setSize(lFrameRect.width, lFrameRect.height);
-
-        final ScriptyPanel lScripty = new ScriptyPanel(this);
-        frame.add(lScripty);
-        return lScripty;
+        //
+        scriptyPanel = new ScriptyPanel(this);
+        frame.add(scriptyPanel);
     }
 
     public void startLoop()
@@ -77,3 +86,5 @@ extends ScriptyCapable
         if(frame != null) frame.setVisible(true);
     }
 }
+
+
