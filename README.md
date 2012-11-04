@@ -1,15 +1,17 @@
 # Scripty Command Language
-## Embed a scripting language in your application
+## Embed a Scripting Language in your Application
 
 Contents
 
-1. [Description](#-1-description)
-2. [Example](#-2-example-create-a-read-eval-print-loop) 
-3. [Build](#-3-build)
-4. [Use Cases](#-4-use-cases)
-5. [Scripty Syntax](toc_5)
-6. [Available Scripty Libraries](toc_6)
-7. [Create a Scripty Command or Macro](toc_7)
+1. Description
+2. Example
+3. Build
+4. Use Cases
+5. Scripty Syntax
+6. Available Scripty Libraries
+7. Create a Scripty Command or Macro
+8. Using the Command Line
+9. Using the Debug Commands
 
 ### 1. Description
 
@@ -393,7 +395,7 @@ Or stated otherwise:
 * **"truthy"**: yes, y, on, true, t, non-null
 * **"falsy"**: 0, no, off, false, null, empty collection, non-empty strings different from the negative values listed before.
 
-##### 5.5. Remarks
+#### 5.5. Remarks
 
 Scripty is not Lisp. The syntax is the same, most of the concepts and ideas were borrowed from Lisp. Scripty was not built to be a Lisp clone, it was built to be extended with your own Java commands. Some of the differences that might trip you up are listed below.
 
@@ -411,11 +413,218 @@ The scripty component contains a number of pre-defined command libraries that ar
 
 #### 6.1. Bean Library
 
-Access JavaBeans as a nested directory structure.
+Access JavaBeans as a nested directory structure. This command library provides a number of commands to manipulate the JavaBeans in the context. It has a Naked Objects flavor. There is a current JavaBean like there is a current directory, it tries to apply the same traversal logic from file systems to JavaBeans. Obviously you need to put the JavaBeans in the context using your own custom commands.
+
+**bean-cd**
+
+Go to another location. Absolute or relative paths allowed.
+
+* '/' is the context of the repl.
+* '.' and '..' have the usual meaning.
+* '[5]' indexing. Arrays, lists can be indexed. 'xyz[5]' has same semantics as 'xyz/5'.
+
+**bean-pwd**
+
+Print the current path to the repl.
+
+**bean-ls**
+
+List the contents of the denoted object. The action depends on the type of the object, properties, array elements are listed.
+
+**bean-cat**
+
+Convert the denoted object to a string and print it on the repl. The difference between 'ls' and 'cat' is that 'ls' lists the sub elements while 'cat' calls the toString() method.
+
+**bean-rslv**
+
+Convert a pathname to the object itself. We can obtain a direct reference to the object in this way. It is what the other commands do automatically. This command is in fact the link between other command libraries and this one.
+
+**bean-call**
+
+Call java methods on an object denoted by a path. The target object should be denoted by a pathname. The method can be specified by a method instance or by a name (and a lookup will occur). The arguments are not resolved, they are passed directly to the method. You can use the 'rslv' command above to accomplish argument resolution as well. It has the form (bean-call $bean method arg1 ... argN).
+
+**bean-upd**
+
+Set the property of a JavaBean. The argument should be a pair, a propname=value combination.
 
 #### 6.2. Debugger Library
 
 Debug commands to interactively debug Scripty programs.
+
+**dbg-expr**
+
+Start the debugger with the expression. The debugger is halted in the beginning of evaluation. Starting a new debugging session will end the previous session if one was active.
+
+**dbg-eval**
+
+Evaluate an expression in the context of the top level stack frame. This allows you to examine or modify the frame context during debugging. Use dbg-ctx to print this context and to examine the values. While you are debugging you can execute stuff in the current context where the debugger is halted.
+
+**dbg-step**
+
+Step into an expression, it takes the smallest step possible.
+
+**dbg-stepin**
+
+A synonym for dbg-step, it was added to be the inverse for dbg-stepout.
+dbg-back
+
+Take a step back, it might not work as expected because it does not undo bindings, nor other side effects. It could be useful to replay some sequences.
+dbg-stepout
+
+Run until the current expression on top of the stack is completely evaluated and then execute the return statement. We return to the previous stack level. It always evaluates the current frame and then goes to the previous frame. This operation always reduces the stack.
+
+**dbg-stepover**
+
+Evaluate the next parameter without stepping trough it or execute the expression. We remain positioned at the same stack level. Use this if you want to evaluate each parameter in turn, without seeing the details of it.
+
+**dbg-stack**
+
+Print the current stack. Optional arguments:
+
+* quiet = true | false*. Prevents writing output, only returns the instance.
+
+**dbg-terminate**
+
+Terminate the debugging session.
+
+**dbg-raise**
+
+Raise a CommandException, it is useful to debug certain constructs, or to examine the result of an exception in a certain expression.
+
+* arg: an optional message.
+
+**dbg-run**
+
+Keep on running.
+
+**dbg-runresult**
+
+Keep on running until a result has been produced.
+
+**dbg-runready**
+
+Keep on running until all parameters in the current frame have been evaluated, and the main expression is ready for being executed. Use this if you are not interested in detailed evaluation of the parameters.
+
+**dbg-restart**
+
+Reset the debugger to the beginning of the evaluation. You can restart the debugging of an expression with this. Side effects will not be undone though.
+
+**dbg-dropframe**
+
+Drop the top level stack frame. It can be useful to redo the evaluation of a sub expression.
+
+**dbg-moresteps?**
+
+Check if more steps could be executed in the current debugging session.
+
+**dbg-result?**
+
+Check if the current debugging session has reached a result.
+
+**dbg-exception?**
+
+Check if the current debugging session was halted with an exception. If so, the exception will be remembered, you can get it with dbg-exception.
+
+**dbg-result**
+
+Get the result of the current debugging session if a result has been reached. Otherwise null will be returned, note that the result might be null, in order to maker sure if this is the result or it stands for an empty result use the dbg-result? command.
+
+**dbg-exception**
+
+Get the exception that was thrown during the current debugging session if the expression under scrutiny effectively raised an exception. If no exception was raised, null will be returned.
+
+**dbg-ctx**
+
+Print the context of the top of the stack. You can examine all the bindings at that point during the evaluation of the expression. Use dbg-eval to manipulate this context. Optional arguments:
+
+* quiet = true | false*. Prevents writing output, only returns the instance.
+
+**bpt-func**
+
+Create a break point that breaks when a function with a specified name appears on top of the stack. Required arguments:
+
+* The function name.
+
+Optional arguments:
+
+* name: choose a name for this break point, otherwise a name will be generated of the form bp[x] where [x] is an integer sequence.
+
+**bpt-when**
+
+Create a break point that breaks when a condition is met. The condition is evaluated in the context of the current frame. Required arguments:
+
+* A conditional expression.
+
+Optional arguments:
+
+* name: A user name for this break point, otherwise it will be a generated one.
+
+**bpt-stack**
+
+Create a break point that breaks when the stack exceeds the specified depth. Required arguments:
+
+* The stack size threshold.
+
+Optional arguments:
+
+* name: A user name for this break point, otherwise it will be a generated one.
+
+**bpt-and, bpt-or**
+
+Combine lists of break points into a new break point.
+
+**bpt-not**
+
+Create a new break point by inverting an existing one.
+
+**dbg-addbreakpoint**
+
+Add a breakpoint. Required argument: a break point, created with bpt-func, bpt-stack, ...
+
+Example: (dbg-addbreakpoint (bpt-func fac))
+
+**dbg-breakpoints**
+
+List the existing break points known by the debugger.
+
+**dbg-removebreakpoint**
+
+Remove a break point. Required argument: the name of the break point.
+
+Example (dbg-removebreakpoint bp0)
+
+**dbg-enablebreakpoint**
+
+Enable or disable a named break point. Required arguments:
+
+* The break point name.
+* true | false.
+
+Example: (dbg-enablebreakpoint bp0 true)
+
+dbg-clearbreakpoints
+
+Remove all break points from the debugger.
+
+**Macro's**
+
+These macros are provided for your convenience. You have to load these explicitly before you can use them by issuing the command (load cp:/dbgutil.lsp).
+
+* **e 'expr**, Start debugging an expression. Don't forget the quote!
+* **t**, Terminate the debug session.
+* **x**, Stack dump.
+* **s**, Step + stack.
+* **b**, Backstep + stack.
+* **sover**, Step over (the parameter) + stack.
+* sout, Step out (of the expression) + stack.
+* **r**, Run until finished.
+* **rready**, Run until the parmeters of the topmost expression are evaluated and the expression itself can be executed.
+* **rresult**, Run until a result is reached.
+* **result**, Print the result.
+* **ctx**, Print the current context (of the topmost expression).
+* **v 'expr**, View an expression, evaluated in the topmost context. Don't forget the quote!
+* **restart**, Restart evaluation, start from the beginning.
+* **df**, Drop the topmostframe + stack.
 
 #### 6.3. Editor Library
 
@@ -433,25 +642,261 @@ Commands to open a dialog to open or save a file.
 
 UNIX commands to navigate the file system.
 
+* It is intentionally based on the Java File object (for re-usability in other commands). As a consequence, a move only accepts 2 files, no wildcards.
+* No wild card globbing by the shell. The ls provides a grep on the short name. The find command provides a lookup facility.
+* Delete was not implemented for safety reasons.
+
+**cd**
+
+Change the current directory.
+
+**pwd**
+
+Print the current directory and return the File object.
+
+**ls**
+
+Print a listing of the current directory and return it as an array.
+
+* grep=regexp: applied to the absolute pathname.
+* quiet=true|*false.
+* files=*true|false : include files.
+* dirs=*true|false : include directories.
+* exec=lambda: process the files using a lambda. Processing is done after grepping and filtering.
+
+**cat**
+
+Not implemented.
+
+**rslv**
+
+Resolve is the same as a 'quiet' pwd, but pwd only returns directories, whereas rslv can also resolve to files. This command is *very* important for integration with other libraries. The other command libraries should not be dependent on this one, they can simply request a File argument and this command can resolve the path to the File.
+
+**mv**
+
+Rename a file. It does not use wild cards since the implementation is based on the Java File class which does not accept wild cards.
+
 #### 6.7. List Library
 
-Lisp commands to manipulate list structures.
+Some Lisp like commands that act on lists. This module provides the basic Data manipulation commands, they are not built-in but provided as a separate command library. The semantics deviates from common lisp because we based our lists on Java lists and not on cons constructs. Consing for example modifies the existing list, while in Lisp it creates a new version, the original binding refers to the sublist. This can lead to surprising results if one is used to the original Lisp semantics.
+
+**list?**
+
+A test to see if the argument is a list or not. The other command types are only applicable if this test turns out positive.
+
+**empty?**
+
+A test to see if the list is empty.
+
+**member?**
+
+A test to see if an element is part of the list or not. (member? <list> <el>)
+
+**car**
+
+The first element of the list.
+
+**cdr**
+
+A copy of the list without the first element. Non destructible on the original.
+
+**pop**
+
+Get the element at the end of the list. Modifies the list and returns the element.
+
+**shift**
+
+Get the first element of the list and modifies the list. It returns the element.
+
+**push**
+
+Add one or more elements at the end of the list. Modifies the list and returns the list. (push <list> el1 ... eln)
+
+**unshift**
+
+Insert one or more elements at the beginning of the list. (unshift <list> el1 ... eln)
+
+**cons**
+
+Insert one element at the beginning of the list. The list is modified, destructible on the original.(cons el <list>)
+
+**append**
+
+Append two or more lists into a single new list. Non destructible.
+
+**size**
+
+The number of elements in the list. The result is a string representing an integer.
+
+**dup**
+
+Make a shallow copy of the list.
+
+**null?**
+
+A test to see if the argument is null.
 
 #### 6.8. Load Library
 
 Load and reload external scripts into the environment.
 
+**load**
+
+Load and execute one or more scripts. If the file exists and is readable, it will be remembered for the reload.
+
+```
+(load file | classpath:/resource | cp:/resource ...)
+```
+
+**reload**
+
+Reload previously loaded files. A file is remembered if it existed and was readable.
+
+```
+(reload)
+```
+
 #### 6.9. Map Library
 
 Manipulate map data structures.
 
+**map-create**
+
+Create an empty map. You can immediately insert pairs.
+
+(map-create key=val | str | m ...)
+
+**map?**
+
+Test whether an object is a map.
+
+```
+(map? m)
+```
+
+**map-set**
+
+Insert the key/value in a map.
+
+```
+(map-set m key val)
+```
+
+**map-get**
+
+Get the value bound by the key.
+
+```
+(map-get m key)
+```
+
+**map-key?**
+
+Test whether a key is present.
+
+```
+(map-key? m key)
+```
+
+**map-keys**
+
+Get the list of keys.
+
+```
+(map-keys m)
+```
+
+**map-values**
+
+Get the list of values.
+
+```
+(map-values m)
+```
+
+**map-clear**
+
+Make the map empty.
+
+```
+(map-clear m)
+```
+
+**map-size**
+
+Get the number of entries in the map.
+
+```
+(map-size m)
+```
+
 #### 6.10. Math Library
 
-Math commands.
+The JavaScript approach was taken to implement the math command library, there is only one type that is the BigDecimal type. Some unconventional notation was chosen, like the <~ and >~ operators for comparison, this is because using the ''=" here would conflict with Scripty pairs which have the form name=value.
+
+If you provide strings, they will be converted to numbers first, it is ok to provide string arguments.
+
+**abs**
+
+Absolute value.
+
+**+, -, *, /, ^**
+
+The conventional mathematics operators.
+
+**fin**
+
+Convert the number to a String with 2 decimals as it is used in financial information (invoices and the lot).
+
+**float->int**
+
+Convert to an integer representation.
+
+**zero?**
+
+Test if a number is zero.
+
+**~, >, >~, <, <~**
+
+Numerical comparison. The '~' stands for '=' but the last one cannot be used because it conflicts with Scripty pairs, the Scripty parser will try to create a pair when it encounters a '='.
+
+**number?**
+
+Check if the thing you passed as an argument can be converted to a float.
+
+**rem**
+
+Remainder.
 
 #### 6.11. Pair Library
 
-A pair is a Scripty construct 'key=value'. These commands let you manipulate this data structure.
+A pair is a Scripty construct 'key=value'. These commands let you manipulate this data structure. A Pair is an immutable parser artifact. There are only test functions and getter functions.
+
+**pair?**
+
+Test whether an object is of type pair.
+
+```
+(pair? obj)
+```
+
+**pair-left**
+
+Get the left part of a pair.
+
+```
+> print (pair-left key=value)
+key
+```
+
+**pair-right**
+
+Get the right part of a pair.
+
+```
+> print (pair-right key=value)
+value
+```
 
 #### 6.12. Print Library
 
@@ -464,6 +909,46 @@ A record editor that allows key-value pair editing in a GUI property editor.
 #### 6.14. String Library
 
 String manipulation commands.
+
+**str?**
+
+Check if an arbitrary object is a string.
+
+**str-trim**
+
+Trim the whitespace on both ends of the string.
+
+**str-format**
+
+It has the same behaviour as the Java version.
+
+```
+> print (str-format "%s = %s" "1 + 1" (+ 1 1))
+1 + 1 = 2
+```
+
+**str-match**
+
+Do a single match, the result is a list of matched groups. Even is there is no group in the pattern, the global match is always available.
+
+```
+> print (str-match "rosa\S*\b" "rosa rosam rosas")
+[rosa]
+```
+
+**str-match***
+
+Repeatedly match the pattern. The result is a list of lists of matches. It is the same as str-match but it is applied repeatedly to the string.
+
+```
+> print (str-match* "rosa\S*\b" "rosa rosam rosas")
+[[rosa], [rosam], [rosas]]
+```
+
+**str-match?**
+
+Check if a string complies to a pattern. The result is a boolean.
+
 
 ### 7. Create a Scripty Command or Macro
 #### 7.1. Defining commands
@@ -502,3 +987,92 @@ Without parameter mappings the command invoker will look at the signature of the
 
 The first list parameter will receive the expression. All other values will be set to null.
 
+### 8. Using the Command Line
+#### 8.1. Optional Outer Parentheses
+
+Outer parenthesis can be omitted on the command line as a convenience for short commands. Using the parenthesis is off course allowed, it is the only way to enter nested expressions.
+
+In script files the outer parentheses are obligatory.
+
+Example: These two expressions have the same meaning on the command line.
+
+```
+> (print Hello World)
+Hello World 
+> print Hello World
+Hello World
+```
+
+#### 8.2. Multi Line Commands
+
+Commands can be spread over multiple lines. This can happen automatically when the command is not complete. You can also ask for this explicitly by terminating the line with a backslash. When you want to quit the multi line command without execution you can issue the break command. It is not really a command since it is directly interpreted by the read-eval-print loop. So you cannot use this command in external scripts.
+
+Example 1: Automatic multi line command.
+
+```
+> (print Hello
++ > World
++ > )
+Hello World
+```
+
+Example 2: Explicit multi line command with backslashes at the end of the line.
+
+```
+> print Hello \
++ > World \
++ > )
+Hello World
+```
+
+Example 3: Terminating a multi line command without execution.
+
+```
+> print \
++ > Hello \
++ > break
+Canceling the command.
+```
+
+#### 8.3.print
+
+Print stuff on the standard output. Scripty does not automatically print the result of an evaluation on the command line, often you have to use the print command explicitly. It is not uncommon for a command to show something on the standard output and to have something else as the result of the evaluation.
+
+#### 8.4. exit
+
+Obviously, this command terminates the application.
+
+### 9. Using the Debug Commands
+#### 9.1. Starting a debug session
+
+If we want to debug the expression "2 . 3 + 7" we have to execute following commands:
+
+```
+> dbg-expr (+ (* 2 3) 7)
+> dbg-step
+> dbg-stack
+```
+
+The result is a stack of expressions, the topmost expression is the most recent one, this expression has to be evaluated before the lower ones. In our example, the + expression will be evaluated before the complete expression.
+
+```
++
+[+, [*, 2, 3], 7]:0 ~ [null, null, null]
+```
+
+#### 9.2. Interpreting the stack trace
+
+If we keep on executing (progn (dbg-step) (dbg-stack))for a while, we will get stack dumps of the form:
+
+```
+2 ==> 2
+[*, 2, 3]:1 ~ [*, null, null]
+[+, [*, 2, 3], 7]:1 ~ [+, null, null]
+```
+
+This is how we should understand this:
+
+* We are now evaluating string '2', and the result is '2' since numbers evaluate to themselves.
+* We were evaluating '2' because in the previous expression on the stack we are evaluating (* 2 3) and we already evaluated the *.
+
+The list right of the '~' shows the evaluated parts of the expression.
