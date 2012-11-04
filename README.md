@@ -137,11 +137,12 @@ Create a Scripty interpreter inside the application and invoke the expression ev
 TODO Create Documentation
 
 ### 5. Scripty Syntax
+
+This is a description of the core Scripty language without any of the command libraries, this describes the base functionality. You have to augment the core with one or more command libraries.
+
 #### 5.1. Expression Evaluation
 
-Each Scripty expression consists of a command and zero or more arguments. All arguments are evaluated first, from left to right, and then the command is applied to the evaluated arguments.
-
-The command must evaluate to the name of a built-in form, the name of a user defined function, the name of a command or a lambda expression.
+Each Scripty expression consists of a command and zero or more arguments. All arguments are evaluated first, from left to right, and then the command is applied to the evaluated arguments. The command must evaluate to the name of a built-in form, the name of a user defined function, the name of a command or a lambda expression.
 
 #### 5.2. Forms
 
