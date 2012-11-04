@@ -1,6 +1,17 @@
-# Scripty embeddable command language
+# Scripty Command Language
 ## Embed a scripting language in your application
-### 1. Description
+
+Contents
+
+1. [Description](toc_1)
+2. [Example](toc_2) 
+3. [Build](toc_3)
+4. [Use Cases](toc_4)
+5. [Scripty Syntax](toc_5)
+6. [Available Scripty Libraries](toc_6)
+7. [Create a Scripty Command or Macro](toc_7)
+
+### <a id="toc_1"></a> 1. Description
 
 Scripty is an interpreter that can be used to provide a simple script language that can be embedded inside an application. Situations where Scripty might be useful:
 
@@ -11,7 +22,7 @@ Scripty is an interpreter that can be used to provide a simple script language t
 
 Furthermore, you have full control over the power of Scripty. By default only the language syntax and control structures are present. You can augment the power of Scripty by selecting the command libraries explicitly.
 
-### 2. Example: Create a read-eval-print loop
+### <a id="toc_2"></a> 2. Example: Create a read-eval-print loop
 
 This is only one of the possible ways to embed Scripty in an application. We will use Scripty as the top level REPL.
 
@@ -42,7 +53,7 @@ public class PrintLibrary
 }
 ```
 
-### 3. Build
+### <a id="toc_3"></a> 3. Build
 
 The project is based on maven.
 
@@ -50,7 +61,7 @@ The project is based on maven.
 mvn clean install
 ```
 
-### 4. Use cases
+### <a id="toc_4"></a> 4. Use cases
 
 #### 4.1. Text REPL
 
@@ -120,7 +131,7 @@ Create a Scripty interpreter inside the application and invoke the expression ev
 
 TODO Create Documentation
 
-### 5. Scripty Syntax
+### <a id="toc_5"></a> 5. Scripty Syntax
 #### 5.1. Expression Evaluation
 
 Each Scripty expression consists of a command and zero or more arguments. All arguments are evaluated first, from left to right, and then the command is applied to the evaluated arguments.
@@ -357,7 +368,44 @@ Example
 0
 ```
 
-### 6. Available Libraries
+#### 5.3. Data Types
+
+Scripty itself only uses strings and lists. No other data types are built into the scripting language (no booleans, no numeric values, ...). How can such a language be of any use? The commands can return any type of reference as a result. This means that whatever Java instance can be stored in the Scripty context, and although Scripty itself cannot utilize this value, it can pass these variables to other commands.
+
+The file commands in the file library print out file information on the standard output, but they also return java.io.File objects as a result of the call. These instances can be passed to the other commands or to your own commands. You can utilize the file commands to scan a directory and pass the File instances to your own extensions.
+
+1. Strings. They can be quoted "this is a string" and in this form it can contain the usual control characters. In unquoted form, Scripty will create a string for each delimited series of characters.
+2. Pairs. They have the form left=right, and are instances of the class Pair. It is up to the commands process these.
+3. Lists are formed automatically.
+
+#### 5.4. Boolean Expressions
+
+Scripty takes the same approach as JavaScript for boolean evaluation. There are 'truthy' values and 'falsy' values.
+
+* If the object is a **boolean**, then it will evaluate to its own value.
+* **Collections** evaluate to true if they are non empty, and to false if they are empty.
+* **Numerical** values byte, short, integer and long will evaluate to true if different from zero and false otherwise.
+* **String** values are interpreted. The strings (case insensitive comparison) "true", "yes", "t", "y", "on" are interpreted as true, other values as false.
+* Any other **Object** is interpreted as true, a null value is interpreted as false.
+
+Or stated otherwise:
+
+* **"truthy"**: yes, y, on, true, t, non-null
+* **"falsy"**: 0, no, off, false, null, empty collection, non-empty strings different from the negative values listed before.
+
+##### 5.5. Remarks
+
+Scripty is not Lisp. The syntax is the same, most of the concepts and ideas were borrowed from Lisp. Scripty was not built to be a Lisp clone, it was built to be extended with your own Java commands. Some of the differences that might trip you up are listed below.
+
+* Lists are Java lists and not conses. So list semantics is different (and maybe less efficient). There is no 'nil' concept; a list does not end with a nil, a nil is not the same as an empty list.
+* No separate name spaces for different constructs, there is only a single context stack.
+* Contexts have side effects, bindings can be changed.
+* Only strings are provided, there is no 'symbol' concept. If an application wants e.g. numbers for calculation, the commands should parse the strings.
+* Binding context lookup order. Scoping is lexical. The global context is always available for everybody, there is no need to introduce dynamic scoping.
+  1. Call context, arguments are bound to parameters. This context is especially created for this call. It contains all local bindings.
+  2. Lexical (static) context, where the function or lambda was defined. It is the closure of the lambda.
+
+### <a id="toc_6"></a> 6. Available Libraries
 
 The scripty component contains a number of pre-defined command libraries that are at your disposal.
 
@@ -417,7 +465,7 @@ A record editor that allows key-value pair editing in a GUI property editor.
 
 String manipulation commands.
 
-### 7. Create a Scripty Command or Macro
+### <a id="toc_7"></a> 7. Create a Scripty Command or Macro
 #### 7.1. Defining commands
 
 **Static methods** in a class. Scripty will scan the static methods of the class for annotations and transform each annotated method in a Command or macro.
