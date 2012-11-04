@@ -1,8 +1,6 @@
 # Scripty Command Language
 ## Embed a Scripting Language in your Application
 
-Contents
-
 1. Description
 2. Example
 3. Build
@@ -12,6 +10,8 @@ Contents
 7. Create a Scripty Command or Macro
 8. Using the Command Line
 9. Using the Debug Commands
+
+----------
 
 ### 1. Description
 
@@ -210,9 +210,11 @@ Example 2
 **eq**
 
 The comparison operator has the same semantics as the 'equals' method in Java. It is the only data inspection that is implemented in the Eval. It is included because it is a standard Java Object method, applicable to all instances.
-eval
+
+**eval**
 
 Evaluate an expression. This is less important for a command language, but it is here for completeness sake. Eval works on lists, it does not work on string representations of expressions.
+
 Example
 
 In this example we make use of the optional library containing list manipulation commands, the 'list' command creates a list. If we want to execute this command we created on the fly, we can use the 'eval' command.
@@ -225,8 +227,9 @@ Hello
 **funcall**
 
 This is the official way to call a user defined function (funcall name <args>). But luckily there is a shorthand call of the form (name arg-list). This form will lead to a function call if there was no registered command with the same name. The first 'funcall' form will only work for user defined functions and lambdas, not for commands. The second form will work for commands as well. Commands are not considered to be real functions that is why there is a difference.
-name should be a string and is not evaluated.
-<args> The arguments in a separate list.
+
+ * name should be a string and is not evaluated.
+ * <args> The arguments in a separate list.
 
 Example
 
