@@ -40,7 +40,7 @@ throws ExtensionException
 }
 ````
 
-![Screenshot](https://www.dropbox.com/s/sg8i0lwof6xgv94/scripty-autorepl-screenshot.jpg)
+![Screenshot](https://dl.dropbox.com/u/48099178/Scripty%20Screenshots/scripty-autorepl-screenshot.jpg)
 
 Note that you have to provide a list of command libraries to Scripty, you have complete control over the commands that will be available.
 
