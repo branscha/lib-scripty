@@ -3,15 +3,15 @@
 
 Contents
 
-1. [Description](toc_1)
-2. [Example](toc_2) 
-3. [Build](toc_3)
-4. [Use Cases](toc_4)
+1. [Description](#-1-description)
+2. [Example](#-2-example-create-a-read-eval-print-loop) 
+3. [Build](#-3-build)
+4. [Use Cases](#-4-use-cases)
 5. [Scripty Syntax](toc_5)
 6. [Available Scripty Libraries](toc_6)
 7. [Create a Scripty Command or Macro](toc_7)
 
-### <a id="toc_1"></a> 1. Description
+### 1. Description
 
 Scripty is an interpreter that can be used to provide a simple script language that can be embedded inside an application. Situations where Scripty might be useful:
 
@@ -22,7 +22,7 @@ Scripty is an interpreter that can be used to provide a simple script language t
 
 Furthermore, you have full control over the power of Scripty. By default only the language syntax and control structures are present. You can augment the power of Scripty by selecting the command libraries explicitly.
 
-### <a id="toc_2"></a> 2. Example: Create a read-eval-print loop
+### 2. Example: Create a read-eval-print loop
 
 This is only one of the possible ways to embed Scripty in an application. We will use Scripty as the top level REPL.
 
@@ -53,7 +53,7 @@ public class PrintLibrary
 }
 ```
 
-### <a id="toc_3"></a> 3. Build
+### 3. Build
 
 The project is based on maven.
 
@@ -61,7 +61,7 @@ The project is based on maven.
 mvn clean install
 ```
 
-### <a id="toc_4"></a> 4. Use cases
+### 4. Use cases
 
 #### 4.1. Text REPL
 
@@ -131,7 +131,7 @@ Create a Scripty interpreter inside the application and invoke the expression ev
 
 TODO Create Documentation
 
-### <a id="toc_5"></a> 5. Scripty Syntax
+### 5. Scripty Syntax
 #### 5.1. Expression Evaluation
 
 Each Scripty expression consists of a command and zero or more arguments. All arguments are evaluated first, from left to right, and then the command is applied to the evaluated arguments.
@@ -405,7 +405,7 @@ Scripty is not Lisp. The syntax is the same, most of the concepts and ideas were
   1. Call context, arguments are bound to parameters. This context is especially created for this call. It contains all local bindings.
   2. Lexical (static) context, where the function or lambda was defined. It is the closure of the lambda.
 
-### <a id="toc_6"></a> 6. Available Libraries
+### 6. Available Libraries
 
 The scripty component contains a number of pre-defined command libraries that are at your disposal.
 
@@ -465,7 +465,7 @@ A record editor that allows key-value pair editing in a GUI property editor.
 
 String manipulation commands.
 
-### <a id="toc_7"></a> 7. Create a Scripty Command or Macro
+### 7. Create a Scripty Command or Macro
 #### 7.1. Defining commands
 
 **Static methods** in a class. Scripty will scan the static methods of the class for annotations and transform each annotated method in a Command or macro.
