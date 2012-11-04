@@ -1,0 +1,15 @@
+# Maven artifacts.
+#
+target/
+test-output/
+
+# IDEA IntelliJ.
+#
+.idea/
+*.iml
+
+# Eclipse.
+#
+.classpath
+.project
+.settings/

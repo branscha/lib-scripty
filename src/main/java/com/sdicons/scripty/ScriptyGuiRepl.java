@@ -21,10 +21,13 @@
 
 package com.sdicons.scripty;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
 
 public class ScriptyGuiRepl
 extends ScriptyCapable    
