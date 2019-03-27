@@ -28,7 +28,7 @@ throws ExtensionException
 }
 ````
 
-![Screenshot](https://dl.dropbox.com/u/48099178/Scripty%20Screenshots/scripty-autorepl-screenshot.jpg)
+Use `./gradlew run` comman to start the minimalistic GUI.
 
 Note that you have to provide a list of command libraries to Scripty, you have complete control over the commands that will be available.
 
@@ -48,9 +48,16 @@ public class PrintLibrary
 
 ### Build
 
-The project is based on maven.
+The project is based on gradle.
 
-	mvn clean install
+	./gradlew clean build
+	
+	
+## Run
+
+Start the minimalistic example GUI:
+
+`./gradlew run`
 
 ## Available Libraries
 

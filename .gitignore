@@ -13,3 +13,11 @@ test-output/
 .classpath
 .project
 .settings/
+
+# Gradle.
+.gradle
+build/
+out/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache

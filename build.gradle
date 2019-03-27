@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'application'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = 'http://repo.maven.apache.org/maven2'
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.1'
+}
+
+group = 'com.sdicons'
+version = '2.0-SNAPSHOT'
+description = 'Scripty Embeddable Scripting Language'
+sourceCompatibility = '1.8'
+mainClassName = 'branscha.scripty.ScriptyAutoRepl'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
