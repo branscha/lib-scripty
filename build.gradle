@@ -15,7 +15,7 @@ dependencies {
     testCompile 'junit:junit:4.1'
 }
 
-group = 'com.sdicons'
+group = 'branscha'
 version = '2.0-SNAPSHOT'
 description = 'Scripty Embeddable Scripting Language'
 sourceCompatibility = '1.8'

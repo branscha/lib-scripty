@@ -242,7 +242,7 @@ public class ArgListBuilderUtil
             }
         }
 
-        // type="Instance com.sdicons.MyClass nullAllowed=true"
+        // type="Instance branscha.MyClass nullAllowed=true"
         private static StdArgList INSTANCE_ARGLIST = new StdArgList(new FixedArg[]{FIXED_CLASSNAME}, new OptionalArg[]{}, new NamedArg[]{NAMED_NULLALLOWED});
 
         @ScriptyCommand(name="Instance")
@@ -382,7 +382,7 @@ public class ArgListBuilderUtil
             }
         }
 
-        // type="Custom com.sdicons.MySpec"
+        // type="Custom branscha.MySpec"
         private static StdArgList CUSTOM_ARGLIST = new StdArgList(new FixedArg[]{FIXED_CLASSNAME}, new OptionalArg[]{}, new NamedArg[]{});
 
         @ScriptyCommand(name="Custom")
