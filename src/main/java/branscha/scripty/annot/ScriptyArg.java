@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,10 +24,37 @@
  ******************************************************************************/
 package branscha.scripty.annot;
 
-public @interface ScriptyArg
-{
+/**
+ * Provide argument type details in an {@link ScriptyStdArgList} or al {@link ScriptyVarArgList}.
+ * Argument list annotations are used to specify the interface for a command, the Scripty engine will automatically
+ * enforce this interface.
+ *
+ * The example defines a command interface with a single argument of type String.
+ *
+ * <pre>
+ *     @ScriptyStdArgList(
+ *    fixed={
+ *       @ScriptyArg(name="uno", type="String")})
+ * </pre>
+ */
+public @interface ScriptyArg {
+    /**
+     * The name of the argument.
+     */
     public String name();
+
+    /**
+     * The type of the argument, the description is in the type DSL.
+     */
     public String type();
-    public String value () default "";
+
+    /**
+     * The default value of the argument.
+     */
+    public String value() default "";
+
+    /**
+     * Flag to indicate if the  argument is optional or not.
+     */
     public boolean optional() default false;
 }

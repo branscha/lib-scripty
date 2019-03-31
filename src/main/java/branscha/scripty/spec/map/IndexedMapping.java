@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,61 +30,50 @@ import branscha.scripty.parser.IEval;
 import java.util.List;
 
 public class IndexedMapping
-implements IArgMapping
-{
+        implements IArgMapping {
     private int offset;
 
-    public IndexedMapping(int aOffset)
-    {
+    public IndexedMapping(int aOffset) {
         offset = aOffset;
     }
 
     public Object map(IEval aEval, IContext aContext, Object aArgs)
-    throws ArgMappingException
-    {
-        if(aArgs == null)
-        {
+    throws ArgMappingException {
+        if (aArgs == null) {
             // TODO generate ERROR
             throw new ArgMappingException("...");
-            
+
         }
-        
-        if(offset < 0)
-        {
+
+        if (offset < 0) {
             // TODO generate ERROR
             throw new ArgMappingException("...");
         }
-        
+
         Class lArgsClass = aArgs.getClass();
-        if(lArgsClass.isArray())
-        {
+        if (lArgsClass.isArray()) {
             Object[] lArgs = (Object[]) aArgs;
-            if(offset >= lArgs.length)
-            {
+            if (offset >= lArgs.length) {
                 // TODO generate ERROR
                 throw new ArgMappingException("...");
             }
-            
+
             return lArgs[offset];
-        }
-        else if(List.class.isAssignableFrom(lArgsClass))
-        {
+        } else if (List.class.isAssignableFrom(lArgsClass)) {
             List lArgs = (List) aArgs;
-            if(offset >= lArgs.size())
-            {
+            if (offset >= lArgs.size()) {
                 // TODO generate error
                 throw new ArgMappingException("...");
             }
             return lArgs.get(offset);
         }
-        
+
         // If we get here we could not interprete the argument object as an
         // indexed collection.
         throw new ArgMappingException("...");
     }
 
-    public void setOffset(int aOffset)
-    {
-       offset = offset + aOffset;
+    public void setOffset(int aOffset) {
+        offset = offset + aOffset;
     }
 }

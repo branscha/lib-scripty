@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -31,11 +31,9 @@ import java.util.List;
 /**
  * Debugger.
  * Protocol: consructor - step* - getresult.
- *  - Resultaat *moet* opgehaald worden, de eval wacht op een step of een getresult.
- *
+ * - Resultaat *moet* opgehaald worden, de eval wacht op een step of een getresult.
  */
-public class EvalTrace
-{
+public class EvalTrace {
     private Eval2 eval;
     private Eval2.EvalStack stack;
 
@@ -56,79 +54,65 @@ public class EvalTrace
     // Otherwise it would be impossible to continue stepping after a matching breakpoint was encountered.
     private long stepcount = 0;
 
-    public static interface IBreakpoint
-    {
+    public static interface IBreakpoint {
         public String getName();
+
         public void setEnabled(boolean aEnabled);
+
         public boolean breakHere(Eval2.EvalStack aStack);
     }
 
-    public static class BreakpointSet
-    {
+    public static class BreakpointSet {
         private List<IBreakpoint> breakpoints = new ArrayList<IBreakpoint>();
 
-        public void addBreakpoint(IBreakpoint aBpt)
-        {
+        public void addBreakpoint(IBreakpoint aBpt) {
             breakpoints.add(aBpt);
         }
 
-        public void removeBreakpoint(String aName)
-        {
-            for(IBreakpoint lBpt: breakpoints)
-            {
-                if(lBpt.getName() != null && lBpt.getName().equals(aName))
-                {
+        public void removeBreakpoint(String aName) {
+            for (IBreakpoint lBpt : breakpoints) {
+                if (lBpt.getName() != null && lBpt.getName().equals(aName)) {
                     breakpoints.remove(lBpt);
                     return;
                 }
             }
         }
 
-        public void enableBreakpoint(String aName, boolean aEnable)
-        {
-            for(IBreakpoint lBpt: breakpoints)
-            {
-                if(lBpt.getName() != null && lBpt.getName().equals(aName))
-                {
+        public void enableBreakpoint(String aName, boolean aEnable) {
+            for (IBreakpoint lBpt : breakpoints) {
+                if (lBpt.getName() != null && lBpt.getName().equals(aName)) {
                     lBpt.setEnabled(aEnable);
                 }
             }
         }
 
-        public void removeAllBreakpoints()
-        {
+        public void removeAllBreakpoints() {
             breakpoints.clear();
         }
 
-        public List<IBreakpoint> findAllMatchingBreakpoints(Eval2.EvalStack aStack)
-        {
+        public List<IBreakpoint> findAllMatchingBreakpoints(Eval2.EvalStack aStack) {
             List<IBreakpoint> lResult = new ArrayList<IBreakpoint>();
-            if(aStack != null)
-            {
-                for(IBreakpoint lBpt: breakpoints)
-                    if(lBpt.breakHere(aStack)) lResult.add(lBpt);
+            if (aStack != null) {
+                for (IBreakpoint lBpt : breakpoints)
+                    if (lBpt.breakHere(aStack)) lResult.add(lBpt);
             }
             return lResult;
         }
 
-        public IBreakpoint findFirstMatchingBreakpoint(Eval2.EvalStack aStack)
-        {
-            for(IBreakpoint lBpt : breakpoints)
-                if(lBpt.breakHere(aStack)) return lBpt;
+        public IBreakpoint findFirstMatchingBreakpoint(Eval2.EvalStack aStack) {
+            for (IBreakpoint lBpt : breakpoints)
+                if (lBpt.breakHere(aStack)) return lBpt;
             return null;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack)
-        {
+        public boolean breakHere(Eval2.EvalStack aStack) {
             return findFirstMatchingBreakpoint(aStack) != null;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             final StringBuilder lBuilder = new StringBuilder();
-            for(IBreakpoint lBpt: breakpoints)
-            {
+            for (IBreakpoint lBpt : breakpoints) {
                 lBuilder.append(lBpt.toString()).append("\n");
             }
             return lBuilder.toString();
@@ -136,30 +120,25 @@ public class EvalTrace
     }
 
     public static class BreakpointFunc
-    implements EvalTrace.IBreakpoint
-    {
+            implements EvalTrace.IBreakpoint {
         private String name;
         private String func;
         private boolean enabled = true;
 
-        public BreakpointFunc(String aName, String aFunc)
-        {
+        public BreakpointFunc(String aName, String aFunc) {
             name = aName;
             func = aFunc;
         }
 
-        public void setEnabled(boolean enabled)
-        {
+        public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack)
-        {
+        public boolean breakHere(Eval2.EvalStack aStack) {
             final Eval2.StackFrame lFrame = aStack.top();
             final Object lExpr = lFrame.getExpr();
 
-            if(enabled && name != null && lExpr != null && lExpr instanceof List)
-            {
+            if (enabled && name != null && lExpr != null && lExpr instanceof List) {
                 // Fetch the expression that is being evaluated.
                 final List lExprLst = (List) lExpr;
                 // Only break if the name of the expression is the one we are looking for,
@@ -171,244 +150,202 @@ public class EvalTrace
             return false;
         }
 
-        public String getName()
-        {
+        public String getName() {
             return name;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("name break: '").append(this.func).append("'").append(enabled?", enabled":", paused");
+            lBuilder.append(this.name).append(", ").append("name break: '").append(this.func).append("'").append(enabled ? ", enabled" : ", paused");
             return lBuilder.toString();
         }
     }
 
     public static class BreakpointWhen
-    implements IBreakpoint
-    {
+            implements IBreakpoint {
         private String name;
         private Object lWhenExpr;
         private IEval eval = new Eval();
         private boolean enabled = true;
 
-        public BreakpointWhen(String aName, Object aExpr)
-        {
+        public BreakpointWhen(String aName, Object aExpr) {
             this.name = aName;
             this.lWhenExpr = aExpr;
         }
 
-        public String getName()
-        {
+        public String getName() {
             return name;
         }
 
-        public void setEnabled(boolean enabled)
-        {
+        public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack)
-        {
-            try
-            {
+        public boolean breakHere(Eval2.EvalStack aStack) {
+            try {
                 return enabled && AbstractEval.boolEval(eval.eval(lWhenExpr, aStack.top().getCtx()));
-            }
-            catch (CommandException e)
-            {
+            } catch (CommandException e) {
                 return false;
             }
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("expression break: '").append(lWhenExpr.toString()).append("'").append(enabled?", enabled":", paused");
+            lBuilder.append(this.name).append(", ").append("expression break: '").append(lWhenExpr.toString()).append("'").append(enabled ? ", enabled" : ", paused");
             return lBuilder.toString();
         }
     }
 
     public static class BreakpointStackdepth
-    implements IBreakpoint
-    {
+            implements IBreakpoint {
         private String name;
         private boolean enabled = true;
         private int depth;
 
-        public BreakpointStackdepth(String aName, int aDepth)
-        {
+        public BreakpointStackdepth(String aName, int aDepth) {
             this.name = aName;
             this.depth = aDepth;
         }
 
-        public String getName()
-        {
+        public String getName() {
             return name;
         }
 
-        public void setEnabled(boolean enabled)
-        {
+        public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack)
-        {
+        public boolean breakHere(Eval2.EvalStack aStack) {
             return enabled && aStack.size() >= depth;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("stack depth break: '").append(depth).append("'").append(enabled?", enabled":", paused");
+            lBuilder.append(this.name).append(", ").append("stack depth break: '").append(depth).append("'").append(enabled ? ", enabled" : ", paused");
             return lBuilder.toString();
         }
     }
 
     public static class BreakpointNot
-    implements IBreakpoint
-    {
+            implements IBreakpoint {
         private String name;
         private boolean enabled = true;
         private IBreakpoint bp;
 
-        public BreakpointNot(String aName, IBreakpoint aBp)
-        {
+        public BreakpointNot(String aName, IBreakpoint aBp) {
             this.name = aName;
             this.bp = aBp;
         }
 
-        public String getName()
-        {
+        public String getName() {
             return name;
         }
 
-        public void setEnabled(boolean enabled)
-        {
+        public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack)
-        {
+        public boolean breakHere(Eval2.EvalStack aStack) {
             return enabled && !(bp.breakHere(aStack));
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("not-composite").append(enabled?", enabled":", paused");
+            lBuilder.append(this.name).append(", ").append("not-composite").append(enabled ? ", enabled" : ", paused");
             lBuilder.append("\n\t").append(bp.toString().replace("\n\t", "\n\t\t"));
             return lBuilder.toString();
         }
     }
 
     public static class BreakpointAnd
-    implements IBreakpoint
-    {
+            implements IBreakpoint {
         private String name;
         private boolean enabled = true;
         private List<IBreakpoint> bps;
 
-        public BreakpointAnd(String aName, List<IBreakpoint> aBps)
-        {
+        public BreakpointAnd(String aName, List<IBreakpoint> aBps) {
             this.name = aName;
             this.bps = aBps;
         }
 
-        public String getName()
-        {
+        public String getName() {
             return name;
         }
 
-        public void setEnabled(boolean enabled)
-        {
+        public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack)
-        {
+        public boolean breakHere(Eval2.EvalStack aStack) {
             boolean lBreak = enabled;
-            for(IBreakpoint lBp: bps)
-            {
+            for (IBreakpoint lBp : bps) {
                 lBreak = lBreak && lBp.breakHere(aStack);
-                if(!lBreak) return lBreak;
+                if (!lBreak) return lBreak;
             }
             return lBreak;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("and-composite").append(enabled?", enabled":", paused");
-            for(IBreakpoint lBp: bps)
+            lBuilder.append(this.name).append(", ").append("and-composite").append(enabled ? ", enabled" : ", paused");
+            for (IBreakpoint lBp : bps)
                 lBuilder.append("\n\t * ").append(lBp.toString().replace("\n\t", "\n\t\t"));
             return lBuilder.toString();
         }
     }
 
     public static class BreakpointOr
-    implements IBreakpoint
-    {
+            implements IBreakpoint {
         private String name;
         private boolean enabled = true;
         private List<IBreakpoint> bps;
 
-        public BreakpointOr(String aName, List<IBreakpoint> aBps)
-        {
+        public BreakpointOr(String aName, List<IBreakpoint> aBps) {
             this.name = aName;
             this.bps = aBps;
         }
 
-        public String getName()
-        {
+        public String getName() {
             return name;
         }
 
-        public void setEnabled(boolean enabled)
-        {
+        public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack)
-        {
-            if(!enabled) return false;
+        public boolean breakHere(Eval2.EvalStack aStack) {
+            if (!enabled) return false;
             boolean lBreak = false;
-            for(IBreakpoint lBp: bps)
-            {
+            for (IBreakpoint lBp : bps) {
                 lBreak = lBreak || lBp.breakHere(aStack);
-                if(lBreak) return lBreak;
+                if (lBreak) return lBreak;
             }
             return lBreak;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("or-composite").append(enabled?", enabled":", paused");
-            for(IBreakpoint lBp: bps)
+            lBuilder.append(this.name).append(", ").append("or-composite").append(enabled ? ", enabled" : ", paused");
+            for (IBreakpoint lBp : bps)
                 lBuilder.append("\n\t * ").append(lBp.toString().replace("\n\t", "\n\t\t"));
             return lBuilder.toString();
         }
     }
 
-    public EvalTrace(final Eval2 aEval, final Object aExpr)
-    {
+    public EvalTrace(final Eval2 aEval, final Object aExpr) {
         // Keep track of the eval under scrutiny.
         // Add an event listener to it.
         eval = aEval;
-        eval.addEvalListener(new Eval2.EvalListener()
-        {
-            public void finishedEval(Eval2.EvalEvent aEvent)
-            {
-                synchronized (EvalTrace.this)
-                {
-                    try
-                    {
+        eval.addEvalListener(new Eval2.EvalListener() {
+            public void finishedEval(Eval2.EvalEvent aEvent) {
+                synchronized (EvalTrace.this) {
+                    try {
                         // The eval is done. Set the flags.
                         halted = true;
                         hasResult = true;
@@ -424,20 +361,15 @@ public class EvalTrace
                         // this earlier evaluation!
                         EvalTrace.this.wait();
                         halted = false;
-                    }
-                    catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         halted = true;
                     }
                 }
             }
 
-            public void startEval(Eval2.EvalEvent aEvent)
-            {
-                synchronized(EvalTrace.this)
-                {
-                    try
-                    {
+            public void startEval(Eval2.EvalEvent aEvent) {
+                synchronized (EvalTrace.this) {
+                    try {
                         // The eval marks itself as being halted (see a bit further).
                         halted = true;
                         result = null;
@@ -452,20 +384,15 @@ public class EvalTrace
                         EvalTrace.this.wait();
                         // If we pass through the wait method, the eval kicks into action.
                         halted = false;
-                    }
-                    catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         halted = true;
                     }
                 }
             }
 
-            public void stepEvent(Eval2.EvalEvent aEvent)
-            {
-                synchronized (EvalTrace.this)
-                {
-                    try
-                    {
+            public void stepEvent(Eval2.EvalEvent aEvent) {
+                synchronized (EvalTrace.this) {
+                    try {
                         // Set the halted flag.
                         halted = true;
                         // Provide the stack for the debugger to examine.
@@ -475,25 +402,20 @@ public class EvalTrace
                         // If there are more steps to take, we let the eval wait a bit.
                         // If this was the last step, we can let the eval worker finish its job
                         // and prepare the result for us.
-                        if(stack.hasMoreSteps())
-                        {
+                        if (stack.hasMoreSteps()) {
                             // The eval goes to sleep ...
                             // We wait for a signal of the tracer.
                             EvalTrace.this.wait();
                             halted = false;
                         }
-                    }
-                    catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         halted = true;
                     }
                 }
             }
 
-            public void receivedException(Eval2.EvalEvent aEvent)
-            {
-                synchronized (EvalTrace.this)
-                {
+            public void receivedException(Eval2.EvalEvent aEvent) {
+                synchronized (EvalTrace.this) {
                     halted = true;
                     stack = aEvent.getStack();
                     exception = aEvent.getException();
@@ -508,17 +430,12 @@ public class EvalTrace
         });
 
         // Create a separate suspendable thread to evaluate our expresion in.
-        worker = new Thread()
-        {
+        worker = new Thread() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     eval.eval(aExpr);
-                }
-                catch (CommandException e)
-                {
+                } catch (CommandException e) {
                     // The eval will have notified any listeners.
                     // Our EvalTrace will have received the exception event and should have
                     // taken appropriate action.
@@ -533,12 +450,10 @@ public class EvalTrace
         worker.start();
     }
 
-    public synchronized boolean hasMoreSteps()
-    {
-        if(worker == null || excepted || !worker.isAlive() ) return false;
+    public synchronized boolean hasMoreSteps() {
+        if (worker == null || excepted || !worker.isAlive()) return false;
 
-        try
-        {
+        try {
             while (!halted) this.wait();
             // This is a difficult piece of code.
             // We halt if there is an exception, this is the easy part.
@@ -546,23 +461,18 @@ public class EvalTrace
             // There can be multiple stacks if there is a nesting, i.e. a command invokes eval itself.
             // In the nested case, the debugger can go on stepping, no problem.
             return stack != null && !excepted && (stack.hasMoreSteps() || stack.getPrevStack() != null);
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             halted = true;
             return false;
         }
     }
 
-    public synchronized void step()
-    {
-        if(worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
+    public synchronized void step() {
+        if (worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
 
-        try
-        {
+        try {
             while (!halted) this.wait();
-            if(!excepted)
-            {
+            if (!excepted) {
                 // Clear the breakpoint flag.
                 breakpoint = false;
 
@@ -571,30 +481,24 @@ public class EvalTrace
                 // We put ourselves in wait mode until the eval has taken a step.
                 // The eval has to get us out of the wait queue.
                 this.wait();
-                stepcount ++;
+                stepcount++;
             }
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             halted = true;
         }
     }
 
-    public synchronized Eval2.EvalStack getStack()
-    {
+    public synchronized Eval2.EvalStack getStack() {
         // No guard because you could always get the last stack for examination,
         // even post mortem.
 
-        try
-        {
+        try {
             // We cant access the stack while the
             // eval is working on it. So we are patient.
-            while(!halted) this.wait();
+            while (!halted) this.wait();
             // If the eval is halted, we can access its stack.
             return stack;
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             halted = true;
             return null;
         }
@@ -607,18 +511,14 @@ public class EvalTrace
      *
      * @return
      */
-    public synchronized Object getResult()
-    {
+    public synchronized Object getResult() {
         // No guard because you always could get the last result for examination,
         // even post mortem.
 
-        try
-        {
-            while(!halted) this.wait();
+        try {
+            while (!halted) this.wait();
             return result;
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             // The wait could be interrupted because the
             // eval thread ended.
             halted = true;
@@ -632,18 +532,14 @@ public class EvalTrace
      *
      * @return
      */
-    public synchronized boolean hasResult()
-    {
+    public synchronized boolean hasResult() {
         // No guard because you always could get the last result for examination,
         // even post mortem.
 
-        try
-        {
-            while(!halted) this.wait();
+        try {
+            while (!halted) this.wait();
             return hasResult;
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             // The wait could be interrupted because the
             // eval thread ended.
             halted = true;
@@ -655,270 +551,222 @@ public class EvalTrace
      * Stop tracing. No operation is possible after the tracer has halted.
      * All resources held by the eval being traced will be released.
      * Stopping a tracer is necessary in order not to clutter the memory.
-     *
      */
-   public synchronized void terminate()
-   {
-       if(worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
+    public synchronized void terminate() {
+        if (worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
 
-       try
-        {
-            while(!halted) this.wait();
+        try {
+            while (!halted) this.wait();
             worker.interrupt();
             worker = null;
             halted = true;
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             halted = true;
         }
-   }
+    }
 
-   /**
-    * Check if the trace has been halted or not.
-    * If it is halted, nothing can be done with it anymore.
-    *
-    * @return
-    */
-   public synchronized boolean isTerminated()
-   {
-       return (worker == null);
-   }
+    /**
+     * Check if the trace has been halted or not.
+     * If it is halted, nothing can be done with it anymore.
+     *
+     * @return
+     */
+    public synchronized boolean isTerminated() {
+        return (worker == null);
+    }
 
-   /**
-    * Restart the evaluation of the current expression to the beginning.
-    * Ignore all intermediate results obtained so far.
-    *
-    */
-   public synchronized void reset()
-   {
-       if(worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
+    /**
+     * Restart the evaluation of the current expression to the beginning.
+     * Ignore all intermediate results obtained so far.
+     */
+    public synchronized void reset() {
+        if (worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
 
-       try
-        {
-            while(!halted) this.wait();
+        try {
+            while (!halted) this.wait();
             stack.reset();
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             halted = true;
         }
-   }
+    }
 
-   /**
-    * Restart the evaluation of the current expression to the beginning.
-    * Ignore all intermediate results obtained so far.
-    *
-    */
-   public synchronized void dropFrame()
-   {
-       if(worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
+    /**
+     * Restart the evaluation of the current expression to the beginning.
+     * Ignore all intermediate results obtained so far.
+     */
+    public synchronized void dropFrame() {
+        if (worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
 
-       try
-        {
-            while(!halted) this.wait();
+        try {
+            while (!halted) this.wait();
             stack.dropFrame();
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             halted = true;
         }
-   }
+    }
 
-   /**
-    * Step backwards. Note that side effects will not be undone.
-    *
-    */
-   public synchronized void backStep()
-   {
-       if(worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
+    /**
+     * Step backwards. Note that side effects will not be undone.
+     */
+    public synchronized void backStep() {
+        if (worker == null || excepted || !worker.isAlive()) throw new IllegalStateException();
 
-       try
-        {
-            while(!halted) this.wait();
+        try {
+            while (!halted) this.wait();
 
             final Eval2.StackFrame lFrame = stack.top();
-            if(lFrame.getDataptr() > 0) lFrame.backStep();
+            if (lFrame.getDataptr() > 0) lFrame.backStep();
             else stack.dropFrame();
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             halted = true;
         }
-   }
+    }
 
-   /**
-    * Keep on stepping as long as there are more expressions to evaluate.
-    * This will walk over the results, this can happen when an intermediate command
-    * keeps on evaluating expressions in sequence.
-    *
-    */
-   public synchronized void run()
-   {
-       // Initialize statistics.
-       stepcount = 0;
-       breakpoint = false;
+    /**
+     * Keep on stepping as long as there are more expressions to evaluate.
+     * This will walk over the results, this can happen when an intermediate command
+     * keeps on evaluating expressions in sequence.
+     */
+    public synchronized void run() {
+        // Initialize statistics.
+        stepcount = 0;
+        breakpoint = false;
 
-       // Take some steps.
-       steploop: while(hasMoreSteps() && !excepted)
-           if(stepcount > 0 && breakpoints.breakHere(stack))
-           {
-               breakpoint = true;
-               break steploop;
-           }
-           else step();
-   }
+        // Take some steps.
+        steploop:
+        while (hasMoreSteps() && !excepted)
+            if (stepcount > 0 && breakpoints.breakHere(stack)) {
+                breakpoint = true;
+                break steploop;
+            } else step();
+    }
 
-   /**
-    * Keep on stepping as long as the expression has not been completely evaluated.
-    * Note that after the result has been reached, new expressions might be evaluated, so this is
-    * not necessarily the end of evaluation. This can happen with intermediary commands.
-    *
-    */
-   public synchronized void runToResult()
-   {
-       // Initialize run statistics.
-       stepcount = 0;
-       breakpoint = false;
+    /**
+     * Keep on stepping as long as the expression has not been completely evaluated.
+     * Note that after the result has been reached, new expressions might be evaluated, so this is
+     * not necessarily the end of evaluation. This can happen with intermediary commands.
+     */
+    public synchronized void runToResult() {
+        // Initialize run statistics.
+        stepcount = 0;
+        breakpoint = false;
 
-       // Take the steps.
-       steploop: while(!hasResult() && !excepted)
-           if(stepcount > 0 && breakpoints.breakHere(stack))
-           {
-               breakpoint = true;
-               break steploop;
-           }
-           else step();
-   }
+        // Take the steps.
+        steploop:
+        while (!hasResult() && !excepted)
+            if (stepcount > 0 && breakpoints.breakHere(stack)) {
+                breakpoint = true;
+                break steploop;
+            } else step();
+    }
 
 
+    public synchronized void stepOut() {
+        // First we run until the current frame has been evaluated.
+        // Note that we keep holding on to the same frame for testing,
+        // the one that was on the top when this method was called.
+        final Eval2.StackFrame lFrame = getStack().top();
+        stepcount = 0;
+        breakpoint = false;
 
-   public synchronized void stepOut()
-   {
-       // First we run until the current frame has been evaluated.
-       // Note that we keep holding on to the same frame for testing,
-       // the one that was on the top when this method was called.
-       final Eval2.StackFrame lFrame = getStack().top();
-       stepcount = 0;
-       breakpoint = false;
+        // Take some steps.
+        steploop:
+        while (!lFrame.isEvaluated() && !excepted)
+            if (stepcount > 0 && breakpoints.breakHere(stack)) {
+                breakpoint = true;
+                break steploop;
+            } else step();
+        // Now we take a single step to step out of the frame.
+        if (this.hasMoreSteps())
+            if (stepcount > 0 && breakpoints.breakHere(stack)) breakpoint = true;
+            else step();
+    }
 
-       // Take some steps.
-       steploop: while(!lFrame.isEvaluated() && !excepted)
-           if(stepcount > 0 && breakpoints.breakHere(stack))
-           {
-               breakpoint = true;
-               break steploop;
-           }
-           else step();
-       // Now we take a single step to step out of the frame.
-       if(this.hasMoreSteps())
-           if(stepcount > 0 && breakpoints.breakHere(stack))breakpoint = true;
-           else step();
-   }
+    public synchronized void runToReady() {
+        // We run until the current frame has been evaluated.
+        // Note that we keep holding on to the same frame for testing,
+        // the one that was on the top when this method was called.
+        final Eval2.StackFrame lFrame = getStack().top();
+        stepcount = 0;
+        breakpoint = false;
 
-   public synchronized void runToReady()
-   {
-       // We run until the current frame has been evaluated.
-       // Note that we keep holding on to the same frame for testing,
-       // the one that was on the top when this method was called.
-       final Eval2.StackFrame lFrame = getStack().top();
-       stepcount = 0;
-       breakpoint = false;
+        // Take some steps.
 
-       // Take some steps.
+        steploop:
+        while (
+            // If there is no handler, the data slots will not have been initialized (this is the task of the handler)
+            // and the slot pointer will not be a reliable metric.
+                (lFrame.getHandler() == null) ||
+                        ((lFrame.getDataptr() < lFrame.getData().length) && !excepted))
+            if (stepcount > 0 && breakpoints.breakHere(stack)) {
+                breakpoint = true;
+                break steploop;
+            } else step();
+    }
 
-       steploop: while(
-           // If there is no handler, the data slots will not have been initialized (this is the task of the handler)
-           // and the slot pointer will not be a reliable metric.
-           (lFrame.getHandler() == null) ||
-           ((lFrame.getDataptr() < lFrame.getData().length) && !excepted))
-           if(stepcount > 0 && breakpoints.breakHere(stack))
-           {
-               breakpoint = true;
-               break steploop;
-           }
-           else step();
-   }
+    public synchronized void stepOver() {
+        if (excepted) return;
 
-   public synchronized void stepOver()
-   {
-       if(excepted) return;
+        final Eval2.StackFrame lFrame = getStack().top();
+        final int lStartSlot = lFrame.getDataptr();
 
-       final Eval2.StackFrame lFrame = getStack().top();
-       final int lStartSlot = lFrame.getDataptr();
+        // Initialize runstatistics.
+        stepcount = 0;
+        breakpoint = false;
 
-       // Initialize runstatistics.
-       stepcount = 0;
-       breakpoint = false;
+        // Take some steps.
+        if (lFrame.isEvaluated()) {
+            if (stepcount > 0 && breakpoints.breakHere(stack)) breakpoint = true;
+            else step();
+        } else {
+            steploop:
+            while (
+                // If there is not yet a handler, the frame slots will not have
+                // been initialized and the datapointer will not be a reliable metric.
+                    lFrame.getHandler() == null ||
+                            (!lFrame.isEvaluated() && !excepted && (lFrame.getDataptr() <= lStartSlot)))
+                if (stepcount > 0 && breakpoints.breakHere(stack)) {
+                    breakpoint = true;
+                    break steploop;
+                } else step();
+        }
+    }
 
-       // Take some steps.
-       if(lFrame.isEvaluated())
-       {
-           if(stepcount > 0 && breakpoints.breakHere(stack)) breakpoint = true;
-           else step();
-       }
-       else
-       {
-           steploop: while(
-               // If there is not yet a handler, the frame slots will not have
-               // been initialized and the datapointer will not be a reliable metric.
-               lFrame.getHandler() == null ||
-               (!lFrame.isEvaluated() && !excepted && (lFrame.getDataptr() <= lStartSlot)))
-               if(stepcount > 0 && breakpoints.breakHere(stack))
-               {
-                   breakpoint = true;
-                   break steploop;
-               }
-               else step();
-       }
-   }
+    public synchronized boolean isExcepted() {
+        try {
+            while (!halted) this.wait();
+            return excepted;
+        } catch (InterruptedException e) {
+            // The wait could be interrupted because the eval thread ended.
+            halted = true;
+            return excepted;
+        }
+    }
 
-   public synchronized boolean isExcepted()
-   {
-       try
-       {
-           while(!halted) this.wait();
-           return excepted;
-       }
-       catch (InterruptedException e)
-       {
-           // The wait could be interrupted because the eval thread ended.
-           halted = true;
-           return excepted;
-       }
-   }
+    public synchronized Exception getException() {
+        // No guard because you always could get the last result for examination,
+        // even post mortem.
 
-   public synchronized Exception getException()
-   {
-       // No guard because you always could get the last result for examination,
-       // even post mortem.
+        try {
+            while (!halted) this.wait();
+            return exception;
+        } catch (InterruptedException e) {
+            // The wait could be interrupted because the
+            // eval thread ended.
+            halted = true;
+            return exception;
+        }
+    }
 
-       try
-       {
-           while(!halted) this.wait();
-           return exception;
-       }
-       catch (InterruptedException e)
-       {
-           // The wait could be interrupted because the
-           // eval thread ended.
-           halted = true;
-           return exception;
-       }
-   }
-
-    public BreakpointSet getBreakpoints()
-    {
+    public BreakpointSet getBreakpoints() {
         return breakpoints;
     }
 
-    public void setBreakpoints(BreakpointSet breakpoints)
-    {
+    public void setBreakpoints(BreakpointSet breakpoints) {
         this.breakpoints = breakpoints;
     }
 
-    public boolean isBreakpointEncountered()
-    {
+    public boolean isBreakpointEncountered() {
         return breakpoint;
     }
 }

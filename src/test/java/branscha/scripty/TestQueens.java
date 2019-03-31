@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -34,43 +34,36 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestQueens
-{
+public class TestQueens {
     private ScriptyStreamProcessor scripty;
     private PrintPlusCmd printer;
 
-    @ScriptyLibrary(type= ScriptyLibraryType.INSTANCE)
-    public static class PrintPlusCmd
-    {
+    @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
+    public static class PrintPlusCmd {
         private int counter = 0;
 
         @ScriptyCommand
-        public void print()
-        {
-            counter ++;
-        }
-
-        @ScriptyCommand
-        public void println()
-        {
+        public void print() {
             counter++;
         }
 
-        public int getCounter()
-        {
+        @ScriptyCommand
+        public void println() {
+            counter++;
+        }
+
+        public int getCounter() {
             return counter;
         }
 
-        public void reset()
-        {
+        public void reset() {
             counter = 0;
         }
     }
 
     @Before
     public void setup()
-    throws ExtensionException, ProcessorException
-    {
+    throws ExtensionException, ProcessorException {
         scripty = new ScriptyStreamProcessor();
         printer = new PrintPlusCmd();
 
@@ -80,8 +73,7 @@ public class TestQueens
     }
 
     public int queens(int n)
-    throws ProcessorException
-    {
+    throws ProcessorException {
         printer.reset();
         scripty.process(String.format("(queens %d)", n));
         return printer.getCounter();
@@ -89,8 +81,7 @@ public class TestQueens
 
     @Test
     public void queens()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Assert.assertEquals(1, queens(1));
         Assert.assertEquals(0, queens(2));
         Assert.assertEquals(0, queens(3));

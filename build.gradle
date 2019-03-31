@@ -28,3 +28,21 @@ publishing {
         }
     }
 }
+
+// Start a Scripty repl with minimalistic GUI (if possible)
+// It will fall back to the CLI if a GUI cannot be started.
+// ./gradlew --console plain repl
+task repl(type: JavaExec) {
+    main = "branscha.scripty.ScriptyAutoRepl"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+// Start a Scripty repl on the command line.
+// ./gradlew --console plain textrepl
+task textrepl(type: JavaExec) {
+    main = "branscha.scripty.ScriptyAutoRepl"
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperty 'mode', 'text'
+    standardInput = System.in
+    standardOutput = System.out
+}

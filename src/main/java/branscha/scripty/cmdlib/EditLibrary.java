@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,71 +28,60 @@ import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Parser;
 import branscha.scripty.parser.Token;
-import branscha.scripty.annot.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-@ScriptyLibrary(type=ScriptyLibraryType.STATIC)
-@ScriptyNamedArgLists(std = {@ScriptyStdArgList(name="content + title", optional = {@ScriptyArg(name="content", type="String")}, named = {@ScriptyArg(name="title", type="String", optional = true, value = "Text Editor")})})
-public class EditLibrary
-{
-    @ScriptyCommand(name="edit")
+@ScriptyLibrary(type = ScriptyLibraryType.STATIC)
+@ScriptyNamedArgLists(std = {@ScriptyStdArgList(name = "content + title", optional = {@ScriptyArg(name = "content", type = "String")}, named = {@ScriptyArg(name = "title", type = "String", optional = true, value = "Text Editor")})})
+public class EditLibrary {
+    @ScriptyCommand(name = "edit")
     @ScriptyRefArgList(ref = "content + title")
     public static String edit(@ScriptyParam("content") String aContent, @ScriptyParam("title") String aTitle)
-    throws CommandException
-    {
+    throws CommandException {
         // Not available in head less mode.
-        if(GraphicsEnvironment.isHeadless())
+        if (GraphicsEnvironment.isHeadless())
             throw new CommandException("Java VM is running in headless mode.");
 
         JFrame lParent = null;
         final EditDialog lDiag = new EditDialog(lParent, aTitle, aContent);
         lDiag.setLocationRelativeTo(lParent);
-        
+
         lDiag.setVisible(true);
         final String lEdited = lDiag.getContent();
 
         return lEdited;
     }
 
-    @ScriptyCommand(name="edit-expr")
+    @ScriptyCommand(name = "edit-expr")
     @ScriptyRefArgList(ref = "content + title")
     public static Object editExpr(@ScriptyParam("content") String aContent, @ScriptyParam("title") String aTitle)
-    throws CommandException
-    {
+    throws CommandException {
         final String lEdited = edit(aContent, aTitle);
-        if(lEdited != null)
-        {
+        if (lEdited != null) {
             Parser lParser = new Parser();
-            Object lRes =  lParser.parseExpression(lEdited);
-            if(lRes instanceof Token)
-            {
+            Object lRes = lParser.parseExpression(lEdited);
+            if (lRes instanceof Token) {
                 Token lResTok = (Token) lRes;
-                if(lResTok.isErroneous()) throw new CommandException(lResTok.getValue());
+                if (lResTok.isErroneous()) throw new CommandException(lResTok.getValue());
             }
             return lRes;
-        }
-        else return null;
+        } else return null;
     }
 }
 
-class EditDialog
-extends JDialog
-{
+class EditDialog extends JDialog {
     private String content = null;
     private JTextArea txtArea;
 
-    public EditDialog(Frame aParent, String lTitle, String aContent)
-    {
+    public EditDialog(Frame aParent, String lTitle, String aContent) {
         this(aParent, lTitle);
         txtArea.setText(aContent);
     }
 
-    public EditDialog(Frame aParent, String lTitle)
-    {
+    public EditDialog(Frame aParent, String lTitle) {
         super(aParent, lTitle);
 
         setModal(true);
@@ -111,7 +100,7 @@ extends JDialog
         lConstraints.gridwidth = 3;
         lConstraints.gridheight = 1;
         lConstraints.fill = GridBagConstraints.BOTH;
-        lConstraints.insets = new Insets(5,5,5,5);
+        lConstraints.insets = new Insets(5, 5, 5, 5);
         lConstraints.weightx = 1.0;
         lConstraints.weighty = 1.0;
         lCont.add(new JScrollPane(txtArea), lConstraints);
@@ -124,7 +113,7 @@ extends JDialog
         lConstraints.gridheight = 1;
         lConstraints.gridx = 0;
         lConstraints.gridy = 1;
-        lConstraints.insets = new Insets(0,5,5,5);
+        lConstraints.insets = new Insets(0, 5, 5, 5);
         lConstraints.weightx = 1.0;
         lConstraints.anchor = GridBagConstraints.EAST;
         lCont.add(lOkButton, lConstraints);
@@ -135,27 +124,22 @@ extends JDialog
         lConstraints.weightx = 0.0;
         lCont.add(lCancelButton, lConstraints);
 
-        lCancelButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        lCancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 content = null;
                 EditDialog.this.setVisible(false);
             }
         });
 
-        lOkButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        lOkButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 content = txtArea.getText();
                 EditDialog.this.setVisible(false);
             }
         });
     }
 
-    public String getContent()
-    {
+    public String getContent() {
         return content;
     }
 }

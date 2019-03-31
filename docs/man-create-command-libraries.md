@@ -1,9 +1,9 @@
 ### 7. Create a Scripty Command or Macro
 #### 7.1. Defining commands
 
-**Static methods** in a class. Scripty will scan the static methods of the class for annotations and transform each annotated method in a Command or macro.
+**Static methods**. Scripty will scan the static methods of the class for annotations and transform each annotated method in a Command or macro.
 
-* Most efficient commands, no extra memory needed the commands are completely stateless. Commands can only share information trough the context.
+* Most efficient commands, no extra memory needed the commands are stateless. Commands can only share information trough the context.
 
 **Plain objects** with one or more annotated methods. Scripty will scan the instance for both instance methods with annotations and also static methods. Scripty will call the static method or the method on the instance when the command is executed.
 
@@ -59,7 +59,7 @@ The possible argument types:
 
 Since the annotation parameters cannot refer to objects, the default value has to be represented by a String. This will only work if the type specification can convert String instances into the type. This restriction is the result of the annotation system.
 
-Type expressions are in fact Scripty expressions which enable us to write nested type definitions. Since it is impossible to implement the composite pattern using Java Annotations (due to inheritance limitations) it is not feasible to try to express the nested type system using annotations.
+Type expressions are in fact Scripty expressions which enable us to write nested type definitions.
 
 * Any nullAllowed=true|false
 * Double
@@ -123,7 +123,7 @@ public class Add {
 
 ### 11. Parameter Mapping
 
-Again, these annotations are here to delegate the parameter mapping to the Scripty engine. Since Scripty is aware of the command line structure, it can map the parameters to the parameters of the command implementation.
+These annotations are here to delegate the parameter mapping to the Scripty engine. Since Scripty is aware of the command line structure, it can map the parameters to the parameters of the command implementation.
 
 #### 11.1. Annotations
 

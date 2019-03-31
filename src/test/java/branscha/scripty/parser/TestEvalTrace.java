@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -33,12 +33,10 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 
-public class TestEvalTrace
-{
+public class TestEvalTrace {
     @Test
     public void testTrace()
-    throws CommandException, ExtensionException, InterruptedException
-    {
+    throws CommandException, ExtensionException, InterruptedException {
         Parser parser = new Parser();
         Eval2 eval = new Eval2();
 
@@ -48,11 +46,10 @@ public class TestEvalTrace
         eval.setCommandRepo(lBuilder.getCommandRepository());
 
         eval.eval(parser.parseExpression("(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))"));
-        Object lExpr =  parser.parseExpression("(fac 3)");
+        Object lExpr = parser.parseExpression("(fac 3)");
 
         EvalTrace trace = new EvalTrace(eval, lExpr);
-        while (trace.hasMoreSteps())
-        {
+        while (trace.hasMoreSteps()) {
             System.out.println(trace.getStack());
             trace.step();
         }

@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -34,14 +34,12 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestListLibrary
-{
+public class TestListLibrary {
     private ScriptyStreamProcessor scripty;
 
     @Before
     public void initialize()
-    throws ExtensionException
-    {
+    throws ExtensionException {
         scripty = new ScriptyStreamProcessor();
         scripty.addLibraryClasses(ListLibrary.class);
     }
@@ -49,8 +47,7 @@ public class TestListLibrary
     @Test
     // 'list' without arguments should create an empty list.
     public void createList1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("list");
         Assert.assertTrue(lResult instanceof java.util.List);
         Assert.assertTrue(((List) lResult).isEmpty());
@@ -59,8 +56,7 @@ public class TestListLibrary
     @Test
     // Standard case to create a list.
     public void createList2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("list 1 2 3 4 5");
         Assert.assertTrue(lResult instanceof java.util.List);
         Assert.assertTrue(((List) lResult).size() == 5);
@@ -69,8 +65,7 @@ public class TestListLibrary
     @Test
     // An empty list should test as empty.
     public void isEmpty1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("empty? (list)");
         Assert.assertTrue(Boolean.TRUE.equals(lResult));
     }
@@ -78,8 +73,7 @@ public class TestListLibrary
     @Test
     // A non-empty list should not be empty.
     public void isEmpty2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("empty? (list 1 2 3 4 5)");
         Assert.assertTrue(Boolean.FALSE.equals(lResult));
     }
@@ -87,8 +81,7 @@ public class TestListLibrary
     @Test(expected = ProcessorException.class)
     // 'empty?' without arguments should throw an exception.
     public void isEmpty3()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("empty?");
         Assert.fail();
     }
@@ -96,8 +89,7 @@ public class TestListLibrary
     @Test(expected = ProcessorException.class)
     // 'list?' without argument should throw an exception.
     public void isList1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("list?");
         Assert.fail();
     }
@@ -105,8 +97,7 @@ public class TestListLibrary
     @Test
     // Normal case, test that a list is a list.
     public void isList2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("list? (list 1 2 3 4 5)");
         Assert.assertTrue(Boolean.TRUE.equals(lResult));
     }
@@ -114,8 +105,7 @@ public class TestListLibrary
     @Test
     // An empty list is a list as well.
     public void isList3()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("list? (list)");
         Assert.assertTrue(Boolean.TRUE.equals(lResult));
     }
@@ -123,8 +113,7 @@ public class TestListLibrary
     @Test
     // A string is not a list.
     public void isList4()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("list? abc");
         Assert.assertTrue(Boolean.FALSE.equals(lResult));
     }
@@ -132,70 +121,62 @@ public class TestListLibrary
     @Test
     // The 'list?' should not blow up on null values.
     public void isList5()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("list? $null");
         Assert.assertTrue(Boolean.FALSE.equals(lResult));
     }
 
     @Test
     public void isMember1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("member? (list 1 2 3 4 5) 13");
         Assert.assertTrue(Boolean.FALSE.equals(lResult));
     }
 
     @Test
     public void isMember2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("member? (list 1 2 3 4 5) 3");
         Assert.assertTrue(Boolean.TRUE.equals(lResult));
     }
 
     @Test
     public void car1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("car (list 17 13 19 23)");
         Assert.assertTrue("17".equals(lResult));
     }
 
     @Test(expected = ProcessorException.class)
     public void car2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("car (list)");
         Assert.fail();
     }
 
     @Test(expected = ProcessorException.class)
     public void car3()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("car ()");
         Assert.fail();
     }
 
     @Test
     public void car4()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 "   (let " +
-                "      (lst=(list 17 13 19 23)) " +
-                "      (progn (car $lst) $lst))");
+                        "      (lst=(list 17 13 19 23)) " +
+                        "      (progn (car $lst) $lst))");
         Assert.assertTrue(lResult instanceof List);
         Assert.assertTrue(((List) lResult).size() == 4);
     }
 
     @Test
     public void cdr1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("cdr (list 17 13 19 23)");
-        Assert.assertTrue(lResult instanceof  List);
+        Assert.assertTrue(lResult instanceof List);
         List lList = (List) lResult;
         Assert.assertTrue(lList.size() == 3);
         Assert.assertTrue("13".equals(lList.get(0)));
@@ -205,40 +186,35 @@ public class TestListLibrary
 
     @Test(expected = ProcessorException.class)
     public void cdr2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("cdr ()");
         Assert.fail();
     }
 
     @Test
     public void shift1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("shift (list 17 13 19 23)");
         Assert.assertTrue("17".equals(lResult));
     }
 
     @Test(expected = ProcessorException.class)
     public void shift2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("shift (list)");
         Assert.fail();
     }
 
     @Test(expected = ProcessorException.class)
     public void shift3()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("shift ()");
         Assert.fail();
     }
 
     @Test
     public void shift4()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
@@ -249,8 +225,7 @@ public class TestListLibrary
 
     @Test
     public void unshift1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
@@ -265,8 +240,7 @@ public class TestListLibrary
     @Test
     // We test the side effect of cons, viz. it changes the original list.
     public void cons1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
@@ -280,8 +254,7 @@ public class TestListLibrary
     // We test the side effect of pop, viz. it changes
     // the original list.
     public void pop1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
@@ -297,8 +270,7 @@ public class TestListLibrary
     // We test the main functionality of pop, viz. it returns
     // the last element.
     public void pop2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
@@ -309,8 +281,7 @@ public class TestListLibrary
     @Test
     // We test for the side efffect of 'push' by pushing on the list, then returning the original list.
     public void push1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
@@ -325,13 +296,12 @@ public class TestListLibrary
     @Test
     // We test the main functionality of the append.
     public void append1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 "(let " +
-                    " (lst1=(list 1 2 3) lst2=(list 4 5 6) lst3=(list 7 8 9)) " +
-                    " (append $lst1 $lst2 $lst3)" +
-                ")");
+                        " (lst1=(list 1 2 3) lst2=(list 4 5 6) lst3=(list 7 8 9)) " +
+                        " (append $lst1 $lst2 $lst3)" +
+                        ")");
         Assert.assertTrue(lResult instanceof List);
         List lList = (List) lResult;
         Assert.assertTrue(lList.size() == 9);
@@ -342,8 +312,7 @@ public class TestListLibrary
     // The original lists should be unmodified.
     // Here we check out lst1 and see if it remained unchanged.
     public void append2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 "(let " +
                         " (lst1=(list 1 2 3) lst2=(list 4 5 6) lst3=(list 7 8 9)) " +
@@ -358,8 +327,7 @@ public class TestListLibrary
     @Test
     // Main functionality of 'size' on a normal list.
     public void size1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 "(let " +
                         " (lst1=(list 1 2 3 4 5 6 7 8 9)) " +
@@ -371,8 +339,7 @@ public class TestListLibrary
     @Test
     // The empty list should have size 0.
     public void size2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process(
                 "(let " +
                         " (lst1='()) " +
@@ -384,11 +351,10 @@ public class TestListLibrary
     @Test
     // Test the main dup functionality.
     public void dup()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         // Prepare a list with 1000 elements.
         final List lOrig = new ArrayList();
-        for(int i = 0; i < 1000; i++) lOrig.add(i);
+        for (int i = 0; i < 1000; i++) lOrig.add(i);
 
         // Duplicate it.
         scripty.getContext().defBinding("lst", lOrig);
@@ -403,13 +369,12 @@ public class TestListLibrary
     // 'null?' should not blow up on null values.
     //
     public void isNull()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         // Duplicate it.
         scripty.getContext().defBinding("one", null);
         scripty.getContext().defBinding("two", "abc");
-        
-        Assert.assertTrue( (Boolean) scripty.process("null? $one"));
-        Assert.assertFalse( (Boolean) scripty.process("null? $two"));
+
+        Assert.assertTrue((Boolean) scripty.process("null? $one"));
+        Assert.assertFalse((Boolean) scripty.process("null? $two"));
     }
 }

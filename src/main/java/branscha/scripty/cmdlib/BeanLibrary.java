@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,7 +28,6 @@ import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.IContext;
 import branscha.scripty.parser.Pair;
-import branscha.scripty.annot.*;
 
 import java.beans.*;
 import java.io.PrintWriter;
@@ -42,10 +41,9 @@ import java.util.regex.Pattern;
 
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(
-        std = {@ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name="path", type = "String", value = ".")})}
+        std = {@ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name = "path", type = "String", value = ".")})}
 )
-public class BeanLibrary
-{
+public class BeanLibrary {
 
     private String currentDirectory = "/";
 
@@ -55,15 +53,14 @@ public class BeanLibrary
     // - [5] arrays, lists can be indexed.
     //   xyz[5] has same semantics as xyz/5
     //
-    @ScriptyCommand(name="bean-cd")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name="path", type = "String")})
+    @ScriptyCommand(name = "bean-cd")
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
     public Object beanCd(@ScriptyParam("path") String aPath, IContext aCtx)
-    throws CommandException
-    {
+    throws CommandException {
         // Follow the path to see if it leads somewhere.
         final Resolution lRes = resolve(aPath, aCtx);
         // We succeeded following the path, so it exists.
-        if(!filter(lRes)) throw new CommandException("ERROR - cannot go there.");
+        if (!filter(lRes)) throw new CommandException("ERROR - cannot go there.");
         // We remember the current directory.
         currentDirectory = lRes.getPath();
         return lRes.getVal();
@@ -71,10 +68,9 @@ public class BeanLibrary
 
     // Print the current path to the repl.
     //
-    @ScriptyCommand(name="bean-pwd")
+    @ScriptyCommand(name = "bean-pwd")
     @ScriptyStdArgList
-    public Object beanPwd(@ScriptyBindingParam("*output") PrintWriter aWriter)
-    {
+    public Object beanPwd(@ScriptyBindingParam("*output") PrintWriter aWriter) {
         aWriter.println(currentDirectory);
         return currentDirectory;
     }
@@ -82,14 +78,13 @@ public class BeanLibrary
     // List the contents of the denoted object.
     // The action depends on the type of the object, properties, array elements are listed.
     //
-    @ScriptyCommand(name="bean-ls")
+    @ScriptyCommand(name = "bean-ls")
     @ScriptyRefArgList(ref = "path")
     public Object beanLs(@ScriptyParam("path") String aPath, IContext aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
-    throws CommandException
-    {
+    throws CommandException {
         // Resolve the path.
-        final Resolution lRes = resolve( aPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("Cannot show filtered.");
+        final Resolution lRes = resolve(aPath, aCtx);
+        if (!filter(lRes)) throw new CommandException("Cannot show filtered.");
         // Render the target object.
         final Object lVal = lRes.getVal();
         render(lVal, aWriter);
@@ -100,14 +95,13 @@ public class BeanLibrary
     // The difference between ls and cat is that ls lists the subelements while
     // cat calls the toString() method.
     //
-    @ScriptyCommand(name="bean-cat")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name="path", type = "String")})
+    @ScriptyCommand(name = "bean-cat")
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
     public Object beanCat(@ScriptyParam("path") String aPath, IContext aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
-    throws CommandException
-    {
+    throws CommandException {
         // Resolve the path.
         final Resolution lRes = resolve(aPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("Cannot cat filtered.");
+        if (!filter(lRes)) throw new CommandException("Cannot cat filtered.");
         final Object lVal = lRes.getVal();
         aWriter.println(lVal == null ? "null" : lVal.toString());
         return lVal;
@@ -118,14 +112,13 @@ public class BeanLibrary
     // It is what the other commands do automatically. This command is in fact the
     // link between other command libraries and this one.
     //
-    @ScriptyCommand(name="bean-rslv")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name="path", type = "String")})
+    @ScriptyCommand(name = "bean-rslv")
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
     public Object beanRslv(@ScriptyParam("path") String aPath, IContext aCtx)
-    throws CommandException
-    {
+    throws CommandException {
         // Resolve the path.
         final Resolution lRes = resolve(aPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("Cannot rslv filtered.");
+        if (!filter(lRes)) throw new CommandException("Cannot rslv filtered.");
         else return lRes.getVal();
     }
 
@@ -135,40 +128,33 @@ public class BeanLibrary
     // The arguments are not resolved, they are passed directly to the method. You can use the
     // rslv method above to accomplish argument resolution as well.
     //
-    @ScriptyCommand(name="bean-call")
+    @ScriptyCommand(name = "bean-call")
     public Object beanCall(Object[] aArgs, IContext aCtx)
-    throws CommandException
-    {
-        try
-        {
+    throws CommandException {
+        try {
             final String lPath = guardStringOther(aArgs);
             final Resolution lRes = resolve(lPath, aCtx);
-            if(! filter(lRes)) throw new CommandException("Cannot call filtered.");
+            if (!filter(lRes)) throw new CommandException("Cannot call filtered.");
             final Object lTarget = lRes.getVal();
 
             Object[] lArgs = new Object[aArgs.length - 3];
-            for(int i = 0; i < lArgs.length; i++) lArgs[i] = aArgs[i + 3];
+            for (int i = 0; i < lArgs.length; i++) lArgs[i] = aArgs[i + 3];
 
             Method lMeth = null;
-            if(aArgs[2] instanceof Method)
-            {
+            if (aArgs[2] instanceof Method) {
                 lMeth = (Method) aArgs[2];
-            }
-            else if (aArgs[2] instanceof String)
-            {
+            } else if (aArgs[2] instanceof String) {
                 Class[] lClasses = new Class[lArgs.length];
-                for(int i = 0; i < lArgs.length; i++) lClasses[i] = (lArgs[i]==null)?null:lArgs[i].getClass();
+                for (int i = 0; i < lArgs.length; i++) lClasses[i] = (lArgs[i] == null) ? null : lArgs[i].getClass();
 
                 lMeth = lTarget.getClass().getMethod((String) aArgs[2], lClasses);
             }
 
-            if(lMeth == null)
+            if (lMeth == null)
                 throw new CommandException("Method could not be resolved.");
 
             return lMeth.invoke(lTarget, lArgs);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new CommandException("Invocation failed.\n" + e.getMessage(), e);
         }
     }
@@ -176,16 +162,14 @@ public class BeanLibrary
     // Update the properties of a bean.
     // (bean-upd BEAN prop1=val1 prop2=val2 ...)
     //
-    @ScriptyCommand(name="bean-upd")
+    @ScriptyCommand(name = "bean-upd")
     public void beanUpd(Object[] aArgs, IContext aCtx)
-    throws CommandException
-    {
+    throws CommandException {
         final String lPath = guardStringOther(aArgs);
         final Resolution lRes = resolve(lPath, aCtx);
-        if(! filter(lRes)) throw new CommandException("Cannot update filtered.");
-        for(int i = 2; i < aArgs.length; i++)
-        {
-            if(!(aArgs[i] instanceof Pair))
+        if (!filter(lRes)) throw new CommandException("Cannot update filtered.");
+        for (int i = 2; i < aArgs.length; i++) {
+            if (!(aArgs[i] instanceof Pair))
                 throw new CommandException("Pair expected.");
             Pair lPair = (Pair) aArgs[i];
             update(lRes.getVal(), lPair.getLeft(), lPair.getRight());
@@ -193,154 +177,122 @@ public class BeanLibrary
     }
 
     private String guardStringOther(Object[] aArgs)
-    throws CommandException
-    {
-        if(aArgs.length < 3)
+    throws CommandException {
+        if (aArgs.length < 3)
             throw new CommandException("ERROR - Too few args.");
-        if(!(aArgs[1] instanceof String))
+        if (!(aArgs[1] instanceof String))
             throw new CommandException("ERROR - expected a string as first arg.");
         return (String) aArgs[1];
     }
 
-    public static interface IFilter
-    {
+    public static interface IFilter {
         boolean filter(String aPath, Object aValue);
     }
 
     private IFilter[] filters = new IFilter[]{};
 
-    private static Pattern PAT_FIELDNAME_BIS =  Pattern.compile("^\\s*([^\\s\\[\\]]+)?\\s*(\\[\\s*([^\\s\\[\\]]+)\\s*\\])*\\s*$");
+    private static Pattern PAT_FIELDNAME_BIS = Pattern.compile("^\\s*([^\\s\\[\\]]+)?\\s*(\\[\\s*([^\\s\\[\\]]+)\\s*\\])*\\s*$");
 
-    private static class Resolution
-    {
+    private static class Resolution {
         private Object val;
         private String path;
 
-        public Resolution(String aPath, Object aObj)
-        {
+        public Resolution(String aPath, Object aObj) {
             path = aPath;
             val = aObj;
         }
 
-        public String getPath()
-        {
+        public String getPath() {
             return path;
         }
 
-        public Object getVal()
-        {
+        public Object getVal() {
             return val;
         }
     }
 
     public Resolution resolve(String aPath, IContext aCtx)
-    throws CommandException
-    {
-        if(aPath.startsWith("/"))
-        {
+    throws CommandException {
+        if (aPath.startsWith("/")) {
             final String lRelPath = aPath.substring(1);
             List<String> lPieces = canonize(lRelPath);
 
             Object lVal;
-            if("".equals(lRelPath)) lVal = aCtx;
+            if ("".equals(lRelPath)) lVal = aCtx;
             else lVal = resolveCanonical(lPieces, 0, aCtx);
 
             final StringBuilder lBuilder = new StringBuilder("/");
-            for(String lPart : lPieces)
-            {
+            for (String lPart : lPieces) {
                 lBuilder.append(lPart);
-                if(lPieces.get(lPieces.size() - 1) != lPart)
+                if (lPieces.get(lPieces.size() - 1) != lPart)
                     lBuilder.append("/");
             }
             return new Resolution(lBuilder.toString(), lVal);
-        }
-        else
-        {
+        } else {
             String lAbsPath;
-            if("/".equals(currentDirectory)) lAbsPath = currentDirectory + aPath;
+            if ("/".equals(currentDirectory)) lAbsPath = currentDirectory + aPath;
             else lAbsPath = currentDirectory + "/" + aPath;
             return resolve(lAbsPath, aCtx);
         }
     }
 
     private static Object resolveCanonical(List<String> aPieces, int aCurrPiece, Object aBase)
-    throws CommandException
-    {
-        if(aPieces.size() <= aCurrPiece) return aBase;
+    throws CommandException {
+        if (aPieces.size() <= aCurrPiece) return aBase;
         final String lPiece = aPieces.get(aCurrPiece);
         int lIdx = -1;
-        try
-        {
+        try {
             lIdx = Integer.parseInt(lPiece);
-        }
-        catch (NumberFormatException e1)
-        {
+        } catch (NumberFormatException e1) {
             // Ignore this exception!
         }
 
-        if(aBase instanceof IContext && lIdx < 0)
-        {
+        if (aBase instanceof IContext && lIdx < 0) {
             final IContext lCtx = (IContext) aBase;
-            if(lCtx.isBound(lPiece))
+            if (lCtx.isBound(lPiece))
                 return resolveCanonical(aPieces, aCurrPiece + 1, lCtx.getBinding(lPiece));
             else
                 throw new CommandException(String.format("Cannot find '%s' in context.", lPiece));
-        }
-        else if(aBase instanceof Map && lIdx < 0)
-        {
+        } else if (aBase instanceof Map && lIdx < 0) {
             final Map lMap = (Map) aBase;
-            if(lMap.containsKey(lPiece))
+            if (lMap.containsKey(lPiece))
                 return resolveCanonical(aPieces, aCurrPiece + 1, lMap.get(lPiece));
             else
                 throw new CommandException("ERROR - map.");
-        }
-        else if(aBase instanceof List)
-        {
+        } else if (aBase instanceof List) {
             final List lList = (List) aBase;
-            if(lIdx < 0) throw new CommandException("List expects an index.");
-            if(lIdx >= lList.size()) throw new CommandException("List index out of range.");
+            if (lIdx < 0) throw new CommandException("List expects an index.");
+            if (lIdx >= lList.size()) throw new CommandException("List index out of range.");
             else return resolveCanonical(aPieces, aCurrPiece + 1, lList.get(lIdx));
-        }
-        else  if(aBase != null)
-        {
-            if(aBase.getClass().isArray())
-            {
+        } else if (aBase != null) {
+            if (aBase.getClass().isArray()) {
                 // Array rendering.
                 ///////////////////
 
-                if(lIdx >=0 && lIdx < Array.getLength(aBase))
+                if (lIdx >= 0 && lIdx < Array.getLength(aBase))
                     return resolveCanonical(aPieces, aCurrPiece + 1, Array.get(aBase, lIdx));
                 else throw new CommandException("ERROR - index out of range/wrong index type/no index.");
-            }
-            else
-            {
-                try
-                {
+            } else {
+                try {
                     // Try bean.
                     //
                     final BeanInfo lInfo = Introspector.getBeanInfo(aBase.getClass());
                     final PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
-                    for (PropertyDescriptor lProp : lProps)
-                    {
-                        if (lProp.getName().equals(lPiece))
-                        {
+                    for (PropertyDescriptor lProp : lProps) {
+                        if (lProp.getName().equals(lPiece)) {
                             Method lGetter = lProp.getReadMethod();
 
                             Object[] lArgs;
-                            if(lIdx >= 0) lArgs = new Object[]{lIdx};
-                            else  lArgs = new Object[]{};
+                            if (lIdx >= 0) lArgs = new Object[]{lIdx};
+                            else lArgs = new Object[]{};
 
                             Object lVal = lGetter.invoke(aBase, lArgs);
                             return resolveCanonical(aPieces, aCurrPiece + 1, lVal);
                         }
                     }
-                }
-                catch(CommandException e)
-                {
+                } catch (CommandException e) {
                     throw e;
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new CommandException("ERROR - calling getter method.", e);
                 }
             }
@@ -351,51 +303,42 @@ public class BeanLibrary
             // - based on annotations.
             // - ...
             throw new CommandException("ERROR - no property.");
-        }
-        else if(aBase instanceof List && lIdx > 0)
-        {
+        } else if (aBase instanceof List && lIdx > 0) {
             List lList = (List) aBase;
-            if(lIdx > lList.size() - 1)
+            if (lIdx > lList.size() - 1)
                 throw new CommandException("ERROR index out of bounds.");
             return resolveCanonical(aPieces, aCurrPiece + 1, lList.get(lIdx));
-        }
-        else throw new CommandException("ERROR - null.");
+        } else throw new CommandException("ERROR - null.");
     }
 
     private static List<String> canonize(String aPath)
-            throws CommandException
-    {
+    throws CommandException {
         final String[] lPieces = aPath.split("/");
-        final List<String> lResult= new ArrayList<String>(lPieces.length);
-        for(String lPiece : lPieces)
-        {
-            if(".".equals(lPiece))
+        final List<String> lResult = new ArrayList<String>(lPieces.length);
+        for (String lPiece : lPieces) {
+            if (".".equals(lPiece))
                 // Just skip this.
                 continue;
-            else if("..".equals(lPiece))
-            {
+            else if ("..".equals(lPiece)) {
                 // Delete the last part and go back to the previous part.
                 int lResultSize = lResult.size();
-                if(lResultSize > 0) lResult.remove(lResultSize - 1);
-            }
-            else
-            {
+                if (lResultSize > 0) lResult.remove(lResultSize - 1);
+            } else {
                 // Note: Could be done more efficiently using a custom parser.
                 final Matcher m = PAT_FIELDNAME_BIS.matcher(lPiece);
-                if(!m.matches())
+                if (!m.matches())
                     throw new CommandException(String.format("Illegal path '%s'.", lPiece));
                 // Fetch the prefix.
                 final String lName = m.group(1);
-                if(lName != null) lResult.add(lName);
+                if (lName != null) lResult.add(lName);
                 // Get the indices.
-                int lStart = m.end(1)<0?0:m.end(1);
+                int lStart = m.end(1) < 0 ? 0 : m.end(1);
                 final String[] lIndices = lPiece.substring(lStart).split("\\[");
                 // Skip the first empty string.
-                for(int i = 1; i < lIndices.length; i++)
-                {
+                for (int i = 1; i < lIndices.length; i++) {
                     String lIdx = lIndices[i];
                     int lClosing = lIdx.lastIndexOf(']');
-                    if(lClosing > 0) lIdx = lIdx.substring(0, lClosing).trim();
+                    if (lClosing > 0) lIdx = lIdx.substring(0, lClosing).trim();
                     lResult.add(lIdx);
                 }
             }
@@ -405,76 +348,59 @@ public class BeanLibrary
 
     @SuppressWarnings("unchecked")
     private void update(Object aTarget, Object aProp, Object aVal)
-            throws CommandException
-    {
+    throws CommandException {
         String lPropName = "";
         int lIdx = -1;
 
-        if(aProp instanceof String) lPropName = (String) aProp;
+        if (aProp instanceof String) lPropName = (String) aProp;
         else throw new CommandException("Don't know what to do with non-string keys ... (for now).");
 
-        try
-        {
+        try {
             // Try to interprete the property as
             // an integer.
             lIdx = Integer.parseInt(lPropName);
-        }
-        catch (NumberFormatException e1)
-        {
+        } catch (NumberFormatException e1) {
             // Ignore this exception!
         }
 
-        if(aTarget instanceof List)
-        {
+        if (aTarget instanceof List) {
             final List lTargetList = (List) aTarget;
-            if(lIdx < 0)
+            if (lIdx < 0)
                 throw new CommandException("Modifying list should use an index.");
-            if(lIdx >= lTargetList.size())
+            if (lIdx >= lTargetList.size())
                 throw new CommandException("Array index out of range.");
 
             // TODO: catch errors on this one.
             lTargetList.set(lIdx, aVal);
 
-        }
-        else if(aTarget != null)
-        {
-            if(aTarget.getClass().isArray())
-            {
+        } else if (aTarget != null) {
+            if (aTarget.getClass().isArray()) {
                 // Array access.
-                if(lIdx < 0)
+                if (lIdx < 0)
                     throw new CommandException("Modifying array should use an index.");
-                if(lIdx >= Array.getLength(aTarget))
+                if (lIdx >= Array.getLength(aTarget))
                     throw new CommandException("Array index out of range.");
 
                 // TODO: catch errors on this one.
                 Array.set(aTarget, lIdx, aVal);
-            }
-            else
-            {
-                try
-                {
+            } else {
+                try {
                     // JavaBean access.
                     BeanInfo lInfo = Introspector.getBeanInfo(aTarget.getClass());
                     PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
-                    for (PropertyDescriptor lProp : lProps)
-                    {
-                        if(lProp.getDisplayName().equals(lPropName))
-                        {
+                    for (PropertyDescriptor lProp : lProps) {
+                        if (lProp.getDisplayName().equals(lPropName)) {
                             Method lMeth = lProp.getWriteMethod();
-                            if(lMeth == null)
+                            if (lMeth == null)
                                 throw new CommandException("Property cannot be written.");
 
-                            if(lProp.getPropertyType() != aVal.getClass() && aVal instanceof String)
-                            {
+                            if (lProp.getPropertyType() != aVal.getClass() && aVal instanceof String) {
                                 PropertyEditor lEditor = lProp.createPropertyEditor(aTarget);
                                 lEditor.setAsText((String) aVal);
-                            }
-                            else lMeth.invoke(aTarget, new Object[]{aVal});
+                            } else lMeth.invoke(aTarget, new Object[]{aVal});
                         }
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new CommandException(e.getMessage(), e);
                 }
             }
@@ -482,82 +408,62 @@ public class BeanLibrary
     }
 
     private void render(Object aObj, PrintWriter aWriter)
-            throws CommandException
-    {
-        if(aWriter == null) return;
+    throws CommandException {
+        if (aWriter == null) return;
 
-        if(aObj instanceof IContext)
-        {
+        if (aObj instanceof IContext) {
             IContext lCtx = (IContext) aObj;
             Map<String, Object> lDump = lCtx.dumpBindings();
-            for(String lKey : lDump.keySet())
-            {
+            for (String lKey : lDump.keySet()) {
                 Object lVal = lDump.get(lKey);
                 aWriter.print(lKey);
                 aWriter.print("=");
                 aWriter.println(lVal == null ? "null" : lVal.toString());
             }
-        }
-        else if(aObj instanceof List)
-        {
+        } else if (aObj instanceof List) {
             // Show indexed ...
             aWriter.println(aObj.toString());
-        }
-        else if(aObj instanceof Map)
-        {
+        } else if (aObj instanceof Map) {
             // Show map ....
             aWriter.println(aObj.toString());
-        }
-        else if(aObj != null)
-        {
-            if(aObj.getClass().isArray())
-            {
+        } else if (aObj != null) {
+            if (aObj.getClass().isArray()) {
                 // Array rendering.
                 ///////////////////
 
                 aWriter.println(String.format("=== Type '%s' length %d ===", aObj.getClass().getSimpleName(), Array.getLength(aObj)));
-                for(int i = 0; i < Array.getLength(aObj); i++)
-                {
+                for (int i = 0; i < Array.getLength(aObj); i++) {
                     Object lObj = Array.get(aObj, i);
-                    aWriter.println(String.format("%6s %s", "[" + i + "]", lObj==null?"null":lObj.toString()));
+                    aWriter.println(String.format("%6s %s", "[" + i + "]", lObj == null ? "null" : lObj.toString()));
                 }
-            }
-            else
-            {
-                try
-                {
+            } else {
+                try {
                     // Try JavaBean...
                     ///////////////////
 
                     aWriter.println(String.format("=== Type '%s' ===", aObj.getClass().getSimpleName()));
                     BeanInfo lInfo = Introspector.getBeanInfo(aObj.getClass());
                     PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
-                    for (PropertyDescriptor lProp : lProps)
-                    {
+                    for (PropertyDescriptor lProp : lProps) {
                         Method lRead = lProp.getReadMethod();
                         Method lWrite = lProp.getWriteMethod();
-                        String lRw = "" + ((lRead!=null)?"r":"-") + ((lWrite!=null)?"w": "-");
+                        String lRw = "" + ((lRead != null) ? "r" : "-") + ((lWrite != null) ? "w" : "-");
                         aWriter.println(String.format("%s (%s, %s)", lProp.getDisplayName(), lProp.getPropertyType().getSimpleName(), lRw));
                     }
-                }
-                catch (IntrospectionException e)
-                {
+                } catch (IntrospectionException e) {
                     throw new CommandException("ERROR - ...", e);
                 }
             }
-        }
-        else
+        } else
             throw new CommandException("ERROR - null encountered.");
     }
 
-    private boolean filter(Resolution aRes)
-    {
+    private boolean filter(Resolution aRes) {
         final String lPath = aRes.getPath();
         final Object lVal = aRes.getVal();
 
-        for(IFilter lFilt: filters)
-        {
-            if(!lFilt.filter(lPath, lVal)) return false;
+        for (IFilter lFilt : filters) {
+            if (!lFilt.filter(lPath, lVal)) return false;
         }
         return true;
     }

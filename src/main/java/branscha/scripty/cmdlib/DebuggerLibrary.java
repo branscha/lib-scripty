@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,8 +26,6 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.*;
-import branscha.scripty.parser.*;
-import branscha.scripty.annot.*;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -36,40 +34,38 @@ import java.util.LinkedList;
 import java.util.List;
 
 @ScriptyNamedArgLists(
-        std={
-                @ScriptyStdArgList(name = "one argument", fixed={@ScriptyArg(name="arg", type = "Any")}),
+        std = {
+                @ScriptyStdArgList(name = "one argument", fixed = {@ScriptyArg(name = "arg", type = "Any")}),
                 @ScriptyStdArgList(name = "no arguments"),
-                @ScriptyStdArgList(name = "no arguments + quiet option", named = {@ScriptyArg(name="quiet", type = "Boolean", optional = true, value="false")}),
-                @ScriptyStdArgList(name = "breakpoint", fixed={@ScriptyArg(name="arg", type = "Instance EvalTrace$IBreakpoint")}),
-                @ScriptyStdArgList(name = "name", fixed={@ScriptyArg(name="name", type = "String")}),
-                @ScriptyStdArgList(name = "name + bool", fixed={@ScriptyArg(name="name", type = "String"), @ScriptyArg(name="bool", type = "Boolean")}),
-                @ScriptyStdArgList(name = "string + name", fixed={@ScriptyArg(name="str", type = "String")}, named = {@ScriptyArg(name="name", type="String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "posint + name", fixed={@ScriptyArg(name="posint", type = "IntegerRange min=0")}, named = {@ScriptyArg(name="name", type="String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "obj + name", fixed={@ScriptyArg(name="obj", type = "Any")}, named = {@ScriptyArg(name="name", type="String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "breakpoint + name", fixed={@ScriptyArg(name="bpt", type = "Instance EvalTrace$IBreakpoint")}, named = {@ScriptyArg(name="name", type="String", optional = true, value = "")})
+                @ScriptyStdArgList(name = "no arguments + quiet option", named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")}),
+                @ScriptyStdArgList(name = "breakpoint", fixed = {@ScriptyArg(name = "arg", type = "Instance EvalTrace$IBreakpoint")}),
+                @ScriptyStdArgList(name = "name", fixed = {@ScriptyArg(name = "name", type = "String")}),
+                @ScriptyStdArgList(name = "name + bool", fixed = {@ScriptyArg(name = "name", type = "String"), @ScriptyArg(name = "bool", type = "Boolean")}),
+                @ScriptyStdArgList(name = "string + name", fixed = {@ScriptyArg(name = "str", type = "String")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
+                @ScriptyStdArgList(name = "posint + name", fixed = {@ScriptyArg(name = "posint", type = "IntegerRange min=0")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
+                @ScriptyStdArgList(name = "obj + name", fixed = {@ScriptyArg(name = "obj", type = "Any")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
+                @ScriptyStdArgList(name = "breakpoint + name", fixed = {@ScriptyArg(name = "bpt", type = "Instance EvalTrace$IBreakpoint")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
         },
-        var={
-                @ScriptyVarArgList(name = "at least one argument", vararg = @ScriptyArg(name="arg", type="Any"), minLength = 1),
-                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name="bpts", type = "Instance EvalTrace$IBreakpoint"), minLength = 1, named = {@ScriptyArg(name="name", type="String", optional = true, value = "")})
+        var = {
+                @ScriptyVarArgList(name = "at least one argument", vararg = @ScriptyArg(name = "arg", type = "Any"), minLength = 1),
+                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance EvalTrace$IBreakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
         }
 )
-public class DebuggerLibrary
-{
+public class DebuggerLibrary {
     private static final String MSG_NOTRACE = "No current trace. First start debugging an expression.";
     private static final String MSG_NOBREAKPOINTS = "No current breakpoints.";
     private static final String MSG_NOSTACK = "No current stack.";
     private static final String MSG_NOFRAME = "No current frame.";
-    
+
     private EvalTrace trace = null;
-    private  EvalTrace.BreakpointSet breakpoints = null;
+    private EvalTrace.BreakpointSet breakpoints = null;
     private int breakpointcounter = 0;
-    
+
     private static List quoteMacro(String intName, List anExpr)
-    throws CommandException
-    {
+    throws CommandException {
         List<? super Object> lMacro = new ArrayList<Object>();
         lMacro.add(intName);
-    
+
         List<? super Object> lQuoted = new ArrayList<Object>();
         // Quote the first argument.
         lQuoted.add("quote");
@@ -79,17 +75,15 @@ public class DebuggerLibrary
         lMacro.addAll(anExpr.subList(2, anExpr.size()));
         return lMacro;
     }
-    
+
     private void checkTrace()
-    throws CommandException
-    {
-        if(trace == null) throw new CommandException(MSG_NOTRACE);
+    throws CommandException {
+        if (trace == null) throw new CommandException(MSG_NOTRACE);
     }
 
     private void checkBreakpoints()
-    throws CommandException
-    {
-        if(breakpoints == null) throw new CommandException(MSG_NOBREAKPOINTS);
+    throws CommandException {
+        if (breakpoints == null) throw new CommandException(MSG_NOBREAKPOINTS);
     }
 
     // Start the debugger with the expression.
@@ -100,11 +94,10 @@ public class DebuggerLibrary
     // Applies following transformation:
     // (dbg-expr <expr>) ==> (dbg-expr-x (quote <expr>))
     //
-    @ScriptyMacro(name="dbg-expr")
-    @ScriptyRefArgList(ref="at least one argument")
+    @ScriptyMacro(name = "dbg-expr")
+    @ScriptyRefArgList(ref = "at least one argument")
     public static List dbgExpr(Object[] aArgs)
-    throws CommandException
-    {
+    throws CommandException {
         return quoteMacro("dbg-expr-x", Arrays.asList(aArgs));
     }
 
@@ -116,11 +109,10 @@ public class DebuggerLibrary
     // Applies following transformation:
     // (dbg-eval <expr>) ==> (dbg-eval-x (quote <expr>))
     //
-    @ScriptyMacro(name="dbg-eval")
-    @ScriptyRefArgList(ref="at least one argument")
+    @ScriptyMacro(name = "dbg-eval")
+    @ScriptyRefArgList(ref = "at least one argument")
     public static List dbgEval(Object[] aArgs)
-    throws CommandException
-    {
+    throws CommandException {
         return quoteMacro("dbg-eval-x", Arrays.asList(aArgs));
     }
 
@@ -134,23 +126,21 @@ public class DebuggerLibrary
     // A macro is used to prevent evaluation of the condition.
     // In this way the user does not have to quote the conditional expression.
     //
-    @ScriptyMacro(name="bpt-when")
-    @ScriptyRefArgList(ref="at least one argument")
+    @ScriptyMacro(name = "bpt-when")
+    @ScriptyRefArgList(ref = "at least one argument")
     public static List bptWhen(Object[] aArgs)
-    throws CommandException
-    {
+    throws CommandException {
         return quoteMacro("bpt-when-x", Arrays.asList(aArgs));
     }
 
     // Internal (effective) command.
     //
-    @ScriptyCommand(name="dbg-expr-x")
+    @ScriptyCommand(name = "dbg-expr-x")
     @ScriptyRefArgList(ref = "one argument")
-    public void dbgExprInternal(IEval aEval, IContext aContext, @ScriptyParam("arg") Object aExpr)
-    {
+    public void dbgExprInternal(IEval aEval, IContext aContext, @ScriptyParam("arg") Object aExpr) {
         // Halt the previous debug session in order not
         // to clutter up our debugger.
-        if(trace != null) trace.terminate();
+        if (trace != null) trace.terminate();
 
         // Now create a new one.
         final Eval2 lEval = new Eval2();
@@ -159,32 +149,30 @@ public class DebuggerLibrary
         lEval.setContext(aContext);
 
         // Create a new tracer and save it.
-        trace = new EvalTrace(lEval,aExpr);
+        trace = new EvalTrace(lEval, aExpr);
 
         // Wire up the breakpoints.
-        if(breakpoints == null) breakpoints = trace.getBreakpoints();
+        if (breakpoints == null) breakpoints = trace.getBreakpoints();
         else trace.setBreakpoints(breakpoints);
     }
-    
+
     private static enum StepType {STEPIN, STEPOVER, STEPOUT, RUN, RUNTORESULT, RUNTOREADY, BACKSTEP}
 
     // Step into an expression, it takes the smallest step possible.
     //
-    @ScriptyCommand(name="dbg-stepin")
+    @ScriptyCommand(name = "dbg-stepin")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStepIn(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-    throws CommandException
-    {
+    public boolean dbgStepIn(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.STEPIN, aWriter);
     }
 
     // Step into an expression, it takes the smallest step possible.
     //
-    @ScriptyCommand(name="dbg-step")
+    @ScriptyCommand(name = "dbg-step")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStep(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-    throws CommandException
-    {
+    public boolean dbgStep(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.STEPIN, aWriter);
     }
 
@@ -193,11 +181,10 @@ public class DebuggerLibrary
     // It always evaluates the current frame and then goes to the previous frame.
     // This operation always reduces the stack.
     //
-    @ScriptyCommand(name="dbg-stepout")
+    @ScriptyCommand(name = "dbg-stepout")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStepOut(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-            throws CommandException
-    {
+    public boolean dbgStepOut(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.STEPOUT, aWriter);
     }
 
@@ -205,11 +192,10 @@ public class DebuggerLibrary
     // We remain positioned at the same stack level.
     // Use this if you want to evaluate each parameter in turn, without seeing the details of it.
     //
-    @ScriptyCommand(name="dbg-stepover")
+    @ScriptyCommand(name = "dbg-stepover")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStepOver(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-    throws CommandException
-    {
+    public boolean dbgStepOver(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.STEPOVER, aWriter);
     }
 
@@ -217,21 +203,19 @@ public class DebuggerLibrary
     // does not undo bindings, nor other side effects.
     // It could be useful to replay some sequences.
     //
-    @ScriptyCommand(name="dbg-back")
+    @ScriptyCommand(name = "dbg-back")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgBack(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-    throws CommandException
-    {
+    public boolean dbgBack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.BACKSTEP, aWriter);
     }
 
     // Keep on running until a result has been produced.
     //
-    @ScriptyCommand(name="dbg-runresult")
+    @ScriptyCommand(name = "dbg-runresult")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgRunResult(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-    throws CommandException
-    {
+    public boolean dbgRunResult(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.RUNTORESULT, aWriter);
     }
 
@@ -239,67 +223,72 @@ public class DebuggerLibrary
     // been evaluated, and the main expression is ready for being executed.
     // Use this if you are not interested in detailed evaluation of the parameters.
     //
-    @ScriptyCommand(name="dbg-runready")
+    @ScriptyCommand(name = "dbg-runready")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgRunReady(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-    throws CommandException
-    {
+    public boolean dbgRunReady(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.RUNTOREADY, aWriter);
     }
 
     // Keep on running.
     //
-    @ScriptyCommand(name="dbg-run")
+    @ScriptyCommand(name = "dbg-run")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgRun(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter)
-    throws CommandException
-    {
+    public boolean dbgRun(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    throws CommandException {
         return internalStep(StepType.RUN, aWriter);
     }
 
     private boolean internalStep(StepType op, PrintWriter aWriter)
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
-        if(trace.hasMoreSteps())
-        {
+        if (trace.hasMoreSteps()) {
             // Take a step.
-            switch(op)
-            {
-                case STEPIN: trace.step(); break;
-                case STEPOVER: trace.stepOver(); break;
-                case STEPOUT: trace.stepOut(); break;
-                case RUN : trace.run(); break;
-                case RUNTORESULT: trace.runToResult(); break;
-                case RUNTOREADY: trace.runToReady(); break;
-                case BACKSTEP: trace.backStep(); break;  
+            switch (op) {
+                case STEPIN:
+                    trace.step();
+                    break;
+                case STEPOVER:
+                    trace.stepOver();
+                    break;
+                case STEPOUT:
+                    trace.stepOut();
+                    break;
+                case RUN:
+                    trace.run();
+                    break;
+                case RUNTORESULT:
+                    trace.runToResult();
+                    break;
+                case RUNTOREADY:
+                    trace.runToReady();
+                    break;
+                case BACKSTEP:
+                    trace.backStep();
+                    break;
             }
 
             // Check if there was an exception.
-            if(trace.isExcepted())
-            {
+            if (trace.isExcepted()) {
                 aWriter.println("An exception occurred during this step. The exception message:\n");
                 //noinspection ThrowableResultOfMethodCallIgnored
                 aWriter.println(trace.getException().getMessage());
                 return Boolean.FALSE;
             }
 
-            if(trace.isBreakpointEncountered())
-            {
+            if (trace.isBreakpointEncountered()) {
                 // Find all the breakpoints that match the current situation (stack).
                 // We will compose a message mentioning the labels of all the
                 // breakpoints that were triggered.
                 final List<EvalTrace.IBreakpoint> lBpts = trace.getBreakpoints().findAllMatchingBreakpoints(trace.getStack());
                 StringBuilder lBuilder = new StringBuilder();
-                for(EvalTrace.IBreakpoint lBpt: lBpts) lBuilder.append(lBpt.getName());
+                for (EvalTrace.IBreakpoint lBpt : lBpts) lBuilder.append(lBpt.getName());
                 aWriter.println("Breakpoint(s) reached: " + lBuilder.toString() + ".");
             }
-        }
-        else
-        {
+        } else {
             aWriter.println("There are no steps anymore.");
-            if(trace.hasResult()) aWriter.println("There is a result though.");
-            if(trace.isExcepted())aWriter.println("The eval was stalled by an exception.");
+            if (trace.hasResult()) aWriter.println("There is a result though.");
+            if (trace.isExcepted()) aWriter.println("The eval was stalled by an exception.");
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
@@ -309,22 +298,19 @@ public class DebuggerLibrary
     // Optional arguments:
     // - quiet = true | false*. Prevents writing output, only returns the instance.
     //
-    @ScriptyCommand(name="dbg-stack")
-    @ScriptyRefArgList(ref="no arguments + quiet option")
-    public Eval2.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter,
+    @ScriptyCommand(name = "dbg-stack")
+    @ScriptyRefArgList(ref = "no arguments + quiet option")
+    public Eval2.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter,
                                     @ScriptyParam("quiet") boolean aQuiet)
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         final Eval2.EvalStack lStack = trace.getStack();
-        if(!aQuiet)
-        {
-            if(lStack != null) aWriter.print(lStack.toString());
-            else
-            {
+        if (!aQuiet) {
+            if (lStack != null) aWriter.print(lStack.toString());
+            else {
                 aWriter.println("The stack is empty.");
-                if(trace.hasResult()) aWriter.println("There is a result though.");
-                if(trace.isExcepted()) aWriter.println("The eval was stalled by an exception.");
+                if (trace.hasResult()) aWriter.println("There is a result though.");
+                if (trace.isExcepted()) aWriter.println("The eval was stalled by an exception.");
             }
         }
         return lStack;
@@ -336,30 +322,31 @@ public class DebuggerLibrary
     // Optional arguments:
     // - quiet = true | false*. Prevents writing output, only returns the instance.
     //
-    @ScriptyCommand(name="dbg-ctx")
-    @ScriptyRefArgList(ref="no arguments + quiet option")
-    public IContext dbgCtx(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter,
+    @ScriptyCommand(name = "dbg-ctx")
+    @ScriptyRefArgList(ref = "no arguments + quiet option")
+    public IContext dbgCtx(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter,
                            @ScriptyParam("quiet") boolean aQuiet)
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         final Eval2.EvalStack lStack = trace.getStack();
-        if(lStack == null) throw new CommandException(MSG_NOSTACK);
+        if (lStack == null) throw new CommandException(MSG_NOSTACK);
         final IContext lCtx = lStack.top().getCtx();
-        if(!aQuiet) aWriter.print(lCtx.toString());
+        if (!aQuiet) aWriter.print(lCtx.toString());
         return lCtx;
     }
 
     // Terminate the debugging session.
     //
-    @ScriptyCommand(name="dbg-terminate")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-terminate")
+    @ScriptyRefArgList(ref = "no arguments")
     public void dbgTerminate()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         // Eat all exceptions at this point, we want to remove the trace.
-        try {trace.terminate();}catch(Exception ignored){}
+        try {
+            trace.terminate();
+        } catch (Exception ignored) {
+        }
         // Remove the trace from the context.
         trace = null;
     }
@@ -368,13 +355,12 @@ public class DebuggerLibrary
     // examine the result of an exception in a certain expression.
     // - Arg: an optional message.
     //
-    @ScriptyCommand(name="dbg-raise")
+    @ScriptyCommand(name = "dbg-raise")
     @ScriptyRefArgList(ref = "one argument")
     public void dbgRaise(Object[] aArgs)
-    throws CommandException
-    {
+    throws CommandException {
         String lMsg = "Exception generated by: " + aArgs[0];
-        if(aArgs.length > 1 && aArgs[1]!= null) lMsg = aArgs[1].toString();
+        if (aArgs.length > 1 && aArgs[1] != null) lMsg = aArgs[1].toString();
         throw new CommandException(lMsg);
     }
 
@@ -382,63 +368,58 @@ public class DebuggerLibrary
     // You can restart the debugging of an expression with this.
     // Side effects will not be undone though.
     //
-    @ScriptyCommand(name="dbg-restart")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-restart")
+    @ScriptyRefArgList(ref = "no arguments")
     public void dbgRestart()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
-        if(trace.getStack() == null) throw new CommandException(MSG_NOSTACK);
+        if (trace.getStack() == null) throw new CommandException(MSG_NOSTACK);
         trace.reset();
     }
 
     // Drop the toplevel stackframe.
     // It can be useful to redo the evaluation of a subexpression.
     //
-    @ScriptyCommand(name="dbg-dropframe")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-dropframe")
+    @ScriptyRefArgList(ref = "no arguments")
     public void dbgDropFrame()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
-        if(trace.getStack() == null) throw new CommandException(MSG_NOSTACK);
+        if (trace.getStack() == null) throw new CommandException(MSG_NOSTACK);
         trace.dropFrame();
     }
 
     // Internal (effective) command.
     //
-    @ScriptyCommand(name="dbg-eval-x")
+    @ScriptyCommand(name = "dbg-eval-x")
     @ScriptyRefArgList(ref = "one argument")
     public Object dbgEval(@ScriptyParam("arg") Object aArg, IEval aEval)
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         Eval2.EvalStack lStack = trace.getStack();
-        if(lStack == null) throw new CommandException(MSG_NOSTACK);
+        if (lStack == null) throw new CommandException(MSG_NOSTACK);
         Eval2.StackFrame lFrame = lStack.top();
-        if(lFrame == null) throw new CommandException(MSG_NOFRAME);
+        if (lFrame == null) throw new CommandException(MSG_NOFRAME);
         final IContext lCtx = lFrame.getCtx();
         return aEval.eval(aArg, lCtx);
     }
 
     // Check if more steps could be executed in the current debugging session.
     //
-    @ScriptyCommand(name="dbg-moresteps?")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-moresteps?")
+    @ScriptyRefArgList(ref = "no arguments")
     public boolean hasMoreSteps()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         return trace.hasMoreSteps();
     }
 
     // Check if the current debugging session has reached a result.
     //
-    @ScriptyCommand(name="dbg-result?")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-result?")
+    @ScriptyRefArgList(ref = "no arguments")
     public boolean hasResult()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         return trace.hasResult();
     }
@@ -448,11 +429,10 @@ public class DebuggerLibrary
     // to maker sure if this is the result or it stands for an empty result use
     // the dbg-result? command.
     //
-    @ScriptyCommand(name="dbg-result")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-result")
+    @ScriptyRefArgList(ref = "no arguments")
     public Object result()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         return trace.getResult();
     }
@@ -460,11 +440,10 @@ public class DebuggerLibrary
     // Check if the current debugging session was halted with an exception.
     // If so, the exception will be remembered, you can get it with dbg-exception.
     //
-    @ScriptyCommand(name="dbg-exception?")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-exception?")
+    @ScriptyRefArgList(ref = "no arguments")
     public boolean hasException()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         return trace.isExcepted();
     }
@@ -473,11 +452,10 @@ public class DebuggerLibrary
     // the expression under scrutiny effecively raised an exception.
     // If no exception was raised, null will be returned.
     //
-    @ScriptyCommand(name="dbg-exception")
-    @ScriptyRefArgList(ref="no arguments")
+    @ScriptyCommand(name = "dbg-exception")
+    @ScriptyRefArgList(ref = "no arguments")
     public Exception exception()
-    throws CommandException
-    {
+    throws CommandException {
         checkTrace();
         return trace.getException();
     }
@@ -486,12 +464,11 @@ public class DebuggerLibrary
     // Required argument: a breakpoint, created with bpt-func, bpt-stack, ...
     // Example: (dbg-addbreakpoint (bpt-func fac))
     //
-    @ScriptyCommand(name="dbg-addbreakpoint")
-    @ScriptyRefArgList(ref="breakpoint")
-    public EvalTrace.BreakpointSet addBreakpoint(@ScriptyParam("arg") EvalTrace.IBreakpoint aBpt)
-    {
+    @ScriptyCommand(name = "dbg-addbreakpoint")
+    @ScriptyRefArgList(ref = "breakpoint")
+    public EvalTrace.BreakpointSet addBreakpoint(@ScriptyParam("arg") EvalTrace.IBreakpoint aBpt) {
         // If none was found, we create a new empty one.
-        if(breakpoints == null) breakpoints = new EvalTrace.BreakpointSet();
+        if (breakpoints == null) breakpoints = new EvalTrace.BreakpointSet();
         // At this point, we are sure there is a breakpoint set.
         breakpoints.addBreakpoint(aBpt);
         return breakpoints;
@@ -499,14 +476,13 @@ public class DebuggerLibrary
 
     // List the existing breakpoints known by the debugger.
     //
-    @ScriptyCommand(name="dbg-breakpoints")
-    @ScriptyRefArgList(ref="no arguments + quiet option")
-    public EvalTrace.BreakpointSet dbgBreakpoints(@ScriptyBindingParam(value = "*output", unboundException = true)PrintWriter aWriter,
-                                               @ScriptyParam("quiet") boolean aQuiet)
-    throws CommandException
-    {
+    @ScriptyCommand(name = "dbg-breakpoints")
+    @ScriptyRefArgList(ref = "no arguments + quiet option")
+    public EvalTrace.BreakpointSet dbgBreakpoints(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter,
+                                                  @ScriptyParam("quiet") boolean aQuiet)
+    throws CommandException {
         checkBreakpoints();
-        if(!aQuiet && aWriter != null) aWriter.println(breakpoints.toString());
+        if (!aQuiet && aWriter != null) aWriter.println(breakpoints.toString());
         return breakpoints;
     }
 
@@ -514,11 +490,10 @@ public class DebuggerLibrary
     // Required argument: the name of the breakpoint.
     // Example (dbg-removebreakpoint bp0)
     //
-    @ScriptyCommand(name="dbg-removebreakpoint")
-    @ScriptyRefArgList(ref="name")
+    @ScriptyCommand(name = "dbg-removebreakpoint")
+    @ScriptyRefArgList(ref = "name")
     public EvalTrace.BreakpointSet dbgRemoveBreakpoint(@ScriptyParam("name") String aName)
-    throws CommandException
-    {
+    throws CommandException {
         checkBreakpoints();
         breakpoints.removeBreakpoint(aName);
         return breakpoints;
@@ -530,11 +505,10 @@ public class DebuggerLibrary
     // - true | false.
     // Example: (dbg-enablebreakpoint bp0 true)
     //
-    @ScriptyCommand(name="dbg-enablebreakpoint")
-    @ScriptyRefArgList(ref="name + bool")
+    @ScriptyCommand(name = "dbg-enablebreakpoint")
+    @ScriptyRefArgList(ref = "name + bool")
     public EvalTrace.BreakpointSet dbgEnableBreakpoint(@ScriptyParam("name") String aName, @ScriptyParam("bool") boolean aEnable)
-    throws CommandException
-    {
+    throws CommandException {
         checkBreakpoints();
         breakpoints.enableBreakpoint(aName, aEnable);
         return breakpoints;
@@ -542,11 +516,10 @@ public class DebuggerLibrary
 
     // Remove all breakpoints from the debugger.
     //
-    @ScriptyCommand(name="dbg-clearbreakpoints")
+    @ScriptyCommand(name = "dbg-clearbreakpoints")
     @ScriptyRefArgList(ref = "no arguments")
     public EvalTrace.BreakpointSet dbgClearBreakpoints()
-    throws CommandException
-    {
+    throws CommandException {
         checkBreakpoints();
         breakpoints.removeAllBreakpoints();
         return breakpoints;
@@ -560,11 +533,10 @@ public class DebuggerLibrary
     // - name: choose a name for this breakpoint, otherwise a name will be generated
     //         of the form bp<x> where <x> is an integer sequence.
     //
-    @ScriptyCommand(name="bpt-func")
+    @ScriptyCommand(name = "bpt-func")
     @ScriptyRefArgList(ref = "string + name")
-    public EvalTrace.IBreakpoint bptFunc(@ScriptyParam("str") String aFuncName, @ScriptyParam("name") String aBtpName)
-    {
-        if(aBtpName.length() <= 0) aBtpName = "bp" + breakpointcounter++;
+    public EvalTrace.IBreakpoint bptFunc(@ScriptyParam("str") String aFuncName, @ScriptyParam("name") String aBtpName) {
+        if (aBtpName.length() <= 0) aBtpName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointFunc(aBtpName, aFuncName);
     }
 
@@ -577,48 +549,43 @@ public class DebuggerLibrary
     // A macro is used to prevent evaluation of the condition.
     // In this way the user does not have to quote the conditional expression.
     //
-    @ScriptyCommand(name="bpt-stack")
+    @ScriptyCommand(name = "bpt-stack")
     @ScriptyRefArgList(ref = "posint + name")
-    public EvalTrace.IBreakpoint bptStackDepth(@ScriptyParam("posint") Integer aDepth, @ScriptyParam("name") String aBptName)
-    {
-        if(aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
+    public EvalTrace.IBreakpoint bptStackDepth(@ScriptyParam("posint") Integer aDepth, @ScriptyParam("name") String aBptName) {
+        if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointStackdepth(aBptName, aDepth);
     }
 
     // Internal (effective) command.
     //
-    @ScriptyCommand(name="bpt-when-x")
+    @ScriptyCommand(name = "bpt-when-x")
     @ScriptyRefArgList(ref = "obj + name")
-    public EvalTrace.IBreakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName)
-    {
-        if(aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
+    public EvalTrace.IBreakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName) {
+        if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointWhen(aBptName, aExpr);
     }
 
-    @ScriptyCommand(name="bpt-not")
+    @ScriptyCommand(name = "bpt-not")
     @ScriptyRefArgList(ref = "breakpoint + name")
-    public EvalTrace.IBreakpoint bptNot(@ScriptyParam("bpt") EvalTrace.IBreakpoint aBtp, @ScriptyParam("name") String aBptName)
-    {
-        if(aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
+    public EvalTrace.IBreakpoint bptNot(@ScriptyParam("bpt") EvalTrace.IBreakpoint aBtp, @ScriptyParam("name") String aBptName) {
+        if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointNot(aBptName, aBtp);
     }
 
 
-    @ScriptyCommand(name="bpt-and")
+    @ScriptyCommand(name = "bpt-and")
     @ScriptyRefArgList(ref = "breakpoint* + name")
-    public EvalTrace.IBreakpoint bptAnd(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName)
-    {
-        if(aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
+    public EvalTrace.IBreakpoint bptAnd(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
+        if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         List<EvalTrace.IBreakpoint> lBpts = new LinkedList<EvalTrace.IBreakpoint>();
         for (final Object aBpt : aBpts) lBpts.add((EvalTrace.IBreakpoint) aBpt);
         return new EvalTrace.BreakpointAnd(aBptName, lBpts);
     }
 
-    @ScriptyCommand(name="bpt-or")
+    @ScriptyCommand(name = "bpt-or")
     @ScriptyRefArgList(ref = "breakpoint* + name")
-    public EvalTrace.IBreakpoint bptOr(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName)
-    {
-        if(aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
+    public EvalTrace.IBreakpoint bptOr(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
+        if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         List<EvalTrace.IBreakpoint> lBpts = new LinkedList<EvalTrace.IBreakpoint>();
         for (final Object aBpt : aBpts) lBpts.add((EvalTrace.IBreakpoint) aBpt);
         return new EvalTrace.BreakpointOr(aBptName, lBpts);

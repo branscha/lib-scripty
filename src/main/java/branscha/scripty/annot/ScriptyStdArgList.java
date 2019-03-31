@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -29,12 +29,27 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * A standard argument list with the structure:
+ * <ul>
+ *     <li>A fixed number of required {@link ScriptyArg}.</li>
+ *     <li>A fixed number of optional {@link ScriptyArg}. If they are not provided, the default values will be used.</li>
+ *     <li>A number of named {@link ScriptyArg}. These can be specified to be optional or not.</li>
+ * </ul>
+ */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ScriptyStdArgList
-{
+public @interface ScriptyStdArgList {
+    /**
+     * The name of the argument list so that it can be reused later using {@link ScriptyRefArgList}.
+     */
     public String name() default "";
+
     public ScriptyArg[] fixed() default {};
+
+
+
     public ScriptyArg[] optional() default {};
+
     public ScriptyArg[] named() default {};
 }

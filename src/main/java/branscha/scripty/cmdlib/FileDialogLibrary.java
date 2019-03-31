@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,7 +26,6 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.annot.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -37,63 +36,60 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
-public class FileDialogLibrary
-{
-    
+public class FileDialogLibrary {
+
     private File currentDir;
-    
-    @ScriptyCommand(name="file-dialog")
+
+    @ScriptyCommand(name = "file-dialog")
     @ScriptyVarArgList(
-            vararg = @ScriptyArg(name="types", type="String"),
+            vararg = @ScriptyArg(name = "types", type = "String"),
             named = {
-                @ScriptyArg(name="title", type="String", value = "Select a file", optional = true), 
-                @ScriptyArg(name="type", type = "Enum file dir", value = "file", optional = true),
-                @ScriptyArg(name="mode", type="Enum open save", value = "open", optional = true)})
-    public  File fileDialog(
+                    @ScriptyArg(name = "title", type = "String", value = "Select a file", optional = true),
+                    @ScriptyArg(name = "type", type = "Enum file dir", value = "file", optional = true),
+                    @ScriptyArg(name = "mode", type = "Enum open save", value = "open", optional = true)})
+    public File fileDialog(
             @ScriptyParam("title") String aTitle,
-            @ScriptyParam("type") String aType, 
+            @ScriptyParam("type") String aType,
             @ScriptyParam("mode") String aMode,
             @ScriptyParam("types") Object[] aTypes)
-    throws CommandException
-    {
+    throws CommandException {
         // Not available in head less mode.
-        if(GraphicsEnvironment.isHeadless())
+        if (GraphicsEnvironment.isHeadless())
             throw new CommandException("Java VM is running in headless mode.");
 
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(aTitle);
 
-        if("dir".equals(aType)) chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if ("dir".equals(aType)) chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         else chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
-        if(aTypes  != null && aTypes.length > 0) chooser.setFileFilter(new ExampleFileFilter(Arrays.copyOf(aTypes, aTypes.length, String[].class)));
+        if (aTypes != null && aTypes.length > 0)
+            chooser.setFileFilter(new ExampleFileFilter(Arrays.copyOf(aTypes, aTypes.length, String[].class)));
 
         int returnVal = JFileChooser.CANCEL_OPTION;
-        if("save".equals(aMode)) returnVal = chooser.showSaveDialog(null);
+        if ("save".equals(aMode)) returnVal = chooser.showSaveDialog(null);
         else returnVal = chooser.showOpenDialog(null);
 
-        if(returnVal == JFileChooser.APPROVE_OPTION)
-        {
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
             File lFile = chooser.getSelectedFile();
             File lParent = lFile.getParentFile();
             // Remember the last chosen directory. There is a big chance that you will
             // have to select multiple files in the same directory.
-            if(lParent != null)currentDir = lParent;
+            if (lParent != null) currentDir = lParent;
             return lFile;
-        }
-        else return null;
+        } else return null;
     }
 }
 
 /*
-* Copyright (c) 2003 Sun Microsystems, Inc. All Rights Reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*
-* -Redistributions of source code must retain the above copyright
-* notice, this list of conditions and the following disclaimer.
+ * Copyright (c) 2003 Sun Microsystems, Inc. All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * -Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
  *
  * -Redistribution in binary form must reproduct the above copyright
  * notice, this list of conditions and the following disclaimer in
@@ -119,9 +115,7 @@ public class FileDialogLibrary
  * use in the design, construction, operation or maintenance of any nuclear
  * facility.
  */
-class ExampleFileFilter
-extends FileFilter
-{
+class ExampleFileFilter extends FileFilter {
 
     private static String TYPE_UNKNOWN = "Type Unknown";
     private static String HIDDEN_FILE = "Hidden File";
@@ -137,8 +131,7 @@ extends FileFilter
      *
      * @see #addExtension
      */
-    public ExampleFileFilter()
-    {
+    public ExampleFileFilter() {
         this.filters = new Hashtable();
     }
 
@@ -148,8 +141,7 @@ extends FileFilter
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String extension)
-    {
+    public ExampleFileFilter(String extension) {
         this(extension, null);
     }
 
@@ -162,8 +154,7 @@ extends FileFilter
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String extension, String description)
-    {
+    public ExampleFileFilter(String extension, String description) {
         this();
         if (extension != null) addExtension(extension);
         if (description != null) setDescription(description);
@@ -178,8 +169,7 @@ extends FileFilter
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String[] filters)
-    {
+    public ExampleFileFilter(String[] filters) {
         this(filters, null);
     }
 
@@ -191,11 +181,9 @@ extends FileFilter
      *
      * @see #addExtension
      */
-    public ExampleFileFilter(String[] filters, String description)
-    {
+    public ExampleFileFilter(String[] filters, String description) {
         this();
-        for (int i = 0; i < filters.length; i++)
-        {
+        for (int i = 0; i < filters.length; i++) {
             // add filters one by one
             addExtension(filters[i]);
         }
@@ -207,19 +195,14 @@ extends FileFilter
      * false if it shouldn't.
      * <p/>
      * Files that begin with "." are ignored.
-     *
      */
-    public boolean accept(File f)
-    {
-        if (f != null)
-        {
-            if (f.isDirectory())
-            {
+    public boolean accept(File f) {
+        if (f != null) {
+            if (f.isDirectory()) {
                 return true;
             }
             String extension = getExtension(f);
-            if (extension != null && filters.get(getExtension(f)) != null)
-            {
+            if (extension != null && filters.get(getExtension(f)) != null) {
                 return true;
             }
             ;
@@ -233,14 +216,11 @@ extends FileFilter
      * @see #getExtension
      * @see FileFilter#accept
      */
-    public String getExtension(File f)
-    {
-        if (f != null)
-        {
+    public String getExtension(File f) {
+        if (f != null) {
             String filename = f.getName();
             int i = filename.lastIndexOf('.');
-            if (i > 0 && i < filename.length() - 1)
-            {
+            if (i > 0 && i < filename.length() - 1) {
                 return filename.substring(i + 1).toLowerCase();
             }
             ;
@@ -260,10 +240,8 @@ extends FileFilter
      * <p/>
      * Note that the "." before the extension is not needed and will be ignored.
      */
-    public void addExtension(String extension)
-    {
-        if (filters == null)
-        {
+    public void addExtension(String extension) {
+        if (filters == null) {
             filters = new Hashtable(5);
         }
         filters.put(extension.toLowerCase(), this);
@@ -274,26 +252,20 @@ extends FileFilter
      * Returns the human readable description of this filter. For
      * example: "JPEG and GIF Image Files (*.jpg, *.gif)"
      */
-    public String getDescription()
-    {
-        if (fullDescription == null)
-        {
-            if (description == null || isExtensionListInDescription())
-            {
+    public String getDescription() {
+        if (fullDescription == null) {
+            if (description == null || isExtensionListInDescription()) {
                 fullDescription = description == null ? "(" : description + " (";
                 // build the description from the extension list
                 Enumeration extensions = filters.keys();
-                if (extensions != null)
-                {
+                if (extensions != null) {
                     fullDescription += "." + (String) extensions.nextElement();
-                    while (extensions.hasMoreElements())
-                    {
+                    while (extensions.hasMoreElements()) {
                         fullDescription += ", ." + (String) extensions.nextElement();
                     }
                 }
                 fullDescription += ")";
-            } else
-            {
+            } else {
                 fullDescription = description;
             }
         }
@@ -304,8 +276,7 @@ extends FileFilter
      * Sets the human readable description of this filter. For
      * example: filter.setDescription("Gif and JPG Images");
      */
-    public void setDescription(String description)
-    {
+    public void setDescription(String description) {
         this.description = description;
         fullDescription = null;
     }
@@ -317,8 +288,7 @@ extends FileFilter
      * Only relevent if a description was provided in the constructor
      * or using setDescription();
      */
-    public void setExtensionListInDescription(boolean b)
-    {
+    public void setExtensionListInDescription(boolean b) {
         useExtensionsInDescription = b;
         fullDescription = null;
     }
@@ -330,8 +300,7 @@ extends FileFilter
      * Only relevent if a description was provided in the constructor
      * or using setDescription();
      */
-    public boolean isExtensionListInDescription()
-    {
+    public boolean isExtensionListInDescription() {
         return useExtensionsInDescription;
     }
 }

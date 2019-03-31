@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -33,22 +33,19 @@ import org.junit.Test;
 
 import java.util.*;
 
-public class TestMapLibrary
-{
+public class TestMapLibrary {
     private ScriptyStreamProcessor scripty;
 
     @Before
     public void initialize()
-    throws ExtensionException
-    {
+    throws ExtensionException {
         scripty = new ScriptyStreamProcessor();
         scripty.addLibraryClasses(MapLibrary.class);
     }
 
     @Test
     public void createMap1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("map-create");
         Assert.assertTrue(lResult instanceof java.util.Map);
         Assert.assertTrue(((Map) lResult).isEmpty());
@@ -56,8 +53,7 @@ public class TestMapLibrary
 
     @Test
     public void createMap2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("map-create a=uno b=duo c=tres d=quattuor");
 
         Assert.assertTrue(lResult instanceof java.util.Map);
@@ -72,8 +68,7 @@ public class TestMapLibrary
 
     @Test
     public void createMap3()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");
@@ -95,16 +90,14 @@ public class TestMapLibrary
 
     @Test(expected = ProcessorException.class)
     public void createMap4()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         scripty.process("map-create '()");
         Assert.fail();
     }
 
     @Test
     public void createMap5()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("map-create a b c d");
 
         Assert.assertTrue(lResult instanceof java.util.Map);
@@ -119,45 +112,40 @@ public class TestMapLibrary
 
     @Test
     public void testMap1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("map? (map-create)");
         Assert.assertTrue((Boolean) lResult);
     }
 
     @Test
     public void testMap2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("map? $null");
         Assert.assertFalse((Boolean) lResult);
     }
 
     @Test
     public void testMap3()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Object lResult = scripty.process("map? abc");
         Assert.assertFalse((Boolean) lResult);
     }
 
     @Test
     public void testMapSet1()
-    throws ProcessorException 
-    {
+    throws ProcessorException {
         Map lMap = new HashMap();
         scripty.getContext().defBinding("map", lMap);
-        
+
         scripty.process("map-set $map key 123");
-        Assert.assertTrue(lMap.size() ==1);
+        Assert.assertTrue(lMap.size() == 1);
         Assert.assertTrue(lMap.containsKey("key"));
         Assert.assertTrue("123".equals(lMap.get("key")));
     }
 
     @Test
     public void testMapGet1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");
@@ -173,8 +161,7 @@ public class TestMapLibrary
 
     @Test(expected = ProcessorException.class)
     public void testMapGet2()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");
@@ -188,8 +175,7 @@ public class TestMapLibrary
 
     @Test
     public void testMapKey1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");
@@ -206,8 +192,7 @@ public class TestMapLibrary
 
     @Test
     public void testMapKeys1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");
@@ -222,8 +207,7 @@ public class TestMapLibrary
 
     @Test
     public void testMapValues1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");
@@ -238,8 +222,7 @@ public class TestMapLibrary
 
     @Test
     public void testClear1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");
@@ -254,8 +237,7 @@ public class TestMapLibrary
 
     @Test
     public void testSize1()
-    throws ProcessorException
-    {
+    throws ProcessorException {
         Map<String, Object> lMap = new HashMap<String, Object>();
         lMap.put("a", "uno");
         lMap.put("b", "duo");

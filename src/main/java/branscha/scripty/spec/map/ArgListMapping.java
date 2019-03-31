@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,22 +30,18 @@ import branscha.scripty.parser.IEval;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArgListMapping
-{
+public class ArgListMapping {
     private List<IArgMapping> mappings = new ArrayList<IArgMapping>();
-    
-    public void addArgMapping(IArgMapping aArgMapping)
-    {
+
+    public void addArgMapping(IArgMapping aArgMapping) {
         mappings.add(aArgMapping);
     }
-    
+
     public Object[] map(IEval aEval, IContext aContext, Object[] aArgs)
-    throws ArgMappingException
-    {
+    throws ArgMappingException {
         Object[] lMapped = new Object[mappings.size()];
         int i = 0;
-        for(IArgMapping lMapping : mappings)
-        {
+        for (IArgMapping lMapping : mappings) {
             lMapped[i++] = lMapping.map(aEval, aContext, aArgs);
         }
         return lMapped;

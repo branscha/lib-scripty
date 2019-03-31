@@ -50,33 +50,41 @@ public class PrintLibrary
 
 The project is based on gradle.
 
-	./gradlew clean build
-	
+`./gradlew clean build`
 	
 ## Run
 
 Start the minimalistic example GUI:
 
-`./gradlew run`
+`./gradlew --console plain repl`
+
+And the text mode repl:
+
+`./gradlew --console plain textrepl`
 
 ## Available Libraries
 
 The scripty component contains a number of pre-defined command libraries that are at your disposal.
 
-* JavaBean Library
-* Debugger Library
-* Script Editor Library
-* Text editor
-* Record Editor Library
-* Exit Command
-* File Dialog Library
-* File System Library
-* Lisp Functions
-* Load Library
-* Map Functions
-* Math Functions
-* Pair Functions
-* Print Command
+* [JavaBean Library](docs/cmdlib-javabean.md)
+* [Debugger Library](docs/cmdlib-debugger.md)
+* [Text editor](docs/cmdlib-editor.md)
+* [Record Editor Library](docs/cmdlib-receditor.md)
+* [Exit Command](docs/cmdlib-exit.md)
+* [File Dialog Library](docs/cmdlib-filedialog.md)
+* [File System Library](docs/cmdlib-filsystem.md)
+* [Lisp Functions](docs/cmdlib-lisp.md)
+* [Load Library](docs/cmdlib-scriptloader.md)
+* [Map Functions](docs/cmdlib-map.md)
+* [Math Functions](docs/cmdlib-math.md)
+* [Pair Functions](docs/cmdlib-pair.md)
+* [string Functions](docs/cmdlib-string.md)
+
+Man pages
+
+* [Create Command Libraries](docs/man-create-command-libraries.md)
+* [Embedding Scripty](docs/man-embedding-scripty.md)
+* [Scripty Syntax](docs/man-scripty-syntax.md)
 
 #### 6.13. Record Editor Library
 
@@ -98,7 +106,7 @@ Example: These two expressions have the same meaning on the command line.
 ```
 > (print Hello World)
 Hello World 
-> print Hello World
+> println Hello World
 Hello World
 ```
 
@@ -109,7 +117,7 @@ Commands can be spread over multiple lines. This can happen automatically when t
 Example 1: Automatic multi line command.
 
 ```
-> (print Hello
+> (println Hello
 + > World
 + > )
 Hello World
@@ -118,7 +126,7 @@ Hello World
 Example 2: Explicit multi line command with backslashes at the end of the line.
 
 ```
-> print Hello \
+> println Hello \
 + > World \
 + > )
 Hello World
@@ -127,7 +135,7 @@ Hello World
 Example 3: Terminating a multi line command without execution.
 
 ```
-> print \
+> println \
 + > Hello \
 + > break
 Canceling the command.
@@ -136,5 +144,3 @@ Canceling the command.
 #### 8.3.print
 
 Print stuff on the standard output. Scripty does not automatically print the result of an evaluation on the command line, often you have to use the print command explicitly. It is not uncommon for a command to show something on the standard output and to have something else as the result of the evaluation.
-
-

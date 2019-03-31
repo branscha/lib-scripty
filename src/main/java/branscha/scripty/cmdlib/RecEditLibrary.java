@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,7 +26,6 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.annot.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -39,138 +38,117 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-@ScriptyLibrary(type=ScriptyLibraryType.STATIC)
-public class RecEditLibrary
-{
-    @ScriptyCommand(name="rec-edit")
-    @ScriptyStdArgList(fixed={@ScriptyArg(name="fields", type ="ListOf(String)"), @ScriptyArg(name="values", type="ListOf(Any)")})
+@ScriptyLibrary(type = ScriptyLibraryType.STATIC)
+public class RecEditLibrary {
+    @ScriptyCommand(name = "rec-edit")
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "fields", type = "ListOf(String)"), @ScriptyArg(name = "values", type = "ListOf(Any)")})
     public static List recEdit(@ScriptyParam("fields") List<String> aPropNames, @ScriptyParam("values") List<Object> aPropVals)
-    throws CommandException
-    {
-        if(aPropNames.size() != aPropVals.size()) throw new CommandException("Nr. of property names and values is different.");
+    throws CommandException {
+        if (aPropNames.size() != aPropVals.size())
+            throw new CommandException("Nr. of property names and values is different.");
 
         String[] lPropNamesArr = new String[aPropNames.size()];
         Object[] lPropValArr = new Object[aPropVals.size()];
 
-        for(int i = 0; i < lPropNamesArr.length; i++) lPropNamesArr[i] = (String) aPropNames.get(i);
-        for(int i = 0; i < lPropValArr.length; i++) lPropValArr[i] = aPropVals.get(i);
+        for (int i = 0; i < lPropNamesArr.length; i++) lPropNamesArr[i] = (String) aPropNames.get(i);
+        for (int i = 0; i < lPropValArr.length; i++) lPropValArr[i] = aPropVals.get(i);
 
         PropertyPage lPage = new PropertyPage(lPropNamesArr, lPropValArr);
-        int result = JOptionPane.showOptionDialog(null, lPage, "Property Editor",JOptionPane.OK_CANCEL_OPTION ,JOptionPane.PLAIN_MESSAGE, null, null, null);
-        return result==JOptionPane.OK_OPTION?lPage.getValues():null;
+        int result = JOptionPane.showOptionDialog(null, lPage, "Property Editor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+        return result == JOptionPane.OK_OPTION ? lPage.getValues() : null;
     }
 }
 
-class RowEditorModel
-{
+class RowEditorModel {
     @SuppressWarnings("unchecked")
     private Hashtable data;
 
-    public RowEditorModel()
-    {
+    public RowEditorModel() {
         data = new Hashtable();
     }
 
     @SuppressWarnings("unchecked")
-    public void addEditorForRow(int row, TableCellEditor e)
-    {
+    public void addEditorForRow(int row, TableCellEditor e) {
         data.put(new Integer(row), e);
     }
 
-    public void removeEditorForRow(int row)
-    {
+    public void removeEditorForRow(int row) {
         data.remove(new Integer(row));
     }
 
-    public TableCellEditor getEditor(int row)
-    {
+    public TableCellEditor getEditor(int row) {
         return (TableCellEditor) data.get(new Integer(row));
     }
 }
 
 @SuppressWarnings("serial")
-class JPropTable extends JTable
-{
+class JPropTable extends JTable {
     protected RowEditorModel rm;
 
-    public JPropTable()
-    {
+    public JPropTable() {
         super();
         rm = null;
     }
 
-    public JPropTable(TableModel tm)
-    {
+    public JPropTable(TableModel tm) {
         super(tm);
         rm = null;
     }
 
-    public JPropTable(TableModel tm, TableColumnModel cm)
-    {
-        super(tm,cm);
+    public JPropTable(TableModel tm, TableColumnModel cm) {
+        super(tm, cm);
         rm = null;
     }
 
     public JPropTable(TableModel tm, TableColumnModel cm,
-                      ListSelectionModel sm)
-    {
-        super(tm,cm,sm);
+                      ListSelectionModel sm) {
+        super(tm, cm, sm);
         rm = null;
     }
 
-    public JPropTable(int rows, int cols)
-    {
-        super(rows,cols);
+    public JPropTable(int rows, int cols) {
+        super(rows, cols);
         rm = null;
     }
 
-    public JPropTable(final Vector rowData, final Vector columnNames)
-    {
+    public JPropTable(final Vector rowData, final Vector columnNames) {
         super(rowData, columnNames);
         rm = null;
     }
 
-    public JPropTable(final Object[][] rowData, final Object[] colNames)
-    {
+    public JPropTable(final Object[][] rowData, final Object[] colNames) {
         super(rowData, colNames);
         rm = null;
     }
 
     // new constructor
-    public JPropTable(TableModel tm, RowEditorModel rm)
-    {
-        super(tm,null,null);
+    public JPropTable(TableModel tm, RowEditorModel rm) {
+        super(tm, null, null);
         this.rm = rm;
     }
 
-    public void setRowEditorModel(RowEditorModel rm)
-    {
+    public void setRowEditorModel(RowEditorModel rm) {
         this.rm = rm;
     }
 
-    public RowEditorModel getRowEditorModel()
-    {
+    public RowEditorModel getRowEditorModel() {
         return rm;
     }
 
-    public TableCellEditor getCellEditor(int row, int col)
-    {
-        if (rm != null)
-        {
+    public TableCellEditor getCellEditor(int row, int col) {
+        if (rm != null) {
             TableCellEditor tmpEditor = rm.getEditor(row);
             if (tmpEditor != null) return tmpEditor;
         }
-        return super.getCellEditor(row,col);
+        return super.getCellEditor(row, col);
     }
 
-    public void changeSelection(int row, int col, boolean toggle, boolean expand)
-    {
+    public void changeSelection(int row, int col, boolean toggle, boolean expand) {
         // This method is called when the user tries to move to a diffferent
         // cell.
         // If the cell they're trying to move to is not editable, we look for
         // then next cell in the proper direction that is editable.
-        if (!getModel().isCellEditable(row, col))
-        {
+        if (!getModel().isCellEditable(row, col)) {
             // Find the row and column we're coming from.
             int curRow = getEditingRow();
             int curCol = getEditingColumn();
@@ -185,16 +163,13 @@ class JPropTable extends JTable
             int nextRow = row;
             int nextCol = col;
 
-            if (col == curCol)
-            {
+            if (col == curCol) {
                 // Up or down motion - go only up or down.
                 int direction = row - curRow;
                 if (direction > 1) direction = 1;
                 if (direction < -1) direction = -1;
                 nextRow = findNextEditableRow(row, col, direction, nRows, nCols);
-            }
-            else if (row == curRow)
-            {
+            } else if (row == curRow) {
                 // Left-or-right motion - use the "natural" (for Americans)
                 // order:
                 // left-to-right, top-to-bottom, or vice-versa if we're trying
@@ -207,9 +182,7 @@ class JPropTable extends JTable
                 int[] nextCell = findNextEditableCell(row, col, direction, nRows, nCols);
                 nextRow = nextCell[0];
                 nextCol = nextCell[1];
-            }
-            else
-            {
+            } else {
                 // Both row and column differ. This probably means we've
                 // moved off the end of a row, or else the user has clicked
                 // on some random cell. The direction is controlled
@@ -225,9 +198,7 @@ class JPropTable extends JTable
             }
             // Go to the cell we found.
             super.changeSelection(nextRow, nextCol, toggle, expand);
-        }
-        else
-        {
+        } else {
             // It's an editable cell, so leave the selection here.
             super.changeSelection(row, col, toggle, expand);
         }
@@ -235,39 +206,33 @@ class JPropTable extends JTable
 
     // Search for an editable cell starting at row,col and using the
     // "natural" order.
-    int[] findNextEditableCell(int row, int col, int direction, int nRows, int nCols)
-    {
+    int[] findNextEditableCell(int row, int col, int direction, int nRows, int nCols) {
         int origRow = row;
         int origCol = col;
-        do
-        {
+        do {
             col = col + direction;
-            if (col >= nCols)
-            {
+            if (col >= nCols) {
                 col = 0;
                 row += direction;
             }
-            if (col < 0)
-            {
+            if (col < 0) {
                 col = nCols - 1;
                 row += direction;
             }
             if (row >= nRows) row = 0;
             if (row < 0) row = nRows - 1;
-            if (isCellEditable(row, col)) return new int[] { row, col };
+            if (isCellEditable(row, col)) return new int[]{row, col};
         }
         while (!((row == origRow) && (col == origCol)));
 
         // Nothing editable found; stay here.
-        return new int[] { origRow, origCol };
+        return new int[]{origRow, origCol};
     }
 
     // Search directly above/below for an editable cell.
-    int findNextEditableRow(int row, int col, int direction, int nRows, int nCols)
-    {
+    int findNextEditableRow(int row, int col, int direction, int nRows, int nCols) {
         int origRow = row;
-        do
-        {
+        do {
             row = row + direction;
             if (row < 0) row = nRows - 1;
             if (row >= nRows) row = 0;
@@ -280,31 +245,25 @@ class JPropTable extends JTable
 }
 
 @SuppressWarnings("serial")
-class PropertyPage
-        extends JPanel
-{
+class PropertyPage extends JPanel {
     private JPropTable table;
     private DefaultTableModel model;
     private String[] colNames = {"Name", "Value"};
     private int nrProps;
 
-    public PropertyPage(final String[] aPropNames, Object[] aPropValues)
-    {
+    public PropertyPage(final String[] aPropNames, Object[] aPropValues) {
         setLayout(new BorderLayout());
         nrProps = aPropNames.length;
 
-        model = new DefaultTableModel(colNames, aPropNames.length)
-        {
+        model = new DefaultTableModel(colNames, aPropNames.length) {
             public String[] propNames = aPropNames;
 
-            public Object getValueAt(int row, int col)
-            {
-                if (col==0)return propNames[row];
-                return super.getValueAt(row,col);
+            public Object getValueAt(int row, int col) {
+                if (col == 0) return propNames[row];
+                return super.getValueAt(row, col);
             }
 
-            public boolean isCellEditable(int row, int col)
-            {
+            public boolean isCellEditable(int row, int col) {
                 return col != 0;
             }
         };
@@ -314,7 +273,7 @@ class PropertyPage
         //table.setFillsViewportHeight(true);
         add(scrollPane, BorderLayout.CENTER);
 
-        for(int i = 0; i  < aPropValues.length; i++)
+        for (int i = 0; i < aPropValues.length; i++)
             table.setValueAt(aPropValues[i], i, 1);
 
         table.setRowSelectionAllowed(false);
@@ -335,10 +294,9 @@ class PropertyPage
         //rm.addEditorForRow(1,ed);
     }
 
-    public List<Object> getValues()
-    {
+    public List<Object> getValues() {
         List<Object> lResult = new LinkedList<Object>();
-        for(int i = 0; i < nrProps; i++) lResult.add(table.getValueAt(i, 1));
+        for (int i = 0; i < nrProps; i++) lResult.add(table.getValueAt(i, 1));
         return lResult;
     }
 }

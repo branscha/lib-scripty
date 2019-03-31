@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -31,56 +31,45 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 @SuppressWarnings("UnusedDeclaration")
-public class ScriptyEmbeddedRepl
-extends ScriptyCapable
-{
-    public ScriptyEmbeddedRepl()
-    {
+public class ScriptyEmbeddedRepl extends ScriptyCapable {
+    public ScriptyEmbeddedRepl() {
     }
 
-    public ScriptyEmbeddedRepl(ScriptyCapable aScriptyFacade)
-    {
+    public ScriptyEmbeddedRepl(ScriptyCapable aScriptyFacade) {
         setReplEngine(aScriptyFacade.getReplEngine());
     }
 
-    public void startLoop(final int aPort, final String aUid, final String aPwd)
-    {
-        final Thread lServerThread = new Thread()
-        {
+    public void startLoop(final int aPort, final String aUid, final String aPwd) {
+        final Thread lServerThread = new Thread() {
             @Override
-            public void run() 
-            {
+            public void run() {
                 final ReplServer lServer = new ReplServer(aPort, getReplEngine());
                 lServer.serveClients(aUid, aPwd);
             }
         };
         lServerThread.setDaemon(true);
-        lServerThread.start();        
+        lServerThread.start();
     }
 }
 
-class ReplServer
-{
+class ReplServer {
     private ServerSocket server;
     private ReplEngine scripty;
 
     /**
-     * Construct the server, you have to call the serveClients method 
+     * Construct the server, you have to call the serveClients method
      * for the server to start serving clients.
-     * @param aPort     The port where the server will listen for connections.
-     * @param aEngine   A REPL engine.
+     *
+     * @param aPort   The port where the server will listen for connections.
+     * @param aEngine A REPL engine.
      */
-    public ReplServer(int aPort, ReplEngine aEngine)
-    {
-        try
-        {
+    public ReplServer(int aPort, ReplEngine aEngine) {
+        try {
             scripty = aEngine;
 
             // Plain server.
             server = new ServerSocket(aPort);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -88,18 +77,15 @@ class ReplServer
     /**
      * Start serving clients. This method will never return.
      *
-     * @param aUid   A user id.
-     * @param aPwd   A password.
+     * @param aUid A user id.
+     * @param aPwd A password.
      */
-    public void serveClients(String aUid, String aPwd)
-    {
+    public void serveClients(String aUid, String aPwd) {
         // An infinite loop, waiting for client requests, spawning handlers and 
         // wait for new requests.
         //noinspection InfiniteLoopStatement
-        while (true)
-        {
-            try
-            {
+        while (true) {
+            try {
                 // This call will block until a client contacts this server.
                 Socket socket = server.accept();
                 // Set the session timeout.
@@ -111,9 +97,7 @@ class ReplServer
                 // and we will immediately keep listening for other clients to connect our server port.
                 // So this call starts the handling process, but it does not wait for it to finish.
                 new RequestHandler(socket, scripty, aUid, aPwd);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -124,11 +108,9 @@ class ReplServer
  * A request handler, it is created by the server.
  * It will always run in a separate thread from the server so that the
  * main server can keep listening for incoming connections.
- *
  */
 class RequestHandler
-implements Runnable
-{
+        implements Runnable {
     private Socket socket;
     private ReplEngine scripty;
     private String uid;
@@ -138,75 +120,71 @@ implements Runnable
      * Create the handler, and start the processing of the request
      * in a separate thread.
      */
-    public RequestHandler(Socket aSocket, ReplEngine aEngine, String aUid, String aPwd)
-    {
+    public RequestHandler(Socket aSocket, ReplEngine aEngine, String aUid, String aPwd) {
         this.socket = aSocket;
         this.scripty = aEngine;
         uid = aUid;
         pwd = aPwd;
-        
+
         Thread workerThread = new Thread(this);
         workerThread.start();
     }
-    
-    public boolean login(InputStream aIn, OutputStream aOut, String aUid, String aPwd)
-    {
-        try 
-        {
+
+    public boolean login(InputStream aIn, OutputStream aOut, String aUid, String aPwd) {
+        try {
             LineNumberReader input = new LineNumberReader(new InputStreamReader(aIn));
             PrintWriter out = new PrintWriter(new OutputStreamWriter(aOut));
-            
+
             int count = 0;
-            while(count++ < 5)
-            {
+            while (count++ < 5) {
                 out.print("user: ");
                 out.flush();
                 String lUid = input.readLine();
-                
+
                 out.print("password: ");
                 out.flush();
                 String lPwd = input.readLine();
 
-                if(lUid != null && lUid.trim().equals(aUid) && lPwd != null && lPwd.trim().equals(aPwd)) return true;
-                else 
-                {
+                if (lUid != null && lUid.trim().equals(aUid) && lPwd != null && lPwd.trim().equals(aPwd)) return true;
+                else {
                     out.println("Login failed.");
                     out.flush();
                 }
             }
             return false;
-        } 
-        catch (Exception e) 
-        {
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public void run()
-    {
+    public void run() {
         InputStream lIn = null;
         OutputStream lOut = null;
-        
-        try
-        {
+
+        try {
             // Get the streams.
             lIn = socket.getInputStream();
             lOut = socket.getOutputStream();
 
-            if(!login(lIn, lOut, uid, pwd)) return;
+            if (!login(lIn, lOut, uid, pwd)) return;
 
             // Start the REPL.
             scripty.startInteractive(lIn, lOut, lOut);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally
-        {
-            if(lIn != null) try {lIn.close();}catch(Exception ignored){}
-            if(lOut != null) try {lOut.close();} catch(Exception ignored){}
-            try {socket.close();} catch(Exception ignored){}
+        } finally {
+            if (lIn != null) try {
+                lIn.close();
+            } catch (Exception ignored) {
+            }
+            if (lOut != null) try {
+                lOut.close();
+            } catch (Exception ignored) {
+            }
+            try {
+                socket.close();
+            } catch (Exception ignored) {
+            }
         }
     }
 }

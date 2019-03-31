@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -39,53 +39,44 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.Writer;
 
-public class ScriptyPanel
-extends JPanel
-{
-    private static class PanelEngine 
-    extends ScriptyCapable { }
+public class ScriptyPanel extends JPanel {
+    private static class PanelEngine extends ScriptyCapable {
+    }
 
     private PanelEngine engine = new PanelEngine();
     private JSplitPane splitter;
     private boolean horizontalLayout = false;
 
-    public ScriptyPanel()
-    {
+    public ScriptyPanel() {
         this.setLayout(new BorderLayout());
-        splitter = new JSplitPane(horizontalLayout?JSplitPane.HORIZONTAL_SPLIT:JSplitPane.VERTICAL_SPLIT);
+        splitter = new JSplitPane(horizontalLayout ? JSplitPane.HORIZONTAL_SPLIT : JSplitPane.VERTICAL_SPLIT);
         buildPanel();
     }
-    
-    public ScriptyPanel(ScriptyCapable aFacade)
-    {
+
+    public ScriptyPanel(ScriptyCapable aFacade) {
         this();
         engine.setReplEngine(aFacade.getReplEngine());
     }
 
-    public boolean isHorizontalLayout() 
-    {
+    public boolean isHorizontalLayout() {
         return horizontalLayout;
     }
 
-    public void setHorizontalLayout() 
-    {
+    public void setHorizontalLayout() {
         this.horizontalLayout = true;
-        if(splitter != null) splitter.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+        if (splitter != null) splitter.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
     }
 
-    public boolean isVerticalLayout()
-    {
+    public boolean isVerticalLayout() {
         return !horizontalLayout;
     }
 
-    public void setVerticalLayout()
-    {
+    public void setVerticalLayout() {
         this.horizontalLayout = false;
-        if(splitter != null) splitter.setOrientation(JSplitPane.VERTICAL_SPLIT);
+        if (splitter != null) splitter.setOrientation(JSplitPane.VERTICAL_SPLIT);
     }
 
-    private void buildPanel()
-    {
+    private void buildPanel() {
         final JToolBar lToolBar = new JToolBar();
         this.add(lToolBar, BorderLayout.NORTH);
 
@@ -110,15 +101,12 @@ extends JPanel
         lErrAttrs.addAttribute(StyleConstants.CharacterConstants.Italic, Boolean.TRUE);
         StyleConstants.setForeground(lErrAttrs, Color.RED);
 
-        final Action lExecuteAction = new AbstractAction("Run")
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        final Action lExecuteAction = new AbstractAction("Run") {
+            public void actionPerformed(ActionEvent e) {
                 // Find top level frame.
-                final JFrame lFrame = (JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, ScriptyPanel.this);
+                final JFrame lFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, ScriptyPanel.this);
 
-                try
-                {
+                try {
                     // Set wait cursor.
                     lFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     //
@@ -127,39 +115,30 @@ extends JPanel
                     // 
                     lInputPane.grabFocus();
                     lInputPane.selectAll();
-                }
-                catch (Exception e1)
-                {
-                    try
-                    {
+                } catch (Exception e1) {
+                    try {
                         final Document lDoc = lOutputPane.getDocument();
                         lDoc.insertString(lDoc.getLength(), e1.getMessage() + "\n", lErrAttrs);
                         lOutputPane.setCaretPosition(lOutputPane.getDocument().getLength());
+                    } catch (BadLocationException ignored) {
                     }
-                    catch (BadLocationException ignored) { }
-                }
-                finally
-                {
+                } finally {
                     lFrame.setCursor(Cursor.getDefaultCursor());
                 }
             }
         };
 
-        final Action lClearAction = new AbstractAction("Clear")
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+        final Action lClearAction = new AbstractAction("Clear") {
+            public void actionPerformed(ActionEvent e) {
                 lOutputPane.setText("");
             }
         };
 
-        this.addComponentListener(new ComponentAdapter()
-        {
+        this.addComponentListener(new ComponentAdapter() {
             boolean firstTime = true;
-            public void componentResized(ComponentEvent e)
-            {
-                if (firstTime)
-                {
+
+            public void componentResized(ComponentEvent e) {
+                if (firstTime) {
                     firstTime = false;
                     splitter.setDividerLocation(1 - 1.0 / 1.618);
                 }
@@ -176,33 +155,30 @@ extends JPanel
         lInputPane.grabFocus();
     }
 
-    private static class TextPaneWriter
-    extends Writer
-    {
+    private static class TextPaneWriter extends Writer {
         private final JTextPane textArea;
 
-        public TextPaneWriter(final JTextPane textArea) 
-        {
+        public TextPaneWriter(final JTextPane textArea) {
             this.textArea = textArea;
         }
 
         @Override
-        public void flush(){ }
+        public void flush() {
+        }
 
         @Override
-        public void close(){ }
+        public void close() {
+        }
 
         @Override
-        public void write(final char[] cbuf, final int off, final int len) 
-        throws IOException 
-        {
+        public void write(final char[] cbuf, final int off, final int len)
+        throws IOException {
             final Document lDoc = textArea.getDocument();
-            try
-            {
+            try {
                 lDoc.insertString(lDoc.getLength(), new String(cbuf, off, len), null);
                 textArea.setCaretPosition(textArea.getDocument().getLength());
+            } catch (BadLocationException ignored) {
             }
-            catch (BadLocationException ignored) { }
         }
     }
 }

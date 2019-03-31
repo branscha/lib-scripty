@@ -2,7 +2,7 @@
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,6 +24,8 @@
  ******************************************************************************/
 package branscha.scripty.repl;
 
+import branscha.scripty.ExtensionException;
+import branscha.scripty.IExtensions;
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandRepository;
 import branscha.scripty.parser.ICommand;
@@ -32,11 +34,6 @@ import branscha.scripty.spec.args.ArgListBuilderUtil;
 import branscha.scripty.spec.args.ArgSpecException;
 import branscha.scripty.spec.args.IArgList;
 import branscha.scripty.spec.map.*;
-import branscha.scripty.parser.*;
-import branscha.scripty.ExtensionException;
-import branscha.scripty.IExtensions;
-import branscha.scripty.annot.*;
-import branscha.scripty.spec.map.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -44,161 +41,130 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExtensionRepositoryBuilder
-implements IExtensions
-{
+        implements IExtensions {
     private CommandRepository commandRepo;
     private CommandRepository macroRepo;
 
-    public ExtensionRepositoryBuilder()
-    {
+    public ExtensionRepositoryBuilder() {
         commandRepo = new CommandRepository();
         macroRepo = new CommandRepository();
     }
 
     public void addCommand(String aName, ICommand aCommand)
-    throws ExtensionException
-    {
+    throws ExtensionException {
         commandRepo.registerCommand(aName, aCommand);
     }
 
     public void addMacro(String aName, ICommand aMacro)
-    throws ExtensionException
-    {
+    throws ExtensionException {
         macroRepo.registerCommand(aName, aMacro);
     }
 
-    public void addLibraryClasses(Class ... aLibraryClasses)
-    throws ExtensionException
-    {
-        for(Class lClass : aLibraryClasses)
-        {
+    public void addLibraryClasses(Class... aLibraryClasses)
+    throws ExtensionException {
+        for (Class lClass : aLibraryClasses) {
             String lLibraryName = lClass.getSimpleName();
             ScriptyLibraryType lLibraryType = ScriptyLibraryType.AUTO;
-            ScriptyLibrary lScriptyLibrary =  (ScriptyLibrary) lClass.getAnnotation(ScriptyLibrary.class);
-            if(lScriptyLibrary != null)
-            {
+            ScriptyLibrary lScriptyLibrary = (ScriptyLibrary) lClass.getAnnotation(ScriptyLibrary.class);
+            if (lScriptyLibrary != null) {
                 lLibraryName = lScriptyLibrary.name();
                 lLibraryType = lScriptyLibrary.type();
             }
-            
-            
+
+
             // Try to instantiate the class in order to be able to use non static 
             // methods as well. 
             Object lLibInstance = null;
-            if(lLibraryType != ScriptyLibraryType.STATIC)
-            {
-                try
-                {
+            if (lLibraryType != ScriptyLibraryType.STATIC) {
+                try {
                     lLibInstance = lClass.newInstance();
-                } 
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     // Nope we could not instantiate the library, so we 
                     // will only be able to add the static methods.
                     lLibInstance = null;
                 }
             }
 
-            if(lLibInstance == null && lLibraryType == ScriptyLibraryType.INSTANCE)
-            {
+            if (lLibInstance == null && lLibraryType == ScriptyLibraryType.INSTANCE) {
                 throw new ExtensionException(String.format("Library '%s' was marked as being of type INSTANCE, but it was impossible to create an instance.\nMaybe you should create an instance manually and provide the instance.", lClass.getName()));
             }
 
             addLibrary(lLibraryName, lLibInstance, lClass);
         }
     }
-    
+
     private void registerClassArgList(Class aClass, ScriptyStdArgList aStdLst, Map<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>> aNamedLists)
-    throws ExtensionException
-    {
+    throws ExtensionException {
         final String lName = aStdLst.name();
-        if(lName.length() == 0)
-        {
+        if (lName.length() == 0) {
             final String lMsg = String.format("Class '%s' contains an unnamed standard argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
             throw new ExtensionException(lMsg);
         }
 
-        try
-        {
+        try {
             // Build it.
             final ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aStdLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
-        }
-        catch (ArgSpecException e)
-        {
+        } catch (ArgSpecException e) {
             final String lMsg = String.format("Class '%s' contains a standard argument list specification '%s' with errors.\n%s", aClass.getName(), aStdLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
 
     private void registerClassArgList(Class aClass, ScriptyVarArgList aVarLst, Map<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>> aNamedLists)
-    throws ExtensionException
-    {
+    throws ExtensionException {
         final String lName = aVarLst.name();
-        if(lName.length() == 0)
-        {
+        if (lName.length() == 0) {
             final String lMsg = String.format("Class '%s' contains an unnamed variable argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
             throw new ExtensionException(lMsg);
         }
 
-        try
-        {
+        try {
             // Build it.
             final ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aVarLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
-        }
-        catch (ArgSpecException e)
-        {
+        } catch (ArgSpecException e) {
             final String lMsg = String.format("Class '%s' contains a variable argument list specification '%s' with errors.\n%s", aClass.getName(), aVarLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
 
     private void addLibrary(String aLibName, Object aLibInstance, Class aClass)
-    throws ExtensionException
-    {
+    throws ExtensionException {
         // We keep track of the named arglists in this datastructure. 
         Map<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>> lNamedArgLists = new HashMap<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>>();
 
         // Library (Class) annotations.
         ///////////////////////////////
-        
+
         ScriptyStdArgList lStdArgListClassAnnot = (ScriptyStdArgList) aClass.getAnnotation(ScriptyStdArgList.class);
         ScriptyVarArgList lVarArgListClassAnnot = (ScriptyVarArgList) aClass.getAnnotation(ScriptyVarArgList.class);
         ScriptyNamedArgLists lNamedArgListsAnnot = (ScriptyNamedArgLists) aClass.getAnnotation(ScriptyNamedArgLists.class);
-        
+
         int lClassAnnotCounter = 0;
-        if(lStdArgListClassAnnot != null) lClassAnnotCounter++;
-        if(lVarArgListClassAnnot != null) lClassAnnotCounter++;
-        if(lNamedArgListsAnnot != null) lClassAnnotCounter++;
-        if(lClassAnnotCounter > 1)
-        {
+        if (lStdArgListClassAnnot != null) lClassAnnotCounter++;
+        if (lVarArgListClassAnnot != null) lClassAnnotCounter++;
+        if (lNamedArgListsAnnot != null) lClassAnnotCounter++;
+        if (lClassAnnotCounter > 1) {
             final String lMsg = String.format("Class '%s' contains more than one argument list spefification. Use @ScriptyNamedArgLists to associate multiple argument list specifications with a single class.", aClass.getName());
             throw new ExtensionException(lMsg);
         }
-        
-        if(lVarArgListClassAnnot != null)
-        {
+
+        if (lVarArgListClassAnnot != null) {
             registerClassArgList(aClass, lVarArgListClassAnnot, lNamedArgLists);
-        }
-        else if(lStdArgListClassAnnot != null)
-        {
+        } else if (lStdArgListClassAnnot != null) {
             registerClassArgList(aClass, lStdArgListClassAnnot, lNamedArgLists);
-        }
-        else if(lNamedArgListsAnnot != null)
-        {
+        } else if (lNamedArgListsAnnot != null) {
             ScriptyStdArgList[] lStdLists = lNamedArgListsAnnot.std();
             ScriptyVarArgList[] lVarLists = lNamedArgListsAnnot.var();
-            
-            for (ScriptyStdArgList lStd : lStdLists)
-            {
+
+            for (ScriptyStdArgList lStd : lStdLists) {
                 registerClassArgList(aClass, lStd, lNamedArgLists);
             }
-            
-            for(ScriptyVarArgList lVar : lVarLists)
-            {
+
+            for (ScriptyVarArgList lVar : lVarLists) {
                 registerClassArgList(aClass, lVar, lNamedArgLists);
             }
         }
@@ -208,27 +174,23 @@ implements IExtensions
 
         final Method[] lMethods = aClass.getMethods();
 
-        for(Method lMethod:lMethods)
-        {
+        for (Method lMethod : lMethods) {
             // Result binding
             /////////////////
 
             IResultMapping lResultMapping = null;
             ScriptySetBinding lSetBinding = lMethod.getAnnotation(ScriptySetBinding.class);
             ScriptyDefBinding lDefBinding = lMethod.getAnnotation(ScriptyDefBinding.class);
-            if(lSetBinding != null && lDefBinding != null)
-            {
+            if (lSetBinding != null && lDefBinding != null) {
                 final String lMsg = String.format("Class '%s' has a macro/command method '%s' is annotated with both def/set binding of the result to the context.", aClass.getName(), lMethod.getName());
                 throw new ExtensionException(lMsg);
             }
 
-            if(lSetBinding != null)
-            {
+            if (lSetBinding != null) {
                 lResultMapping = new SetResultMapping(lSetBinding.value());
             }
 
-            if(lDefBinding != null)
-            {
+            if (lDefBinding != null) {
                 lResultMapping = new DefResultMapping(lDefBinding.value());
             }
 
@@ -241,68 +203,51 @@ implements IExtensions
             ScriptyStdArgList lStdArgListAnnot = lMethod.getAnnotation(ScriptyStdArgList.class);
             ScriptyVarArgList lVarArgListAnnot = lMethod.getAnnotation(ScriptyVarArgList.class);
             ScriptyRefArgList lRefArgListAnnot = lMethod.getAnnotation(ScriptyRefArgList.class);
-            
+
             int lArgListCounter = 0;
-            if(lStdArgListAnnot != null) lArgListCounter++;
-            if(lVarArgListAnnot != null) lArgListCounter++;
-            if(lRefArgListAnnot != null) lArgListCounter++;            
-            if(lArgListCounter > 1)
-            {
+            if (lStdArgListAnnot != null) lArgListCounter++;
+            if (lVarArgListAnnot != null) lArgListCounter++;
+            if (lRefArgListAnnot != null) lArgListCounter++;
+            if (lArgListCounter > 1) {
                 final String lMsg = String.format("Class '%s' has a macro/command method '%s' with more than one argument list specification.", aClass.getName(), lMethod.getName());
                 throw new ExtensionException(lMsg);
             }
 
-            if(lRefArgListAnnot != null)
-            {
+            if (lRefArgListAnnot != null) {
                 final String lRef = lRefArgListAnnot.ref();
-                if(lNamedArgLists.containsKey(lRef))
-                {
+                if (lNamedArgLists.containsKey(lRef)) {
                     ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = lNamedArgLists.get(lRef);
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
-                }
-                else
-                {
+                } else {
                     final String lMsg = String.format("Class '%s' has a macro/command method '%s' with a reference to a named argument list '%s' which does not exist.", aClass, lMethod.getName(), lRef);
                     throw new ExtensionException(lMsg);
                 }
-            }
-            else if(lStdArgListAnnot != null)
-            {
-                try
-                {
+            } else if (lStdArgListAnnot != null) {
+                try {
                     // Build the arglist.
                     ArgListBuilderUtil.ArgListTuple lTuple = ArgListBuilderUtil.buildArgList(lStdArgListAnnot);
                     // Remember it for references if the argument list spec has a name that is.
-                    if(lStdArgListAnnot.name().length() > 0)
-                    {
+                    if (lStdArgListAnnot.name().length() > 0) {
                         lNamedArgLists.put(lStdArgListAnnot.name(), lTuple);
                     }
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
-                } 
-                catch (ArgSpecException e)
-                {
+                } catch (ArgSpecException e) {
                     final String lMsg = String.format("While processing a standard argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
-            }
-            else if (lVarArgListAnnot != null)
-            {
-                try
-                {
+            } else if (lVarArgListAnnot != null) {
+                try {
                     // Build the arglist.
                     ArgListBuilderUtil.ArgListTuple lTuple = ArgListBuilderUtil.buildArgList(lVarArgListAnnot);
                     // Remember it for references if the argument list spec has a name that is.
-                    if(lVarArgListAnnot.name().length() > 0)
-                    {
+                    if (lVarArgListAnnot.name().length() > 0) {
                         lNamedArgLists.put(lVarArgListAnnot.name(), lTuple);
                     }
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
-                }
-                catch (ArgSpecException e)
-                {
+                } catch (ArgSpecException e) {
                     final String lMsg = String.format("While processing a variable argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
@@ -310,95 +255,78 @@ implements IExtensions
 
             // Command or Macro.
             ////////////////////
-            
+
             ScriptyCommand lCmdAnnot = lMethod.getAnnotation(ScriptyCommand.class);
             ScriptyMacro lMacroAnnot = lMethod.getAnnotation(ScriptyMacro.class);
 
-            if(lCmdAnnot != null && lMacroAnnot != null)
-            {
+            if (lCmdAnnot != null && lMacroAnnot != null) {
                 // The method is annotated as a command AND macro.
                 // A method can be a command or a macro, but not both things at the same time.
                 throw new ExtensionException(String.format("Method '%s' in class '%s' is annotated as command and as a macro simultaneously.", lMethod.getName(), aClass.getSimpleName()));
-            }
-            else if(!(lCmdAnnot == null && lMacroAnnot == null))
-            {
+            } else if (!(lCmdAnnot == null && lMacroAnnot == null)) {
                 int lMethodModifiers = lMethod.getModifiers();
                 boolean lIsStaticMethod = Modifier.isStatic(lMethodModifiers);
-                if(!lIsStaticMethod && aLibInstance == null)
-                {
+                if (!lIsStaticMethod && aLibInstance == null) {
                     throw new ExtensionException(String.format("Method '%s' in class '%s' is not static, and there is no library instance.", lMethod.getName(), aClass.getSimpleName()));
                 }
 
                 // Construct the argument mapping.
                 ArgListMapping lArgListMapping = null;
-                try
-                {
+                try {
                     lArgListMapping = ArgMappingBuilderUtil.buildArgMapping(lMethod, lMappings);
-                }
-                catch (ArgMappingException e)
-                {
+                } catch (ArgMappingException e) {
                     final String lMsg = String.format("While constructing the argument mapping for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
 
-                if(lCmdAnnot != null)
-                {
+                if (lCmdAnnot != null) {
                     // If the annotation does not contain a name, we will use the
                     // method name as a name.
                     String lCmdName = lCmdAnnot.name();
-                    if(lCmdName.length() == 0) lCmdName = lMethod.getName();
+                    if (lCmdName.length() == 0) lCmdName = lMethod.getName();
 
                     commandRepo.registerCommand(lCmdName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));
-                }
-                else if (lMacroAnnot != null)
-                {
+                } else if (lMacroAnnot != null) {
                     String lMacroName = lMacroAnnot.name();
-                    if(lMacroName.length() == 0) lMacroName = lMethod.getName();
+                    if (lMacroName.length() == 0) lMacroName = lMethod.getName();
                     macroRepo.registerCommand(lMacroName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));
                 }
             }
         }
     }
 
-    public void addLibraryInstances(Object ... aLibraryInstances)
-    throws ExtensionException
-    {
-        for(Object lLib : aLibraryInstances)
-        {
+    public void addLibraryInstances(Object... aLibraryInstances)
+    throws ExtensionException {
+        for (Object lLib : aLibraryInstances) {
             String lLibraryName = lLib.getClass().getSimpleName();
             ScriptyLibraryType lLibraryType = ScriptyLibraryType.AUTO;
 
-            ScriptyLibrary lScriptyLibrary =  (ScriptyLibrary) lLib.getClass().getAnnotation(ScriptyLibrary.class);
-            if(lScriptyLibrary != null)
-            {
+            ScriptyLibrary lScriptyLibrary = (ScriptyLibrary) lLib.getClass().getAnnotation(ScriptyLibrary.class);
+            if (lScriptyLibrary != null) {
                 lLibraryName = lScriptyLibrary.name();
                 lLibraryType = lScriptyLibrary.type();
             }
 
-            if(lLibraryType == ScriptyLibraryType.STATIC)
+            if (lLibraryType == ScriptyLibraryType.STATIC)
                 throw new ExtensionException(String.format("Class '%s' is marked as a static library, but an instance was added.", lLib.getClass().getName()));
-            
+
             addLibrary(lLibraryName, lLib, lLib.getClass());
         }
     }
-    
-    public CommandRepository getCommandRepository()
-    {
+
+    public CommandRepository getCommandRepository() {
         return commandRepo;
     }
-    
-    public CommandRepository getMacroRepository()
-    {
+
+    public CommandRepository getMacroRepository() {
         return macroRepo;
     }
 
-    public void setCommandRepository(CommandRepository aCommandRepo)
-    {
+    public void setCommandRepository(CommandRepository aCommandRepo) {
         commandRepo = aCommandRepo;
     }
 
-    public void setMacroRepository(CommandRepository aMacroRepo)
-    {
+    public void setMacroRepository(CommandRepository aMacroRepo) {
         macroRepo = aMacroRepo;
     }
 }
