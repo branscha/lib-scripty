@@ -41,7 +41,8 @@ public class InstanceOrBinding
                 aArg = aCtx.getBinding((String) aArg);
             }
             return innerSpec.guard(aArg, aCtx);
-        } catch (TypeSpecException e) {
+        }
+        catch (TypeSpecException e) {
             // Convert the exception from the inner type spec to 
             // our own message. We hijack the exception here.
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg), e);

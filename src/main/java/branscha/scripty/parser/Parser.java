@@ -145,7 +145,8 @@ public class Parser {
                                     //return new Token(Token.TokenType.error, String.format("Unexpected escaped character found in a string constant: '\\%s' is not defined.", lPeek), lLine, lCol);                            
                                 }
                             }
-                        } else lValue.append(aBuffer.consumeChar());
+                        }
+                        else lValue.append(aBuffer.consumeChar());
 
                         // Peek the next character.
                         lPeek = aBuffer.peekChar();
@@ -156,7 +157,8 @@ public class Parser {
                     if (aBuffer.eof()) {
                         // EOF encountered, open string ...
                         return new Token(Token.TokenType.eof, String.format("Unclosed string starting on line: %d col: %d with contents \"%s\".", lLine, lCol, lValue.toString()), lLine, lCol);
-                    } else {
+                    }
+                    else {
                         // The string ended in a normal way.
                         // We skip the " delimiter without doing anything with it.
                         aBuffer.consumeChar();
@@ -173,7 +175,8 @@ public class Parser {
                             lValue.append(aBuffer.consumeChar());
                         // We return the accumulated whitespace.
                         return new Token(Token.TokenType.whitespace, lValue.toString(), lLine, lCol);
-                    } else {
+                    }
+                    else {
                         // Normal identifier encountered. We turn this into a string as well.
                         // We have to test on set of characters that do not appear in any of the
                         // previous branches.
@@ -232,10 +235,11 @@ public class Parser {
                     Token lErrorToken = (Token) lExpr;
                     if (lErrorToken.isError()) return lErrorToken;
                     else if (lErrorToken.isEof())
-                        return new Token(Token.TokenType.eof, String.format("Syntax error in the list starting at line: %d, col: %d.\n%s", lLine, lCol, lErrorToken.getValue()), lLine, lCol);
+                        return new Token(Token.TokenType.eof, String.format("Syntax error in the list starting at line: %d, col: %d.%n%s", lLine, lCol, lErrorToken.getValue()), lLine, lCol);
                     else
-                        return new Token(Token.TokenType.error, String.format("Syntax error in the list starting at line: %d, col: %d.\n Received unexpected token with contents \"%s\".", lLine, lCol, lErrorToken.getValue()), lLine, lCol);
-                } else {
+                        return new Token(Token.TokenType.error, String.format("Syntax error in the list starting at line: %d, col: %d.%n Received unexpected token with contents \"%s\".", lLine, lCol, lErrorToken.getValue()), lLine, lCol);
+                }
+                else {
                     return new Token(Token.TokenType.error, String.format("Internal error, evaluation resulted in an unexpected value: %d, col: %d.", lLine, lCol), lLine, lCol);
                 }
 
@@ -246,9 +250,10 @@ public class Parser {
             // Test on the two possible ending conditions of the loop.
             if (lToken.isError()) return lToken;
             else if (lToken.isEof())
-                return new Token(Token.TokenType.eof, String.format("Syntax error in the list starting at line: %d, col: %d.\n%s", lLine, lCol, lToken.getValue()), lLine, lCol);
+                return new Token(Token.TokenType.eof, String.format("Syntax error in the list starting at line: %d, col: %d.%n%s", lLine, lCol, lToken.getValue()), lLine, lCol);
             else return lResultList;
-        } else {
+        }
+        else {
             return new Token(Token.TokenType.error, "Syntax error, expected '(' but encoutered: " + lToken.getValue(), lToken.getLine(), lToken.getCol());
         }
     }
@@ -267,7 +272,8 @@ public class Parser {
         final Token lToken = getNextNonWhitespaceToken(aBuffer);
         if (lToken.isErroneous()) {
             return lToken;
-        } else if (lToken.isBeginList() || lToken.isString()) {
+        }
+        else if (lToken.isBeginList() || lToken.isString()) {
             Object lResultExpr;
             if (lToken.isBeginList()) {
                 // List found.
@@ -275,7 +281,8 @@ public class Parser {
                 pushBackToken(lToken);
                 // Pass control to the list production.
                 lResultExpr = parseList(aBuffer);
-            } else {
+            }
+            else {
                 // String found.
                 lResultExpr = lToken.getValue();
             }
@@ -295,12 +302,14 @@ public class Parser {
                 if (lValueExpr instanceof Token) return lValueExpr;
                 // If we got here, we got ourselves a nice pair.
                 return new Pair(lResultExpr, lValueExpr);
-            } else {
+            }
+            else {
                 // No, not part of pairing at all.
                 pushBackToken(lPeek);
                 return lResultExpr;
             }
-        } else if (lToken.isQuote()) {
+        }
+        else if (lToken.isQuote()) {
             // Take a look at the next token.
             final Token lPeek = getNextToken(aBuffer);
             pushBackToken(lPeek);
@@ -318,10 +327,12 @@ public class Parser {
                 lResult.add("quote");
                 lResult.add(lExpr);
                 return lResult;
-            } else {
+            }
+            else {
                 return lToken.getValue();
             }
-        } else {
+        }
+        else {
             // Unexpected token found.
             return new Token(Token.TokenType.error, String.format("Syntax error, expected a string- or listtoken, but found a token of type: '%s', value: '%s'.", lToken.getType(), lToken.getValue()), lToken.getLine(), lToken.getCol());
         }

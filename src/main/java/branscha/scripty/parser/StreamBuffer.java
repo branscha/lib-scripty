@@ -55,7 +55,8 @@ public class StreamBuffer
         if (lChar == '\n') {
             line++;
             col = 1;
-        } else col++;
+        }
+        else col++;
         return lChar;
     }
 
@@ -85,11 +86,13 @@ public class StreamBuffer
                 if (buffLim == -1) {
                     eof = true;
                     buffPos = buffLim = 0;
-                } else {
+                }
+                else {
                     buffPos = 0;
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             buffLim = buffPos = 0;
         }
     }

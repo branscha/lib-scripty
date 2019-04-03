@@ -68,7 +68,8 @@ public class EditLibrary {
                 if (lResTok.isErroneous()) throw new CommandException(lResTok.getValue());
             }
             return lRes;
-        } else return null;
+        }
+        else return null;
     }
 }
 

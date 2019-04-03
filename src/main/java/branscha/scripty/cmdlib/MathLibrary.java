@@ -94,7 +94,8 @@ public class MathLibrary {
     throws CommandException {
         try {
             return aNr.pow(aPow.intValueExact(), mathCtx);
-        } catch (ArithmeticException e) {
+        }
+        catch (ArithmeticException e) {
             throw new CommandException("Expected an integer as second argument, the power has to be an integer.");
         }
     }
@@ -111,7 +112,8 @@ public class MathLibrary {
     public boolean isNumber(@ScriptyParam("arg") Object aArg, IContext aCtx) {
         try {
             new BigDecimalType().guard(aArg, aCtx);
-        } catch (TypeSpecException e) {
+        }
+        catch (TypeSpecException e) {
             return false;
         }
         return true;

@@ -38,15 +38,19 @@ public class BigDecimalType
     throws TypeSpecException {
         if (aArg instanceof BigDecimal) {
             return (BigDecimal) aArg;
-        } else if (aArg instanceof Number) {
+        }
+        else if (aArg instanceof Number) {
             return new BigDecimal(((Number) aArg).doubleValue());
-        } else if (aArg instanceof String) {
+        }
+        else if (aArg instanceof String) {
             try {
                 return new BigDecimal((String) aArg);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
             }
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

@@ -50,7 +50,8 @@ public class OrType
         for (int i = 0; i < types.length; i++) {
             try {
                 return types[i].guard(aArg, aCtx);
-            } catch (TypeSpecException e) {
+            }
+            catch (TypeSpecException e) {
                 // Ignore, try the next one!   
                 // Only one has to succeed.
             }

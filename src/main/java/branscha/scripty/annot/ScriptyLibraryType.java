@@ -27,9 +27,9 @@ package branscha.scripty.annot;
 /**
  * The type of a {@link ScriptyLibrary}.
  * <ul>
- *     <li>INSTANCE: You have to create an instance and register it using {@link branscha.scripty.ScriptyCapable#addLibraryClasses(Class[])}. These commands can share data members.</li>
- *     <li>STATIC: You have to register the class using {@link branscha.scripty.ScriptyCapable#addLibraryInstances(Object...)}. The scripty engine will scan static methods in the class for command annotations. The library cannot store data locally to the library commands.</li>
- *     <li>AUTO: If you add an instance then Scripty will scan instance methods and if you register the class it will scan the static methods.</li>
+ * <li>INSTANCE: You have to create an instance and register it using {@link branscha.scripty.ScriptyCapable#addLibraryClasses(Class[])}. These commands can share data members.</li>
+ * <li>STATIC: You have to register the class using {@link branscha.scripty.ScriptyCapable#addLibraryInstances(Object...)}. The scripty engine will scan static methods in the class for command annotations. The library cannot store data locally to the library commands.</li>
+ * <li>AUTO: If you add an instance then Scripty will scan instance methods and if you register the class it will scan the static methods.</li>
  * </ul>
  */
 public enum ScriptyLibraryType {

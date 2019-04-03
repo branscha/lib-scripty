@@ -78,7 +78,8 @@ public class ExtensionRepositoryBuilder
             if (lLibraryType != ScriptyLibraryType.STATIC) {
                 try {
                     lLibInstance = lClass.newInstance();
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     // Nope we could not instantiate the library, so we 
                     // will only be able to add the static methods.
                     lLibInstance = null;
@@ -86,7 +87,7 @@ public class ExtensionRepositoryBuilder
             }
 
             if (lLibInstance == null && lLibraryType == ScriptyLibraryType.INSTANCE) {
-                throw new ExtensionException(String.format("Library '%s' was marked as being of type INSTANCE, but it was impossible to create an instance.\nMaybe you should create an instance manually and provide the instance.", lClass.getName()));
+                throw new ExtensionException(String.format("Library '%s' was marked as being of type INSTANCE, but it was impossible to create an instance.%nMaybe you should create an instance manually and provide the instance.", lClass.getName()));
             }
 
             addLibrary(lLibraryName, lLibInstance, lClass);
@@ -106,8 +107,9 @@ public class ExtensionRepositoryBuilder
             final ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aStdLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
-        } catch (ArgSpecException e) {
-            final String lMsg = String.format("Class '%s' contains a standard argument list specification '%s' with errors.\n%s", aClass.getName(), aStdLst.name(), e.getMessage());
+        }
+        catch (ArgSpecException e) {
+            final String lMsg = String.format("Class '%s' contains a standard argument list specification '%s' with errors.%n%s", aClass.getName(), aStdLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
@@ -125,8 +127,9 @@ public class ExtensionRepositoryBuilder
             final ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aVarLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
-        } catch (ArgSpecException e) {
-            final String lMsg = String.format("Class '%s' contains a variable argument list specification '%s' with errors.\n%s", aClass.getName(), aVarLst.name(), e.getMessage());
+        }
+        catch (ArgSpecException e) {
+            final String lMsg = String.format("Class '%s' contains a variable argument list specification '%s' with errors.%n%s", aClass.getName(), aVarLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
@@ -154,9 +157,11 @@ public class ExtensionRepositoryBuilder
 
         if (lVarArgListClassAnnot != null) {
             registerClassArgList(aClass, lVarArgListClassAnnot, lNamedArgLists);
-        } else if (lStdArgListClassAnnot != null) {
+        }
+        else if (lStdArgListClassAnnot != null) {
             registerClassArgList(aClass, lStdArgListClassAnnot, lNamedArgLists);
-        } else if (lNamedArgListsAnnot != null) {
+        }
+        else if (lNamedArgListsAnnot != null) {
             ScriptyStdArgList[] lStdLists = lNamedArgListsAnnot.std();
             ScriptyVarArgList[] lVarLists = lNamedArgListsAnnot.var();
 
@@ -219,11 +224,13 @@ public class ExtensionRepositoryBuilder
                     ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = lNamedArgLists.get(lRef);
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
-                } else {
+                }
+                else {
                     final String lMsg = String.format("Class '%s' has a macro/command method '%s' with a reference to a named argument list '%s' which does not exist.", aClass, lMethod.getName(), lRef);
                     throw new ExtensionException(lMsg);
                 }
-            } else if (lStdArgListAnnot != null) {
+            }
+            else if (lStdArgListAnnot != null) {
                 try {
                     // Build the arglist.
                     ArgListBuilderUtil.ArgListTuple lTuple = ArgListBuilderUtil.buildArgList(lStdArgListAnnot);
@@ -233,11 +240,13 @@ public class ExtensionRepositoryBuilder
                     }
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
-                } catch (ArgSpecException e) {
-                    final String lMsg = String.format("While processing a standard argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                }
+                catch (ArgSpecException e) {
+                    final String lMsg = String.format("While processing a standard argument list specification for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
-            } else if (lVarArgListAnnot != null) {
+            }
+            else if (lVarArgListAnnot != null) {
                 try {
                     // Build the arglist.
                     ArgListBuilderUtil.ArgListTuple lTuple = ArgListBuilderUtil.buildArgList(lVarArgListAnnot);
@@ -247,8 +256,9 @@ public class ExtensionRepositoryBuilder
                     }
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
-                } catch (ArgSpecException e) {
-                    final String lMsg = String.format("While processing a variable argument list specification for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                }
+                catch (ArgSpecException e) {
+                    final String lMsg = String.format("While processing a variable argument list specification for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
             }
@@ -263,7 +273,8 @@ public class ExtensionRepositoryBuilder
                 // The method is annotated as a command AND macro.
                 // A method can be a command or a macro, but not both things at the same time.
                 throw new ExtensionException(String.format("Method '%s' in class '%s' is annotated as command and as a macro simultaneously.", lMethod.getName(), aClass.getSimpleName()));
-            } else if (!(lCmdAnnot == null && lMacroAnnot == null)) {
+            }
+            else if (!(lCmdAnnot == null && lMacroAnnot == null)) {
                 int lMethodModifiers = lMethod.getModifiers();
                 boolean lIsStaticMethod = Modifier.isStatic(lMethodModifiers);
                 if (!lIsStaticMethod && aLibInstance == null) {
@@ -274,8 +285,9 @@ public class ExtensionRepositoryBuilder
                 ArgListMapping lArgListMapping = null;
                 try {
                     lArgListMapping = ArgMappingBuilderUtil.buildArgMapping(lMethod, lMappings);
-                } catch (ArgMappingException e) {
-                    final String lMsg = String.format("While constructing the argument mapping for class '%s' on method '%s'.\n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                }
+                catch (ArgMappingException e) {
+                    final String lMsg = String.format("While constructing the argument mapping for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
 
@@ -286,7 +298,8 @@ public class ExtensionRepositoryBuilder
                     if (lCmdName.length() == 0) lCmdName = lMethod.getName();
 
                     commandRepo.registerCommand(lCmdName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));
-                } else if (lMacroAnnot != null) {
+                }
+                else if (lMacroAnnot != null) {
                     String lMacroName = lMacroAnnot.name();
                     if (lMacroName.length() == 0) lMacroName = lMethod.getName();
                     macroRepo.registerCommand(lMacroName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));

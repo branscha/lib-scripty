@@ -49,7 +49,8 @@ public class VarArg
             if (aPos < 0 || aPos >= aArgs.length || aArgs[aPos] instanceof Pair)
                 throw new ArgSpecException(String.format("Var argument at position %d: argument not present or type Pair found.", aPos));
             else return spec.guard(aArgs[aPos], aCtx);
-        } catch (TypeSpecException e) {
+        }
+        catch (TypeSpecException e) {
             throw new ArgSpecException(String.format("Var argument at position %d: %s", aPos, e.getMessage()));
         }
     }

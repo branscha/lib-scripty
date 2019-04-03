@@ -66,7 +66,8 @@ public class TestEval {
         try {
             eval.eval(parser.parseExpression("(set thiswasneverdefined=alloallo)"));
             Assert.fail();
-        } catch (CommandException e) {
+        }
+        catch (CommandException e) {
             Assert.assertTrue(e.getMessage().indexOf("no binding") > 0);
         }
     }

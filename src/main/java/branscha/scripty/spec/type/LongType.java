@@ -36,15 +36,19 @@ public class LongType
     throws TypeSpecException {
         if (aArg instanceof Long) {
             return (Long) aArg;
-        } else if (aArg instanceof Number) {
+        }
+        else if (aArg instanceof Number) {
             return ((Number) aArg).longValue();
-        } else if (aArg instanceof String) {
+        }
+        else if (aArg instanceof String) {
             try {
                 return Long.parseLong((String) aArg);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
             }
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

@@ -56,12 +56,15 @@ public class ArgMappingBuilderUtil {
 
             if (aParamClass.isAssignableFrom(IEval.class)) {
                 return new EvalMapping();
-            } else if (aParamClass.isAssignableFrom(IContext.class)) {
+            }
+            else if (aParamClass.isAssignableFrom(IContext.class)) {
                 return new ContextMapping();
-            } else if (aParamClass.isArray() && aParamClass.getComponentType().isAssignableFrom(Object.class)) {
+            }
+            else if (aParamClass.isArray() && aParamClass.getComponentType().isAssignableFrom(Object.class)) {
                 return new CompleteMapping();
             }
-        } else {
+        }
+        else {
             ScriptyParam lScriptyParamAnnot = null;
             ScriptyBindingParam lScriptyBindingAnnot = null;
 
@@ -72,11 +75,13 @@ public class ArgMappingBuilderUtil {
 
             if (lScriptyParamAnnot != null && lScriptyBindingAnnot != null) {
                 throw new ArgMappingException("... there can only be one scripty param annotation ...");
-            } else if (lScriptyParamAnnot != null) {
+            }
+            else if (lScriptyParamAnnot != null) {
                 String lParamName = lScriptyParamAnnot.value();
                 if (aMappings != null && aMappings.containsKey(lParamName)) return aMappings.get(lParamName);
                 else throw new ArgMappingException("... arg name not found ...");
-            } else if (lScriptyBindingAnnot != null) {
+            }
+            else if (lScriptyBindingAnnot != null) {
                 String lBindingName = lScriptyBindingAnnot.value();
                 boolean lExcIfNull = lScriptyBindingAnnot.unboundException();
                 return new BindingMapping(lBindingName, lExcIfNull);

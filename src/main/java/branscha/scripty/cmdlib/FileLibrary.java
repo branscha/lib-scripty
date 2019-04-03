@@ -88,7 +88,8 @@ public class FileLibrary {
         try {
             if (!aQuiet) aWriter.println(lCurDir.getCanonicalPath());
             return lCurDir;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new CommandException(String.format("Cannot calculate the canonical name for '%s'.", lCurDir), e);
         }
 
@@ -158,7 +159,8 @@ public class FileLibrary {
                                     lResultList.add(lXFile);
                                 // Add to the worklist if recursive.
                                 if (aRecursive) lWorkList.add(lXFile);
-                            } else if (lXFile.isFile()) {
+                            }
+                            else if (lXFile.isFile()) {
                                 // Remember if we want files.
                                 if (aFiles && lPattern.matcher(lXFile.getCanonicalPath()).matches())
                                     lResultList.add(lXFile);
@@ -184,8 +186,9 @@ public class FileLibrary {
                 }
             }
             return lResultList.toArray();
-        } catch (IOException e) {
-            throw new CommandException(String.format("Internal error.\n%s", e.getMessage()), e);
+        }
+        catch (IOException e) {
+            throw new CommandException(String.format("Internal error.%n%s", e.getMessage()), e);
         }
     }
 

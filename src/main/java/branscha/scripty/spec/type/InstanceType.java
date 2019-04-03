@@ -49,7 +49,8 @@ public class InstanceType
             if (allowsNull) return null;
             else
                 throw new TypeSpecException(String.format("Null value. Expected type '%s' and null is not allowed.", typeName));
-        } else {
+        }
+        else {
             if (requiredClass.isAssignableFrom(aArg.getClass())) return aArg;
             else throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }

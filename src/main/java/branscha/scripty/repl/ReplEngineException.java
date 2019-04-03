@@ -52,6 +52,6 @@ public class ReplEngineException extends Exception {
 
     @Override
     public String getMessage() {
-        return String.format("ERROR: On line %d column %d.\n%s", line, column, super.getMessage());
+        return String.format("ERROR: On line %d column %d.%n%s", line, column, super.getMessage());
     }
 }

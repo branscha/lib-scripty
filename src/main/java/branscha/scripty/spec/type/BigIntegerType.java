@@ -38,13 +38,16 @@ public class BigIntegerType
     throws TypeSpecException {
         if (aArg instanceof BigInteger) {
             return (BigInteger) aArg;
-        } else if (aArg instanceof String || aArg instanceof Number) {
+        }
+        else if (aArg instanceof String || aArg instanceof Number) {
             try {
                 return new BigInteger(aArg.toString());
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
             }
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

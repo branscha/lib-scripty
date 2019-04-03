@@ -69,7 +69,8 @@ class ReplServer {
 
             // Plain server.
             server = new ServerSocket(aPort);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -97,7 +98,8 @@ class ReplServer {
                 // and we will immediately keep listening for other clients to connect our server port.
                 // So this call starts the handling process, but it does not wait for it to finish.
                 new RequestHandler(socket, scripty, aUid, aPwd);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -152,7 +154,8 @@ class RequestHandler
                 }
             }
             return false;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return false;
         }
     }
@@ -170,20 +173,25 @@ class RequestHandler
 
             // Start the REPL.
             scripty.startInteractive(lIn, lOut, lOut);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             if (lIn != null) try {
                 lIn.close();
-            } catch (Exception ignored) {
+            }
+            catch (Exception ignored) {
             }
             if (lOut != null) try {
                 lOut.close();
-            } catch (Exception ignored) {
+            }
+            catch (Exception ignored) {
             }
             try {
                 socket.close();
-            } catch (Exception ignored) {
+            }
+            catch (Exception ignored) {
             }
         }
     }

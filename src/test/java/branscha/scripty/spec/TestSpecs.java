@@ -25,6 +25,7 @@
 package branscha.scripty.spec;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -55,7 +56,6 @@ public class TestSpecs {
         lList.add(13);
         lList.add(17);
         lList.add(Long.valueOf(5000000000L));
-        Object[] args = new Object[]{lList};
         lSpec.guard(lList, null);
     }
 
@@ -65,6 +65,6 @@ public class TestSpecs {
         IArgSpec lSpec = new NamedArg("oele", new IntegerType(), Integer.valueOf(13), true);
         Object[] args = new Object[]{1, 2, 3, new Pair("oele", Integer.valueOf(17))};
         lSpec.guard(args, 0, null);
-        System.out.println(args);
+        System.out.println(Arrays.toString(args));
     }
 }

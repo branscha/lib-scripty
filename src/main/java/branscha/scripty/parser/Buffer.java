@@ -54,7 +54,8 @@ public class Buffer
             if (lChar == '\n') {
                 line++;
                 col = 1;
-            } else col++;
+            }
+            else col++;
             return lChar;
         }
     }

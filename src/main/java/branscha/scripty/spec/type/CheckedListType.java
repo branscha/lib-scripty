@@ -78,7 +78,8 @@ public class CheckedListType
                 lIter.add(spec.guard(lObj, aCtx));
             }
             return lListArg;
-        } catch (UnsupportedOperationException e) {
+        }
+        catch (UnsupportedOperationException e) {
             // We could not modify the list in-place ...
             // We recover by creating a new one in this case.
             //

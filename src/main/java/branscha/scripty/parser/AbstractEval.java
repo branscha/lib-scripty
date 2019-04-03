@@ -53,6 +53,7 @@ public abstract class AbstractEval
         else if (aObj instanceof String) {
             String lNor = ((String) aObj).toLowerCase();
             return ("true".equals(lNor) || "yes".equals(lNor) || "t".equals(lNor) || "y".equals(lNor) || "on".equals(lNor));
-        } else return aObj != null;
+        }
+        else return aObj != null;
     }
 }

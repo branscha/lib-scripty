@@ -32,9 +32,9 @@ import java.lang.annotation.Target;
 /**
  * A standard argument list with the structure:
  * <ul>
- *     <li>A fixed number of required {@link ScriptyArg}.</li>
- *     <li>A fixed number of optional {@link ScriptyArg}. If they are not provided, the default values will be used.</li>
- *     <li>A number of named {@link ScriptyArg}. These can be specified to be optional or not.</li>
+ * <li>A fixed number of required {@link ScriptyArg}.</li>
+ * <li>A fixed number of optional {@link ScriptyArg}. If they are not provided, the default values will be used.</li>
+ * <li>A number of named {@link ScriptyArg}. These can be specified to be optional or not.</li>
  * </ul>
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
@@ -46,7 +46,6 @@ public @interface ScriptyStdArgList {
     public String name() default "";
 
     public ScriptyArg[] fixed() default {};
-
 
 
     public ScriptyArg[] optional() default {};

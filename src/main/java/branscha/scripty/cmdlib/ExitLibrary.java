@@ -40,7 +40,8 @@ public class ExitLibrary {
             // We have to close all frames. Closing our main frame is not enough,
             // since the help system for instance creates other frames that have to be disposed as well.
             for (Frame lAppFrm : JFrame.getFrames()) lAppFrm.dispose();
-        } else {
+        }
+        else {
             System.exit(aCode);
         }
     }

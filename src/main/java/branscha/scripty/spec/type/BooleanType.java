@@ -38,14 +38,16 @@ public class BooleanType
     throws TypeSpecException {
         if (aArg instanceof Boolean) {
             return (Boolean) aArg;
-        } else if (aArg instanceof String) {
+        }
+        else if (aArg instanceof String) {
             final String lStr = ((String) aArg).trim().toLowerCase();
             if ("true".equals(lStr) || "on".equals(lStr) || "yes".equals(lStr) || "ok".equals(lStr))
                 return Boolean.TRUE;
             else if ("false".equals(lStr) || "off".equals(lStr) || "no".equals(lStr) || "nok".equals(lStr))
                 return Boolean.FALSE;
             else throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), lStr));
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

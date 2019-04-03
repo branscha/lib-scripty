@@ -38,15 +38,19 @@ public class IntegerType implements ITypeSpec {
     throws TypeSpecException {
         if (aArg instanceof Integer) {
             return aArg;
-        } else if (aArg instanceof Number) {
+        }
+        else if (aArg instanceof Number) {
             return ((Number) aArg).intValue();
-        } else if (aArg instanceof String) {
+        }
+        else if (aArg instanceof String) {
             try {
                 return Integer.parseInt((String) aArg);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
             }
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

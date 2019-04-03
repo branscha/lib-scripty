@@ -143,7 +143,8 @@ public class BeanLibrary {
             Method lMeth = null;
             if (aArgs[2] instanceof Method) {
                 lMeth = (Method) aArgs[2];
-            } else if (aArgs[2] instanceof String) {
+            }
+            else if (aArgs[2] instanceof String) {
                 Class[] lClasses = new Class[lArgs.length];
                 for (int i = 0; i < lArgs.length; i++) lClasses[i] = (lArgs[i] == null) ? null : lArgs[i].getClass();
 
@@ -154,7 +155,8 @@ public class BeanLibrary {
                 throw new CommandException("Method could not be resolved.");
 
             return lMeth.invoke(lTarget, lArgs);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new CommandException("Invocation failed.\n" + e.getMessage(), e);
         }
     }
@@ -228,7 +230,8 @@ public class BeanLibrary {
                     lBuilder.append("/");
             }
             return new Resolution(lBuilder.toString(), lVal);
-        } else {
+        }
+        else {
             String lAbsPath;
             if ("/".equals(currentDirectory)) lAbsPath = currentDirectory + aPath;
             else lAbsPath = currentDirectory + "/" + aPath;
@@ -243,7 +246,8 @@ public class BeanLibrary {
         int lIdx = -1;
         try {
             lIdx = Integer.parseInt(lPiece);
-        } catch (NumberFormatException e1) {
+        }
+        catch (NumberFormatException e1) {
             // Ignore this exception!
         }
 
@@ -253,18 +257,21 @@ public class BeanLibrary {
                 return resolveCanonical(aPieces, aCurrPiece + 1, lCtx.getBinding(lPiece));
             else
                 throw new CommandException(String.format("Cannot find '%s' in context.", lPiece));
-        } else if (aBase instanceof Map && lIdx < 0) {
+        }
+        else if (aBase instanceof Map && lIdx < 0) {
             final Map lMap = (Map) aBase;
             if (lMap.containsKey(lPiece))
                 return resolveCanonical(aPieces, aCurrPiece + 1, lMap.get(lPiece));
             else
                 throw new CommandException("ERROR - map.");
-        } else if (aBase instanceof List) {
+        }
+        else if (aBase instanceof List) {
             final List lList = (List) aBase;
             if (lIdx < 0) throw new CommandException("List expects an index.");
             if (lIdx >= lList.size()) throw new CommandException("List index out of range.");
             else return resolveCanonical(aPieces, aCurrPiece + 1, lList.get(lIdx));
-        } else if (aBase != null) {
+        }
+        else if (aBase != null) {
             if (aBase.getClass().isArray()) {
                 // Array rendering.
                 ///////////////////
@@ -272,7 +279,8 @@ public class BeanLibrary {
                 if (lIdx >= 0 && lIdx < Array.getLength(aBase))
                     return resolveCanonical(aPieces, aCurrPiece + 1, Array.get(aBase, lIdx));
                 else throw new CommandException("ERROR - index out of range/wrong index type/no index.");
-            } else {
+            }
+            else {
                 try {
                     // Try bean.
                     //
@@ -290,9 +298,11 @@ public class BeanLibrary {
                             return resolveCanonical(aPieces, aCurrPiece + 1, lVal);
                         }
                     }
-                } catch (CommandException e) {
+                }
+                catch (CommandException e) {
                     throw e;
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     throw new CommandException("ERROR - calling getter method.", e);
                 }
             }
@@ -303,12 +313,10 @@ public class BeanLibrary {
             // - based on annotations.
             // - ...
             throw new CommandException("ERROR - no property.");
-        } else if (aBase instanceof List && lIdx > 0) {
-            List lList = (List) aBase;
-            if (lIdx > lList.size() - 1)
-                throw new CommandException("ERROR index out of bounds.");
-            return resolveCanonical(aPieces, aCurrPiece + 1, lList.get(lIdx));
-        } else throw new CommandException("ERROR - null.");
+        }
+        else {
+            throw new CommandException("ERROR - null.");
+        }
     }
 
     private static List<String> canonize(String aPath)
@@ -323,7 +331,8 @@ public class BeanLibrary {
                 // Delete the last part and go back to the previous part.
                 int lResultSize = lResult.size();
                 if (lResultSize > 0) lResult.remove(lResultSize - 1);
-            } else {
+            }
+            else {
                 // Note: Could be done more efficiently using a custom parser.
                 final Matcher m = PAT_FIELDNAME_BIS.matcher(lPiece);
                 if (!m.matches())
@@ -359,7 +368,8 @@ public class BeanLibrary {
             // Try to interprete the property as
             // an integer.
             lIdx = Integer.parseInt(lPropName);
-        } catch (NumberFormatException e1) {
+        }
+        catch (NumberFormatException e1) {
             // Ignore this exception!
         }
 
@@ -373,7 +383,8 @@ public class BeanLibrary {
             // TODO: catch errors on this one.
             lTargetList.set(lIdx, aVal);
 
-        } else if (aTarget != null) {
+        }
+        else if (aTarget != null) {
             if (aTarget.getClass().isArray()) {
                 // Array access.
                 if (lIdx < 0)
@@ -383,7 +394,8 @@ public class BeanLibrary {
 
                 // TODO: catch errors on this one.
                 Array.set(aTarget, lIdx, aVal);
-            } else {
+            }
+            else {
                 try {
                     // JavaBean access.
                     BeanInfo lInfo = Introspector.getBeanInfo(aTarget.getClass());
@@ -397,10 +409,12 @@ public class BeanLibrary {
                             if (lProp.getPropertyType() != aVal.getClass() && aVal instanceof String) {
                                 PropertyEditor lEditor = lProp.createPropertyEditor(aTarget);
                                 lEditor.setAsText((String) aVal);
-                            } else lMeth.invoke(aTarget, new Object[]{aVal});
+                            }
+                            else lMeth.invoke(aTarget, new Object[]{aVal});
                         }
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     throw new CommandException(e.getMessage(), e);
                 }
             }
@@ -414,19 +428,21 @@ public class BeanLibrary {
         if (aObj instanceof IContext) {
             IContext lCtx = (IContext) aObj;
             Map<String, Object> lDump = lCtx.dumpBindings();
-            for (String lKey : lDump.keySet()) {
-                Object lVal = lDump.get(lKey);
-                aWriter.print(lKey);
+            for (Map.Entry<String, Object> entry : lDump.entrySet()) {
+                aWriter.print(entry.getKey());
                 aWriter.print("=");
-                aWriter.println(lVal == null ? "null" : lVal.toString());
+                aWriter.println(entry.getValue() == null ? "null" : entry.getValue().toString());
             }
-        } else if (aObj instanceof List) {
+        }
+        else if (aObj instanceof List) {
             // Show indexed ...
             aWriter.println(aObj.toString());
-        } else if (aObj instanceof Map) {
+        }
+        else if (aObj instanceof Map) {
             // Show map ....
             aWriter.println(aObj.toString());
-        } else if (aObj != null) {
+        }
+        else if (aObj != null) {
             if (aObj.getClass().isArray()) {
                 // Array rendering.
                 ///////////////////
@@ -436,7 +452,8 @@ public class BeanLibrary {
                     Object lObj = Array.get(aObj, i);
                     aWriter.println(String.format("%6s %s", "[" + i + "]", lObj == null ? "null" : lObj.toString()));
                 }
-            } else {
+            }
+            else {
                 try {
                     // Try JavaBean...
                     ///////////////////
@@ -450,11 +467,13 @@ public class BeanLibrary {
                         String lRw = "" + ((lRead != null) ? "r" : "-") + ((lWrite != null) ? "w" : "-");
                         aWriter.println(String.format("%s (%s, %s)", lProp.getDisplayName(), lProp.getPropertyType().getSimpleName(), lRw));
                     }
-                } catch (IntrospectionException e) {
+                }
+                catch (IntrospectionException e) {
                     throw new CommandException("ERROR - ...", e);
                 }
             }
-        } else
+        }
+        else
             throw new CommandException("ERROR - null encountered.");
     }
 

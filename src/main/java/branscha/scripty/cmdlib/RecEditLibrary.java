@@ -169,7 +169,8 @@ class JPropTable extends JTable {
                 if (direction > 1) direction = 1;
                 if (direction < -1) direction = -1;
                 nextRow = findNextEditableRow(row, col, direction, nRows, nCols);
-            } else if (row == curRow) {
+            }
+            else if (row == curRow) {
                 // Left-or-right motion - use the "natural" (for Americans)
                 // order:
                 // left-to-right, top-to-bottom, or vice-versa if we're trying
@@ -182,7 +183,8 @@ class JPropTable extends JTable {
                 int[] nextCell = findNextEditableCell(row, col, direction, nRows, nCols);
                 nextRow = nextCell[0];
                 nextCol = nextCell[1];
-            } else {
+            }
+            else {
                 // Both row and column differ. This probably means we've
                 // moved off the end of a row, or else the user has clicked
                 // on some random cell. The direction is controlled
@@ -198,7 +200,8 @@ class JPropTable extends JTable {
             }
             // Go to the cell we found.
             super.changeSelection(nextRow, nextCol, toggle, expand);
-        } else {
+        }
+        else {
             // It's an editable cell, so leave the selection here.
             super.changeSelection(row, col, toggle, expand);
         }

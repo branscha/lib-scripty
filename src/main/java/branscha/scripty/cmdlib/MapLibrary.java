@@ -62,14 +62,17 @@ public class MapLibrary {
             for (int i = 1; i < aArgs.length; i++) {
                 if (aArgs[i] instanceof String) {
                     lMap.put(aArgs[i], null);
-                } else if (aArgs[i] instanceof Pair) {
+                }
+                else if (aArgs[i] instanceof Pair) {
                     final Pair lPair = (Pair) aArgs[i];
                     lMap.put(lPair.getLeft(), lPair.getRight());
-                } else if (aArgs[i] instanceof Map) {
+                }
+                else if (aArgs[i] instanceof Map) {
                     lMap.putAll((Map<?, ?>) aArgs[i]);
-                } else {
+                }
+                else {
                     Object lCulprit = aArgs[i];
-                    throw new CommandException(String.format("Command '%s' expects zero or more string or pairs.\nArgument %d is of type '%s'.", aArgs[0], i, lCulprit == null ? "null" : lCulprit.getClass().getCanonicalName()));
+                    throw new CommandException(String.format("Command '%s' expects zero or more string or pairs.%nArgument %d is of type '%s'.", aArgs[0], i, lCulprit == null ? "null" : lCulprit.getClass().getCanonicalName()));
                 }
             }
             return lMap;

@@ -176,7 +176,8 @@ public class ReplEngine
             currCmd.append(aLine.substring(0, aLine.length() - 1));
             // Command not compete.
             setPrompt(PROMPT_CONTINUE);
-        } else {
+        }
+        else {
             // Entering a command that consists of multiple lines.
             // We test if the command can be parsed or not, and on that basis we decide if
             // the command is complete or not.
@@ -197,22 +198,26 @@ public class ReplEngine
                 // Time for evaluation.
                 try {
                     lastResult = eval.eval(lAst);
-                } catch (CommandException e) {
+                }
+                catch (CommandException e) {
                     // Normal command error.
                     throw new ReplEngineException(input.getLineNumber(), 1, e.getMessage());
                 }
-            } else if (lAst instanceof Token) {
+            }
+            else if (lAst instanceof Token) {
                 // Command might not be complete.
                 Token lErr = (Token) lAst;
                 if (lErr.isEof()) {
                     // Command not compete.
                     setPrompt(PROMPT_CONTINUE);
-                } else {
+                }
+                else {
                     // Real error, we have to recover.
                     recover();
                     throw new ReplEngineException(input.getLineNumber(), lErr.getCol(), lErr.getValue());
                 }
-            } else {
+            }
+            else {
                 // Error.
                 recover();
             }
@@ -240,9 +245,11 @@ public class ReplEngine
 
             try {
                 handleLine(lLine);
-            } catch (ReplEngineException e) {
+            }
+            catch (ReplEngineException e) {
                 writeErrorLine(e.getMessage());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 // Probably a bug in a command.
                 // A REPL has to keep on working, no matter what happens.
                 writeErrorLine("ERROR: Unexpected exception occurred.");
@@ -322,7 +329,8 @@ public class ReplEngine
                 write(prompt);
             }
             return input.readLine();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return null;
         }
     }

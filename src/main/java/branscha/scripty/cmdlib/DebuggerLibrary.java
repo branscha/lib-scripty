@@ -285,7 +285,8 @@ public class DebuggerLibrary {
                 for (EvalTrace.IBreakpoint lBpt : lBpts) lBuilder.append(lBpt.getName());
                 aWriter.println("Breakpoint(s) reached: " + lBuilder.toString() + ".");
             }
-        } else {
+        }
+        else {
             aWriter.println("There are no steps anymore.");
             if (trace.hasResult()) aWriter.println("There is a result though.");
             if (trace.isExcepted()) aWriter.println("The eval was stalled by an exception.");
@@ -345,7 +346,8 @@ public class DebuggerLibrary {
         // Eat all exceptions at this point, we want to remove the trace.
         try {
             trace.terminate();
-        } catch (Exception ignored) {
+        }
+        catch (Exception ignored) {
         }
         // Remove the trace from the context.
         trace = null;

@@ -115,14 +115,17 @@ public class ScriptyPanel extends JPanel {
                     // 
                     lInputPane.grabFocus();
                     lInputPane.selectAll();
-                } catch (Exception e1) {
+                }
+                catch (Exception e1) {
                     try {
                         final Document lDoc = lOutputPane.getDocument();
                         lDoc.insertString(lDoc.getLength(), e1.getMessage() + "\n", lErrAttrs);
                         lOutputPane.setCaretPosition(lOutputPane.getDocument().getLength());
-                    } catch (BadLocationException ignored) {
                     }
-                } finally {
+                    catch (BadLocationException ignored) {
+                    }
+                }
+                finally {
                     lFrame.setCursor(Cursor.getDefaultCursor());
                 }
             }
@@ -177,7 +180,8 @@ public class ScriptyPanel extends JPanel {
             try {
                 lDoc.insertString(lDoc.getLength(), new String(cbuf, off, len), null);
                 textArea.setCaretPosition(textArea.getDocument().getLength());
-            } catch (BadLocationException ignored) {
+            }
+            catch (BadLocationException ignored) {
             }
         }
     }

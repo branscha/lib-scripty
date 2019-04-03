@@ -32,9 +32,9 @@ import java.lang.annotation.Target;
 /**
  * A variable argument list with the structure:
  * <ul>
- *     <li>A fixed number of required {@link ScriptyArg}.</li>
- *     <li>A number of named {@link ScriptyArg}. These can be specified to be optional or not.</li>
- *     <li>A variable number of {@link ScriptyArg}. The minimum number and maximum number can be specifed.</li>
+ * <li>A fixed number of required {@link ScriptyArg}.</li>
+ * <li>A number of named {@link ScriptyArg}. These can be specified to be optional or not.</li>
+ * <li>A variable number of {@link ScriptyArg}. The minimum number and maximum number can be specifed.</li>
  * </ul>
  */
 @Target({ElementType.TYPE, ElementType.METHOD})

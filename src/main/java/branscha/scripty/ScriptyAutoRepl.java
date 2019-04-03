@@ -45,7 +45,8 @@ public class ScriptyAutoRepl extends ScriptyCapable {
         final boolean isHeadless = GraphicsEnvironment.isHeadless();
         if (isHeadless || forceTextMode) {
             textRepl = new ScriptyTextRepl(this);
-        } else {
+        }
+        else {
             guiRepl = new ScriptyGuiRepl(this);
         }
     }
@@ -58,9 +59,11 @@ public class ScriptyAutoRepl extends ScriptyCapable {
         buildRepl();
         if (guiRepl != null) {
             guiRepl.startLoop();
-        } else if (textRepl != null) {
+        }
+        else if (textRepl != null) {
             textRepl.startLoop();
-        } else {
+        }
+        else {
             throw new IllegalStateException("Could not create GUI nor TEXT REPL.");
         }
     }

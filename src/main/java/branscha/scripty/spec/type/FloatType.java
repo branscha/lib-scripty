@@ -36,15 +36,19 @@ public class FloatType
     throws TypeSpecException {
         if (aArg instanceof Float) {
             return aArg;
-        } else if (aArg instanceof Number) {
+        }
+        else if (aArg instanceof Number) {
             return ((Number) aArg).floatValue();
-        } else if (aArg instanceof String) {
+        }
+        else if (aArg instanceof String) {
             try {
                 return Float.parseFloat((String) aArg);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
             }
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

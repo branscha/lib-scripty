@@ -50,7 +50,7 @@ public class TestScriptyStreamProcessor {
         lResult = scripty.process("inverse 11 12 add");
         Assert.assertNotNull(lResult);
 
-        lResult = scripty.process("def-bruno abc");
+        scripty.process("def-bruno abc");
         Object val = scripty.getContext().getBinding("bruno");
         Assert.assertEquals("abc", val);
     }

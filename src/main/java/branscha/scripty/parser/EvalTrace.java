@@ -185,7 +185,8 @@ public class EvalTrace {
         public boolean breakHere(Eval2.EvalStack aStack) {
             try {
                 return enabled && AbstractEval.boolEval(eval.eval(lWhenExpr, aStack.top().getCtx()));
-            } catch (CommandException e) {
+            }
+            catch (CommandException e) {
                 return false;
             }
         }
@@ -361,7 +362,8 @@ public class EvalTrace {
                         // this earlier evaluation!
                         EvalTrace.this.wait();
                         halted = false;
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e) {
                         halted = true;
                     }
                 }
@@ -384,7 +386,8 @@ public class EvalTrace {
                         EvalTrace.this.wait();
                         // If we pass through the wait method, the eval kicks into action.
                         halted = false;
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e) {
                         halted = true;
                     }
                 }
@@ -408,7 +411,8 @@ public class EvalTrace {
                             EvalTrace.this.wait();
                             halted = false;
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e) {
                         halted = true;
                     }
                 }
@@ -435,7 +439,8 @@ public class EvalTrace {
             public void run() {
                 try {
                     eval.eval(aExpr);
-                } catch (CommandException e) {
+                }
+                catch (CommandException e) {
                     // The eval will have notified any listeners.
                     // Our EvalTrace will have received the exception event and should have
                     // taken appropriate action.
@@ -461,7 +466,8 @@ public class EvalTrace {
             // There can be multiple stacks if there is a nesting, i.e. a command invokes eval itself.
             // In the nested case, the debugger can go on stepping, no problem.
             return stack != null && !excepted && (stack.hasMoreSteps() || stack.getPrevStack() != null);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             halted = true;
             return false;
         }
@@ -483,7 +489,8 @@ public class EvalTrace {
                 this.wait();
                 stepcount++;
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             halted = true;
         }
     }
@@ -498,7 +505,8 @@ public class EvalTrace {
             while (!halted) this.wait();
             // If the eval is halted, we can access its stack.
             return stack;
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             halted = true;
             return null;
         }
@@ -518,7 +526,8 @@ public class EvalTrace {
         try {
             while (!halted) this.wait();
             return result;
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             // The wait could be interrupted because the
             // eval thread ended.
             halted = true;
@@ -539,7 +548,8 @@ public class EvalTrace {
         try {
             while (!halted) this.wait();
             return hasResult;
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             // The wait could be interrupted because the
             // eval thread ended.
             halted = true;
@@ -560,7 +570,8 @@ public class EvalTrace {
             worker.interrupt();
             worker = null;
             halted = true;
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             halted = true;
         }
     }
@@ -585,7 +596,8 @@ public class EvalTrace {
         try {
             while (!halted) this.wait();
             stack.reset();
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             halted = true;
         }
     }
@@ -600,7 +612,8 @@ public class EvalTrace {
         try {
             while (!halted) this.wait();
             stack.dropFrame();
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             halted = true;
         }
     }
@@ -617,7 +630,8 @@ public class EvalTrace {
             final Eval2.StackFrame lFrame = stack.top();
             if (lFrame.getDataptr() > 0) lFrame.backStep();
             else stack.dropFrame();
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             halted = true;
         }
     }
@@ -638,7 +652,8 @@ public class EvalTrace {
             if (stepcount > 0 && breakpoints.breakHere(stack)) {
                 breakpoint = true;
                 break steploop;
-            } else step();
+            }
+            else step();
     }
 
     /**
@@ -657,7 +672,8 @@ public class EvalTrace {
             if (stepcount > 0 && breakpoints.breakHere(stack)) {
                 breakpoint = true;
                 break steploop;
-            } else step();
+            }
+            else step();
     }
 
 
@@ -675,7 +691,8 @@ public class EvalTrace {
             if (stepcount > 0 && breakpoints.breakHere(stack)) {
                 breakpoint = true;
                 break steploop;
-            } else step();
+            }
+            else step();
         // Now we take a single step to step out of the frame.
         if (this.hasMoreSteps())
             if (stepcount > 0 && breakpoints.breakHere(stack)) breakpoint = true;
@@ -701,7 +718,8 @@ public class EvalTrace {
             if (stepcount > 0 && breakpoints.breakHere(stack)) {
                 breakpoint = true;
                 break steploop;
-            } else step();
+            }
+            else step();
     }
 
     public synchronized void stepOver() {
@@ -718,7 +736,8 @@ public class EvalTrace {
         if (lFrame.isEvaluated()) {
             if (stepcount > 0 && breakpoints.breakHere(stack)) breakpoint = true;
             else step();
-        } else {
+        }
+        else {
             steploop:
             while (
                 // If there is not yet a handler, the frame slots will not have
@@ -728,7 +747,8 @@ public class EvalTrace {
                 if (stepcount > 0 && breakpoints.breakHere(stack)) {
                     breakpoint = true;
                     break steploop;
-                } else step();
+                }
+                else step();
         }
     }
 
@@ -736,7 +756,8 @@ public class EvalTrace {
         try {
             while (!halted) this.wait();
             return excepted;
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             // The wait could be interrupted because the eval thread ended.
             halted = true;
             return excepted;
@@ -750,7 +771,8 @@ public class EvalTrace {
         try {
             while (!halted) this.wait();
             return exception;
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             // The wait could be interrupted because the
             // eval thread ended.
             halted = true;

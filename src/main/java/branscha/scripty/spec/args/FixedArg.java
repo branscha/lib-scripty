@@ -52,7 +52,8 @@ public class FixedArg
             if (aPos < 0 || aPos >= aArgs.length)
                 throw new ArgSpecException(String.format("The required argument at position %d, type %s missing.", aPos, spec.getSpecName()));
             else return spec.guard(aArgs[aPos], aCtx);
-        } catch (TypeSpecException e) {
+        }
+        catch (TypeSpecException e) {
             throw new ArgSpecException(String.format("The required argument at position %d: %s", aPos, e.getMessage()));
         }
     }

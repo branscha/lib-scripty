@@ -61,7 +61,8 @@ public class OptionalArg
             if (aPos < 0 || aPos >= aArgs.length) return spec.guard(defaultVal, aCtx);
             else if (aArgs[aPos] instanceof Pair) return spec.guard(defaultVal, aCtx);
             else return spec.guard(aArgs[aPos], aCtx);
-        } catch (TypeSpecException e) {
+        }
+        catch (TypeSpecException e) {
             throw new ArgSpecException(String.format("Optional argument at position %d: %s", aPos, e.getMessage()));
         }
     }

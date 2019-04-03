@@ -43,7 +43,8 @@ public class ScriptyStreamProcessor extends ScriptyCapable {
     throws ProcessorException {
         try {
             return getReplEngine().startNonInteractive(aExpression);
-        } catch (ReplEngineException e) {
+        }
+        catch (ReplEngineException e) {
             throw new ProcessorException(e.getMessage(), e);
         }
     }
@@ -52,7 +53,8 @@ public class ScriptyStreamProcessor extends ScriptyCapable {
     throws ProcessorException {
         try {
             return getReplEngine().startNonInteractive(aStream);
-        } catch (ReplEngineException e) {
+        }
+        catch (ReplEngineException e) {
             throw new ProcessorException(e.getMessage(), e);
         }
     }
@@ -61,7 +63,8 @@ public class ScriptyStreamProcessor extends ScriptyCapable {
     throws ProcessorException {
         try {
             return getReplEngine().startNonInteractive(aReader);
-        } catch (ReplEngineException e) {
+        }
+        catch (ReplEngineException e) {
             throw new ProcessorException(e.getMessage(), e);
         }
     }

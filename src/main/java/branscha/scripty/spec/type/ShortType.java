@@ -36,15 +36,19 @@ public class ShortType
     throws TypeSpecException {
         if (aArg instanceof Short) {
             return aArg;
-        } else if (aArg instanceof Number) {
+        }
+        else if (aArg instanceof Number) {
             return ((Number) aArg).shortValue();
-        } else if (aArg instanceof String) {
+        }
+        else if (aArg instanceof String) {
             try {
                 return Short.parseShort((String) aArg);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
             }
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

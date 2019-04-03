@@ -77,7 +77,8 @@ public class FileDialogLibrary {
             // have to select multiple files in the same directory.
             if (lParent != null) currentDir = lParent;
             return lFile;
-        } else return null;
+        }
+        else return null;
     }
 }
 
@@ -265,7 +266,8 @@ class ExampleFileFilter extends FileFilter {
                     }
                 }
                 fullDescription += ")";
-            } else {
+            }
+            else {
                 fullDescription = description;
             }
         }

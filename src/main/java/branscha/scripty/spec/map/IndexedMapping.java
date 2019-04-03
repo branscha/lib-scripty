@@ -59,7 +59,8 @@ public class IndexedMapping
             }
 
             return lArgs[offset];
-        } else if (List.class.isAssignableFrom(lArgsClass)) {
+        }
+        else if (List.class.isAssignableFrom(lArgsClass)) {
             List lArgs = (List) aArgs;
             if (offset >= lArgs.size()) {
                 // TODO generate error

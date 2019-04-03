@@ -28,7 +28,7 @@ package branscha.scripty.annot;
  * Provide argument type details in an {@link ScriptyStdArgList} or al {@link ScriptyVarArgList}.
  * Argument list annotations are used to specify the interface for a command, the Scripty engine will automatically
  * enforce this interface.
- *
+ * <p>
  * The example defines a command interface with a single argument of type String.
  *
  * <pre>

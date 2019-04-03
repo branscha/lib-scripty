@@ -60,7 +60,8 @@ public class NamedArg
                         Pair lNewPair = new Pair(paramName, valueSpec.guard(lPair.getRight(), aCtx));
                         aArgs[i] = lNewPair;
                         return lNewPair.getRight();
-                    } catch (TypeSpecException e) {
+                    }
+                    catch (TypeSpecException e) {
                         throw new ArgSpecException(String.format("Named argument '%s': %s", paramName, e.getMessage()));
                     }
                 }
@@ -70,7 +71,8 @@ public class NamedArg
         try {
             if (optional) return valueSpec.guard(value, aCtx);
             else throw new ArgSpecException(String.format("Missing named argument '%s'.", paramName));
-        } catch (TypeSpecException e) {
+        }
+        catch (TypeSpecException e) {
             throw new ArgSpecException(e.getMessage());
         }
     }

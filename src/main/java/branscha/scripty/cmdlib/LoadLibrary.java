@@ -89,20 +89,24 @@ public class LoadLibrary {
                 try {
                     lIn = lLoader.getStream();
                     lEngine.startNonInteractive(lIn);
-                } catch (ReplEngineException e) {
-                    final String lMsg = String.format("While loading '%s'.\n%s", lLoader.toString(), e.getMessage());
+                }
+                catch (ReplEngineException e) {
+                    final String lMsg = String.format("While loading '%s'.%n%s", lLoader.toString(), e.getMessage());
                     throw new CommandException(lMsg);
-                } finally {
+                }
+                finally {
                     // Cleanup. Ignore all exceptions here.
                     if (lIn != null) try {
                         lIn.close();
-                    } catch (Exception ignored) {
+                    }
+                    catch (Exception ignored) {
                     }
                 }
 
                 loaders.add(lLoader);
             }
-        } finally {
+        }
+        finally {
             aContext.setBinding(ReplEngine.INPUT, lInput);
             aContext.setBinding(ReplEngine.OUTPUT, lOutput);
             aContext.setBinding(ReplEngine.ERROR, lError);
@@ -141,8 +145,9 @@ public class LoadLibrary {
         throws CommandException {
             try {
                 return new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                throw new CommandException(String.format("Exception while opening the file: '%s'.\n%s", file.getAbsolutePath(), e.getMessage()), e);
+            }
+            catch (FileNotFoundException e) {
+                throw new CommandException(String.format("Exception while opening the file: '%s'.%n%s", file.getAbsolutePath(), e.getMessage()), e);
             }
         }
 
@@ -191,23 +196,28 @@ public class LoadLibrary {
                 String lPath = (String) aArg;
                 if (lPath.startsWith("classpath:")) {
                     lCandLdr = new ClasspathLoader(lPath.substring(10));
-                } else if (lPath.startsWith("cp:")) {
+                }
+                else if (lPath.startsWith("cp:")) {
                     lCandLdr = new ClasspathLoader(lPath.substring(3));
-                } else {
+                }
+                else {
                     // Interprete the string as a pathname.
                     lCandLdr = new FileLoader(lPath);
                 }
-            } else if (aArg instanceof File) {
+            }
+            else if (aArg instanceof File) {
                 // Easy for us.
                 lCandLdr = new FileLoader((File) aArg);
-            } else {
+            }
+            else {
                 // Don't know how to handle this.
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), aArg.toString()));
             }
 
             try {
                 lCandLdr.checkValidity();
-            } catch (CommandException e) {
+            }
+            catch (CommandException e) {
                 throw new TypeSpecException(String.format("The resource '%s' is not available, it the contents cannot be accessed.", lCandLdr.toString()));
             }
             return lCandLdr;

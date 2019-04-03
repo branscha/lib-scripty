@@ -143,7 +143,8 @@ public class Eval extends AbstractEval {
     throws CommandException {
         try {
             return eval(aExpr, getContext());
-        } catch (StackOverflowError e) {
+        }
+        catch (StackOverflowError e) {
             // Protection against runaway user functions. This probably is a bug
             // like an uncontrolled recursion or a indefinite loop.
             throw new CommandException("Stack overflow, too deep of a recursion.");
@@ -174,13 +175,15 @@ public class Eval extends AbstractEval {
                 if (aExpr instanceof String && ((String) aExpr).startsWith("$")) {
                     // Syntactic sugar. $name is equivalent to (get name).
                     return aContext.getBinding(((String) aExpr).substring(1));
-                } else if (aExpr instanceof Pair) {
+                }
+                else if (aExpr instanceof Pair) {
                     // Pairs are meant to make key/value pairs easier.
                     final Pair lPair = (Pair) aExpr;
                     final Object lEvaluatedLeft = eval(lPair.getLeft(), aContext);
                     final Object lEvaluatedRight = eval(lPair.getRight(), aContext);
                     return new Pair(lEvaluatedLeft, lEvaluatedRight);
-                } else {
+                }
+                else {
                     // All other values except lists evaluate to
                     // themselves! This is quite different from the original LISP.
                     // Our goal is to have a handy and flexible REPL that can handle model objects or "handles"
@@ -188,7 +191,8 @@ public class Eval extends AbstractEval {
                     ////////////////////////////////////////////
                     return aExpr;
                 }
-            } else {
+            }
+            else {
                 // II. List composite expressions
                 /////////////////////////////////
 
@@ -213,7 +217,8 @@ public class Eval extends AbstractEval {
                     // It is a special form because it influences the way the expression is (not) evaluated, it is non-standard.
                     if (lListSize == 2) return lList.get(1);
                     else throw new CommandException("The 'quote' form should have the format (quote <expr>).");
-                } else if ("if".equals(lCmdCandidate)) {
+                }
+                else if ("if".equals(lCmdCandidate)) {
                     // It is a special form because only one of the then or else part is evaluated depending on the outcome of the test.
                     // It shortcuts evaluation of the other branch.
 
@@ -223,7 +228,8 @@ public class Eval extends AbstractEval {
                     if (boolEval(eval(lList.get(1), aContext))) return eval(lList.get(2), aContext);
                     else if (lListSize == 4) return eval(lList.get(3), aContext);
                     else return null;
-                } else if ("while".equals(lCmdCandidate)) {
+                }
+                else if ("while".equals(lCmdCandidate)) {
                     // It is a special form because the test is evaluated again and again.
 
                     // Quick test on the number of arguments.
@@ -233,7 +239,8 @@ public class Eval extends AbstractEval {
                     while (boolEval(eval(lList.get(1), aContext)))
                         if (lListSize == 3) lLastResult = eval(lList.get(2), aContext);
                     return lLastResult;
-                } else if ("and".equals(lCmdCandidate)) {
+                }
+                else if ("and".equals(lCmdCandidate)) {
                     // It is a special form because it shortcuts evaluation if it encounters a
                     // false value.
 
@@ -250,7 +257,8 @@ public class Eval extends AbstractEval {
                         if (!boolEval(eval(lArg, aContext))) return Boolean.FALSE;
                     }
                     return Boolean.TRUE;
-                } else if ("or".equals(lCmdCandidate)) {
+                }
+                else if ("or".equals(lCmdCandidate)) {
                     // It is a special form because it shortcuts evaluation when a single true value
                     // was found
 
@@ -267,13 +275,15 @@ public class Eval extends AbstractEval {
                         if (boolEval(eval(lArg, aContext))) return Boolean.TRUE;
                     }
                     return Boolean.FALSE;
-                } else if ("not".equals(lCmdCandidate)) {
+                }
+                else if ("not".equals(lCmdCandidate)) {
                     // Quick test on the number of arguments.
                     if (lListSize != 2)
                         throw new CommandException("The 'not' form should have the format (not <bool-expr>).");
                     if (boolEval(eval(lList.get(1), aContext))) return Boolean.FALSE;
                     else return Boolean.TRUE;
-                } else if ("set".equals(lCmdCandidate) || "defvar".equals(lCmdCandidate)) {
+                }
+                else if ("set".equals(lCmdCandidate) || "defvar".equals(lCmdCandidate)) {
                     Object lName;
                     Object lValue;
 
@@ -286,12 +296,14 @@ public class Eval extends AbstractEval {
                         Pair lPair = (Pair) lPairCand;
                         lName = eval(lPair.getLeft(), aContext);
                         lValue = eval(lPair.getRight(), aContext);
-                    } else if (lListSize == 3) {
+                    }
+                    else if (lListSize == 3) {
                         // Variant (xxx name value)
                         //
                         lName = eval(lList.get(1), aContext);
                         lValue = eval(lList.get(2), aContext);
-                    } else {
+                    }
+                    else {
                         throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lCmdCandidate, lCmdCandidate));
                     }
 
@@ -304,7 +316,8 @@ public class Eval extends AbstractEval {
                     else aContext.getRootContext().defBinding(lNameRepr, lValue);
 
                     return lValue;
-                } else if ("let".equals(lCmdCandidate) || "let*".equals(lCmdCandidate)) {
+                }
+                else if ("let".equals(lCmdCandidate) || "let*".equals(lCmdCandidate)) {
                     if (lListSize != 3)
                         throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).", lCmdCandidate, lCmdCandidate));
                     final Object lBindings = lList.get(1);
@@ -313,7 +326,7 @@ public class Eval extends AbstractEval {
 
                     // Check the type of the list of bindings.
                     if (!(lBindings instanceof List))
-                        throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).\nThe first parameter should be a list of bindings but encountered an instance of type '%s'.", lCmdCandidate, lCmdCandidate, lBindings == null ? "null" : lBindings.getClass().getCanonicalName()));
+                        throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).%nThe first parameter should be a list of bindings but encountered an instance of type '%s'.", lCmdCandidate, lCmdCandidate, lBindings == null ? "null" : lBindings.getClass().getCanonicalName()));
                     final List lBindingsList = (List) lBindings;
 
                     // For let we will accumulate the eval results of the bindings
@@ -328,7 +341,8 @@ public class Eval extends AbstractEval {
                             final String lName = (String) lBinding;
                             if (letrec) lLetCtx.defBinding(lName, null);
                             else lBindingPrep.add(new Pair(lName, null));
-                        } else if (lBinding instanceof List || lBinding instanceof Pair) {
+                        }
+                        else if (lBinding instanceof List || lBinding instanceof Pair) {
                             Object lKey;
                             Object lValExpr;
 
@@ -337,10 +351,11 @@ public class Eval extends AbstractEval {
                                 //
                                 final List lBindingList = (List) lBinding;
                                 if (lBindingList.size() != 2)
-                                    throw new CommandException(String.format("The '%s' form should have the format (%s ((name val) | name=val ...) expr).\nEach binding should be a list of length 2 of the form (var val).", lCmdCandidate, lCmdCandidate));
+                                    throw new CommandException(String.format("The '%s' form should have the format (%s ((name val) | name=val ...) expr).%nEach binding should be a list of length 2 of the form (var val).", lCmdCandidate, lCmdCandidate));
                                 lKey = lBindingList.get(0);
                                 lValExpr = lBindingList.get(1);
-                            } else {
+                            }
+                            else {
                                 // Variant name=value
                                 //
                                 final Pair lBindingPair = (Pair) lBinding;
@@ -349,13 +364,14 @@ public class Eval extends AbstractEval {
                             }
 
                             if (!(lKey instanceof String))
-                                throw new CommandException(String.format("The '%s' special should have the format (%s ((name val) | name=val ...) expr).\nEach binding should be a list  of the form (var val).\nThe first element should be a string but encountered an instance of type '%s'.", lCmdCandidate, lCmdCandidate, lKey == null ? "null" : lKey.getClass().getCanonicalName()));
+                                throw new CommandException(String.format("The '%s' special should have the format (%s ((name val) | name=val ...) expr).%nEach binding should be a list  of the form (var val).%nThe first element should be a string but encountered an instance of type '%s'.", lCmdCandidate, lCmdCandidate, lKey == null ? "null" : lKey.getClass().getCanonicalName()));
 
                             final String lName = (String) lKey;
                             if (letrec) lLetCtx.defBinding(lName, eval(lValExpr, lLetCtx));
                             else lBindingPrep.add(new Pair(lName, eval(lValExpr, lLetCtx)));
-                        } else {
-                            throw new CommandException(String.format("The '%s' form should have the format (%s ((name val) | name=val ...) expr).\nEach binding should be a list or a string or a pair but encountered an instance of type '%s'.", lCmdCandidate, lCmdCandidate, lBinding == null ? "null" : lBinding.getClass().getCanonicalName()));
+                        }
+                        else {
+                            throw new CommandException(String.format("The '%s' form should have the format (%s ((name val) | name=val ...) expr).%nEach binding should be a list or a string or a pair but encountered an instance of type '%s'.", lCmdCandidate, lCmdCandidate, lBinding == null ? "null" : lBinding.getClass().getCanonicalName()));
                         }
                     }
 
@@ -365,7 +381,8 @@ public class Eval extends AbstractEval {
                     }
                     // Evaluate the body in our freshly created context.
                     return eval(lExpr, lLetCtx);
-                } else if ("get".equals(lCmdCandidate)) {
+                }
+                else if ("get".equals(lCmdCandidate)) {
                     // Quick test on the number of arguments.
                     if (lListSize != 2) throw new CommandException("The 'get' form should have the format (get name).");
                     Object lName = eval(lList.get(1), aContext);
@@ -374,7 +391,8 @@ public class Eval extends AbstractEval {
                     if (!(lName instanceof String))
                         throw new CommandException("The first argument in the 'get' form should evaluate to a string.");
                     return aContext.getBinding((String) lName);
-                } else if ("lambda".equals(lCmdCandidate)) {
+                }
+                else if ("lambda".equals(lCmdCandidate)) {
                     // It is a special form because the parameter list nor the function body
                     // should be evaluated at this point.
 
@@ -400,7 +418,8 @@ public class Eval extends AbstractEval {
                     for (int i = 0; i < lParamList.size(); i++) lStrArgs[i] = (String) lParamList.get(i);
 
                     return new Lambda(lStrArgs, lBody, aContext);
-                } else if ("defun".equals(lCmdCandidate)) {
+                }
+                else if ("defun".equals(lCmdCandidate)) {
                     // It is a special form because the parameter list nor the function body
                     // should be evaluated at this point.
 
@@ -435,7 +454,8 @@ public class Eval extends AbstractEval {
                     final Lambda lLambda = (Lambda) eval(lLambdaMacro, aContext);
                     aContext.getRootContext().defBinding((String) lName, lLambda);
                     return lLambda;
-                } else if ("timer".equals(lCmdCandidate)) {
+                }
+                else if ("timer".equals(lCmdCandidate)) {
                     if (lListSize != 2)
                         throw new CommandException("The 'timer' form should have the format (timer expr).");
 
@@ -443,7 +463,8 @@ public class Eval extends AbstractEval {
                     eval(lList.get(1), aContext);
                     long lStop = System.currentTimeMillis();
                     return lStop - lStart;
-                } else if (lCmdCandidate instanceof String && macros.hasCommand((String) lCmdCandidate)) {
+                }
+                else if (lCmdCandidate instanceof String && macros.hasCommand((String) lCmdCandidate)) {
                     // Built-in macro call.
                     final ICommand lMacro = macros.getCommand((String) lCmdCandidate);
                     final List lArgs = new ArrayList(lList.size());
@@ -453,13 +474,15 @@ public class Eval extends AbstractEval {
                         // Macro expansion in progress!
                         //
                         return eval(lMacro.execute(this, aContext, lArgs.toArray()), aContext);
-                    } catch (CommandException e) {
+                    }
+                    catch (CommandException e) {
                         // This type of error will be handled by our general mechanism.
                         // It does not need special handling here.
                         throw e;
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         // A non-CommandException is converted into a command exception here.
-                        throw new CommandException(String.format("Macro '%s' failed.\n%s", lCmdCandidate, concatExceptionMessages(e)));
+                        throw new CommandException(String.format("Macro '%s' failed.%n%s", lCmdCandidate, concatExceptionMessages(e)));
                     }
                 }
 
@@ -498,7 +521,8 @@ public class Eval extends AbstractEval {
                             if (lListSize != 2)
                                 throw new CommandException("The 'eval' form should have a single argument.");
                             return eval(lEvalList.get(1), aContext);
-                        } else if ("eq".equals(lCmdName)) {
+                        }
+                        else if ("eq".equals(lCmdName)) {
                             if (lListSize != 3) throw new CommandException("The 'eq' form should have two arguments.");
                             Object lArg1 = eval(lEvalList.get(1), aContext);
                             Object lArg2 = eval(lEvalList.get(2), aContext);
@@ -506,20 +530,24 @@ public class Eval extends AbstractEval {
                             else if (lArg1 == null) return Boolean.FALSE;
                             else if (lArg2 == null) return Boolean.FALSE;
                             else return lArg1.equals(lArg2);
-                        } else if ("bound?".equals(lCmdName)) {
+                        }
+                        else if ("bound?".equals(lCmdName)) {
                             if (lListSize != 2)
                                 throw new CommandException("The 'bound?' form should have a single argument.");
                             Object lArg = lEvalList.get(1);
                             if (lArg instanceof String) {
                                 String lName = (String) lArg;
                                 return aContext.isBound(lName);
-                            } else
+                            }
+                            else
                                 throw new CommandException("The 'bound?' form should have a single string argument.");
-                        } else if ("progn".equals(lCmdCandidate)) {
+                        }
+                        else if ("progn".equals(lCmdCandidate)) {
                             if (lListSize < 2)
                                 throw new CommandException("The 'progn' form should have at least one argument.");
                             return lEvalList.get(lEvalList.size() - 1);
-                        } else if ("funcall".equals(lCmdName)) {
+                        }
+                        else if ("funcall".equals(lCmdName)) {
                             // This is the 'official' way of executing a method.
                             // The other methods are macro's that will sooner or later evaluate to this construct.
                             // This is the real deal (whereas the other constructs should be seen as syntactic sugar).
@@ -537,18 +565,20 @@ public class Eval extends AbstractEval {
                             if (lName instanceof Lambda) {
                                 // Easy part.
                                 lFun = (Lambda) lName;
-                            } else if (lName instanceof String) {
+                            }
+                            else if (lName instanceof String) {
                                 // We have to do a lookup.
                                 Object lFunCandidate = aContext.getBinding((String) lName);
                                 if (!(lFunCandidate instanceof Lambda))
                                     throw new CommandException(String.format("Function \"%s\" was not found in the context.", lName));
                                 lFun = (Lambda) lFunCandidate;
-                            } else {
+                            }
+                            else {
                                 // Trouble.
                                 // We found something in the beginning of the list that does not evaluate to a lambda name or a lambda itself.
                                 if (lName == null)
                                     throw new CommandException("The first argument in the 'funcall' form should evaluate to a string or a lambda, but we received 'null'.");
-                                throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.\n Received an instance of class '%s'.", lName.getClass().getCanonicalName()));
+                                throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.%n Received an instance of class '%s'.", lName.getClass().getCanonicalName()));
                             }
 
                             try {
@@ -560,51 +590,61 @@ public class Eval extends AbstractEval {
                                 // the argument list.
                                 final IContext lFunCtx = lFun.createContext(lEvalList.subList(2, lEvalList.size()).toArray(), 0, lEvalList.size() - 2);
                                 return eval(lFun.getExpr(), lFunCtx);
-                            } catch (CommandException e) {
+                            }
+                            catch (CommandException e) {
                                 // This type of error will be handled by our general mechanism.
                                 // It does not need special handling here.
                                 throw e;
-                            } catch (Exception e) {
-                                // A non-CommandException is converted into a command exception here.
-                                throw new CommandException(String.format("Function call '%s' failed.\n%s", lName, concatExceptionMessages(e)));
                             }
-                        } else if (commands.hasCommand(lCmdName)) {
+                            catch (Exception e) {
+                                // A non-CommandException is converted into a command exception here.
+                                throw new CommandException(String.format("Function call '%s' failed.%n%s", lName, concatExceptionMessages(e)));
+                            }
+                        }
+                        else if (commands.hasCommand(lCmdName)) {
                             try {
                                 final ICommand lCmd = commands.getCommand(lCmdName);
                                 return lCmd.execute(this, aContext, lEvalList.toArray());
-                            } catch (CommandException e) {
+                            }
+                            catch (CommandException e) {
                                 // This type of error will be handled by our general mechanism.
                                 // It does not need special handling here.
                                 throw e;
-                            } catch (Exception e) {
-                                // A non-CommandException is converted into a command exception here.
-                                throw new CommandException(String.format("Command '%s' failed.\n%s", lCmdName, concatExceptionMessages(e)));
                             }
-                        } else if (aContext.isBound(lCmdName) && aContext.getBinding(lCmdName) instanceof Lambda) {
+                            catch (Exception e) {
+                                // A non-CommandException is converted into a command exception here.
+                                throw new CommandException(String.format("Command '%s' failed.%n%s", lCmdName, concatExceptionMessages(e)));
+                            }
+                        }
+                        else if (aContext.isBound(lCmdName) && aContext.getBinding(lCmdName) instanceof Lambda) {
                             // SYNTACTIC SUGAR.
                             // This is syntactic sugar so that know and declared user functions
                             // can be called without 'funcall' just like the built-in functions.
 
                             final List lMacro = funcallMacro(lEvalList);
                             return eval(lMacro, aContext);
-                        } else {
+                        }
+                        else {
                             throw new CommandException(String.format("Command or form '%s' does not exist.", lCmdName));
                         }
-                    } else if (lCmdCandidate instanceof Lambda) {
+                    }
+                    else if (lCmdCandidate instanceof Lambda) {
                         // SYNTACTIC SUGAR.
                         // This is syntactic sugar so that lambda's
                         // can be called without 'funcall' just like the built-in functions.
 
                         final List lMacro = funcallMacro(lEvalList);
                         return eval(lMacro, aContext);
-                    } else {
+                    }
+                    else {
                         // Error, name of the command should be a string or a lambda.
                         if (lCmdCandidate == null)
                             throw new CommandException(String.format("The command name should evaluate to a string or a lambda. Found null."));
                         else
-                            throw new CommandException(String.format("The command name should evaluate to a string or a lambda.\nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()));
+                            throw new CommandException(String.format("The command name should evaluate to a string or a lambda.%nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()));
                     }
-                } else {
+                }
+                else {
                     // Error, the list does not contain a command.
                     throw new CommandException(String.format("An empty list cannot be executed."));
                 }
@@ -631,11 +671,12 @@ public class Eval extends AbstractEval {
                     lMsg = lMsg + "\n-> ...";
             }
             // We augment the exception with information so that the user can pinpoint the error.
-            else lMsg = String.format("%s\n-> %s", e.getMessage(), limitMsg(aExpr, lEntryMsgLim));
+            else lMsg = String.format("%s%n-> %s", e.getMessage(), limitMsg(aExpr, lEntryMsgLim));
             throw new CommandException(lMsg);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // A non-CommandException is converted into a command exception here.
-            throw new CommandException(String.format("Evaluation failed.\n%s", concatExceptionMessages(e)));
+            throw new CommandException(String.format("Evaluation failed.%n%s", concatExceptionMessages(e)));
         }
     }
 

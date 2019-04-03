@@ -147,8 +147,9 @@ public class Eval2 extends AbstractEval {
                 // the result slot (this is one after the data slots).
 
                 evaluated = false;
-                if (data.length >= 0) dataptr = data.length;
-            } else {
+                dataptr = data.length;
+            }
+            else {
                 // We point the datapointer to the previous slot
                 // and reset the current slot.
                 if (dataptr > 0 && dataptr <= data.length) {
@@ -257,7 +258,7 @@ public class Eval2 extends AbstractEval {
 
     public static class EvalEvent extends EventObject {
         private static final long serialVersionUID = -514101948441517829L;
-        private EvalStack stack;
+        private transient EvalStack stack;
         private Object result;
         private Exception exception;
 
@@ -357,7 +358,8 @@ public class Eval2 extends AbstractEval {
         final Object lResult;
         try {
             lResult = eval2(currstack);
-        } finally {
+        }
+        finally {
             // Replace the current stack with the previous one if there is one.
             // The stack restoring code is in a finally block because we definitively
             // have to to this in case of exception.
@@ -448,13 +450,15 @@ public class Eval2 extends AbstractEval {
                     aStack.pop();
                     final StackFrame lTop = aStack.top();
                     lTop.pushData(lFrame.getResult());
-                } else {
+                }
+                else {
                     // ERROR.
                     // There are no steps to take anymore.
                     // The stack is completely evaluated.
                     throw new CommandException("No steps anymore.", aStack);
                 }
-            } else {
+            }
+            else {
                 // Still some work to do on the current frame.
 
                 // If there is a handler installed on the frame, then let the handler handle it.
@@ -464,10 +468,12 @@ public class Eval2 extends AbstractEval {
                     if (!(lExpr instanceof List) && !(lExpr instanceof Pair)) {
                         // Atomic expression.
                         lFrame.setHandler(ATOMIC_HANDLER);
-                    } else if (lExpr instanceof Pair) {
+                    }
+                    else if (lExpr instanceof Pair) {
                         // Pair expression.
                         lFrame.setHandler(PAIR_HANDLER);
-                    } else {
+                    }
+                    else {
                         // List expression.
                         final List lLstExpr = (List) lExpr;
                         final int lLstSize = lLstExpr.size();
@@ -508,7 +514,8 @@ public class Eval2 extends AbstractEval {
             // Progress has been made, a return has been performed or a frame handler
             // has been called to do some work. Notify the listeners about this progress.
             fireStepEvent(aStack);
-        } catch (CommandException e) {
+        }
+        catch (CommandException e) {
             // Notify the listeners about this exception.
             fireReceivedException(aStack, e);
             // Re-throw it.
@@ -532,7 +539,8 @@ class AtomicHandler
         if (lExpr instanceof String && ((String) lExpr).startsWith("$")) {
             // Syntactic sugar. $name is equivalent to (get name).
             aFrame.setResult(lCtx.getBinding(((String) lExpr).substring(1)));
-        } else {
+        }
+        else {
             // All other values except lists evaluate to
             // themselves! This is quite different from the original LISP.
             // Our goal is to have a handy and flexible REPL that can handle model objects or "handles"
@@ -629,7 +637,8 @@ class StandardHandler
                     if (lLstSize != 2)
                         throw new CommandException("The 'eval' form should have a single argument.", aStack);
                     aStack.push(lData[1], lCtx);
-                } else if ("eq".equals(lCmdName)) {
+                }
+                else if ("eq".equals(lCmdName)) {
                     if (lLstSize != 3) throw new CommandException("The 'eq' form should have two arguments.", aStack);
                     Object lArg1 = lData[1];
                     Object lArg2 = lData[2];
@@ -639,19 +648,23 @@ class StandardHandler
                     else if (lArg2 == null) lResult = Boolean.FALSE;
                     else lResult = lArg1.equals(lArg2);
                     aFrame.setResult(lResult);
-                } else if ("bound?".equals(lCmdName)) {
+                }
+                else if ("bound?".equals(lCmdName)) {
                     if (lLstSize != 2)
                         throw new CommandException("The 'bound?' form should have a single argument.", aStack);
                     if (lData[1] instanceof String) {
                         String lName = (String) lData[1];
                         aFrame.setResult(lCtx.isBound(lName));
-                    } else
+                    }
+                    else
                         throw new CommandException("The 'bound?' form should have a single string argument.", aStack);
-                } else if ("progn".equals(lCmdName)) {
+                }
+                else if ("progn".equals(lCmdName)) {
                     if (lLstSize < 2)
                         throw new CommandException("The 'progn' form should have at least one argument.", aStack);
                     aFrame.setResult(lData[lData.length - 1]);
-                } else if ("funcall".equals(lCmdName)) {
+                }
+                else if ("funcall".equals(lCmdName)) {
                     // This is the 'official' way of executing a method.
                     // The other methods are macro's that will sooner or later evaluate to this construct.
                     // This is the real deal (whereas the other constructs should be seen as syntactic sugar).
@@ -669,18 +682,20 @@ class StandardHandler
                     if (lName instanceof Lambda) {
                         // Easy part.
                         lFun = (Lambda) lName;
-                    } else if (lName instanceof String) {
+                    }
+                    else if (lName instanceof String) {
                         // We have to do a lookup.
                         Object lFunCandidate = lCtx.getBinding((String) lName);
                         if (!(lFunCandidate instanceof Lambda))
                             throw new CommandException(String.format("Function \"%s\" was not found in the context.", lName), aStack);
                         lFun = (Lambda) lFunCandidate;
-                    } else {
+                    }
+                    else {
                         // Trouble.
                         // We found something in the beginning of the list that does not evaluate to a lambda name or a lambda itself.
                         if (lName == null)
                             throw new CommandException("The first argument in the 'funcall' form should evaluate to a string or a lambda, but we received 'null'.", aStack);
-                        throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.\n Received an instance of class '%s'.", lName.getClass().getCanonicalName()), aStack);
+                        throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.%n Received an instance of class '%s'.", lName.getClass().getCanonicalName()), aStack);
                     }
 
                     // Context that binds the parameters to the arguments in addition to the lexical context.
@@ -689,17 +704,20 @@ class StandardHandler
                     final IContext lFunCtx = lFun.createContext(lData, 2, lLstSize);
                     aStack.push(lFun.getExpr(), lFunCtx);
 
-                } else if (commands.hasCommand(lCmdName)) {
+                }
+                else if (commands.hasCommand(lCmdName)) {
                     try {
                         final ICommand lCmd = commands.getCommand(lCmdName);
                         aFrame.setResult(lCmd.execute(aEval, lCtx, lData));
-                    } catch (CommandException e) {
+                    }
+                    catch (CommandException e) {
                         // This type of error will be handled by our general mechanism.
                         // It does not need special handling here.
                         Eval2.EvalStack lNestedStack = e.getStack();
                         e.setStack(aStack.merge(lNestedStack));
                         throw e;
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         // A non-CommandException is converted into a command exception here.
                         // Extract information about the exception. For some exceptions this is the only
                         // way to get some detail in this way (e.g. NullPointerException).
@@ -710,33 +728,39 @@ class StandardHandler
                         try {
                             lPrinter.close();
                             lBos.close();
-                        } catch (IOException ignored) {
+                        }
+                        catch (IOException ignored) {
                         }
 
                         // Re-throw the exception with more information.
-                        throw new CommandException(String.format("Command '%s' failed.\n%s", lCmdName, lMsg), e, aStack);
+                        throw new CommandException(String.format("Command '%s' failed.%n%s", lCmdName, lMsg), e, aStack);
                     }
-                } else if (lCtx.isBound(lCmdName) && lCtx.getBinding(lCmdName) instanceof Lambda) {
+                }
+                else if (lCtx.isBound(lCmdName) && lCtx.getBinding(lCmdName) instanceof Lambda) {
                     // Immediately execute the lambda.
                     final Lambda lFun = (Lambda) lCtx.getBinding(lCmdName);
                     final IContext lFunCtx = lFun.createContext(lData, 1, lLstSize);
                     aStack.push(lFun.getExpr(), lFunCtx);
-                } else {
+                }
+                else {
                     throw new CommandException(String.format("Command or form '%s' does not exist.", lCmdName), aStack);
                 }
-            } else if (lCmdCandidate instanceof Lambda) {
+            }
+            else if (lCmdCandidate instanceof Lambda) {
                 // Immediately execute the lambda.
                 final Lambda lFun = (Lambda) lCmdCandidate;
                 final IContext lFunCtx = lFun.createContext(lData, 1, lLstSize);
                 aStack.push(lFun.getExpr(), lFunCtx);
-            } else {
+            }
+            else {
                 // Error, name of the command should be a string or a lambda.
                 if (lCmdCandidate == null)
                     throw new CommandException(String.format("The command name should evaluate to a string or a lambda. Found null."), aStack);
                 else
-                    throw new CommandException(String.format("The command name should evaluate to a string or a lambda.\nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
+                    throw new CommandException(String.format("The command name should evaluate to a string or a lambda.%nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
             }
-        } else {
+        }
+        else {
             // Error, the list does not contain a command.
             throw new CommandException(String.format("The expression '%s' cannot be executed.", lLstExpr), aStack);
         }
@@ -848,7 +872,8 @@ class WhileHandler
                         // We evaluate the body.
                         aStack.push(lLstExpr.get(2), lCtx);
                         return;
-                    } else {
+                    }
+                    else {
                         // While expression without body.
                         // Move to slot 0 to receive the result of boolean evaluation.
                         aFrame.setDataPtr(0);
@@ -856,7 +881,8 @@ class WhileHandler
                         aStack.push(lLstExpr.get(1), lCtx);
                         return;
                     }
-                } else {
+                }
+                else {
                     // Done.
                     aFrame.setResult(lData[1]);
                     return;
@@ -905,12 +931,14 @@ class AndHandler
                     // We shortcut the evaluation if we find a false value.
                     // We can stop on the first false value we encounter.
                     aFrame.setResult(Boolean.FALSE);
-                } else {
+                }
+                else {
                     if (lDataPtr < (lLstSize - 1)) {
                         // There are still some and-expressions to evaluate, so we
                         // evaluate the next one.
                         aStack.push(lLstExpr.get(lDataPtr + 1), lCtx);
-                    } else {
+                    }
+                    else {
                         // We evaluated all expressions, and the all evaluated
                         // to true.
                         aFrame.setResult(Boolean.TRUE);
@@ -956,12 +984,14 @@ class OrHandler
                     // We shortcut the evaluation if we find a true value.
                     // We can stop on the first true value we encounter.
                     aFrame.setResult(Boolean.TRUE);
-                } else {
+                }
+                else {
                     if (lDataPtr < (lLstSize - 1)) {
                         // There are still some and-expressions to evaluate, so we
                         // evaluate the next one.
                         aStack.push(lLstExpr.get(lDataPtr + 1), lCtx);
-                    } else {
+                    }
+                    else {
                         // We evaluated all expressions, and the all evaluated
                         // to false.
                         aFrame.setResult(Boolean.FALSE);
@@ -1096,10 +1126,12 @@ class SetHandler
         if (lLstSize == 2) {
             // Variant (xxx name=value)
             aFrame.setHandler(PAIR_HANDLER);
-        } else if (lLstSize == 3) {
+        }
+        else if (lLstSize == 3) {
             // Variant (xxx name value)
             aFrame.setHandler(COUPLE_HANDLER);
-        } else {
+        }
+        else {
             throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lLstExpr.get(0), lLstExpr.get(0)), aStack);
         }
     }
@@ -1125,7 +1157,7 @@ class LetHandler
 
         // Check the type of the list of bindings.
         if (!(lBindings instanceof List))
-            throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).\nThe first parameter should be a list of bindings but encountered an instance of type '%s'.", lLstExpr.get(0), lLstExpr.get(0), lBindings == null ? "null" : lBindings.getClass().getCanonicalName()), aStack);
+            throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).%nThe first parameter should be a list of bindings but encountered an instance of type '%s'.", lLstExpr.get(0), lLstExpr.get(0), lBindings == null ? "null" : lBindings.getClass().getCanonicalName()), aStack);
 
         // Allocate space for all new bindings and also the expression.
         aFrame.allocateData(((List) lBindings).size() + 1);
@@ -1155,7 +1187,8 @@ class LetHandler
                 final String lName = (String) lBinding;
                 aFrame.pushData(new Pair(lName, null));
                 if (letrec) lCtx.defBinding(lName, null);
-            } else if (lBinding instanceof List || lBinding instanceof Pair) {
+            }
+            else if (lBinding instanceof List || lBinding instanceof Pair) {
                 Object lKey;
                 Object lValExpr;
 
@@ -1164,10 +1197,11 @@ class LetHandler
                     //
                     final List lBindingList = (List) lBinding;
                     if (lBindingList.size() != 2)
-                        throw new CommandException(String.format("The 'let' form should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list of length 2 of the form (var val)."), aStack);
+                        throw new CommandException(String.format("The 'let' form should have the format (let ((name val) | name=val ...) expr).%nEach binding should be a list of length 2 of the form (var val)."), aStack);
                     lKey = lBindingList.get(0);
                     lValExpr = lBindingList.get(1);
-                } else {
+                }
+                else {
                     // Variant name=value
                     //
                     final Pair lBindingPair = (Pair) lBinding;
@@ -1176,25 +1210,29 @@ class LetHandler
                 }
 
                 if (!(lKey instanceof String))
-                    throw new CommandException(String.format("The 'let' special should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list  of the form (var val).\nThe first element should be a string but encountered an instance of type '%s'.", lKey == null ? "null" : lKey.getClass().getCanonicalName()), aStack);
+                    throw new CommandException(String.format("The 'let' special should have the format (let ((name val) | name=val ...) expr).%nEach binding should be a list  of the form (var val).%nThe first element should be a string but encountered an instance of type '%s'.", lKey == null ? "null" : lKey.getClass().getCanonicalName()), aStack);
 
                 aStack.push(new Pair(lKey, lValExpr), lCtx);
-            } else {
-                throw new CommandException(String.format("The 'let' form should have the format (let ((name val) | name=val ...) expr).\nEach binding should be a list or a string or a pair but encountered an instance of type '%s'.", lBinding == null ? "null" : lBinding.getClass().getCanonicalName()), aStack);
             }
-        } else if (lDataPtr == (lData.length - 1)) {
+            else {
+                throw new CommandException(String.format("The 'let' form should have the format (let ((name val) | name=val ...) expr).%nEach binding should be a list or a string or a pair but encountered an instance of type '%s'.", lBinding == null ? "null" : lBinding.getClass().getCanonicalName()), aStack);
+            }
+        }
+        else if (lDataPtr == (lData.length - 1)) {
             // All bindings were evaluated. Now we can go for the body.
             if (letrec && (lDataPtr > 0)) {
                 Pair lBindingPair = (Pair) lData[lDataPtr - 1];
                 lCtx.defBinding((String) lBindingPair.getLeft(), lBindingPair.getRight());
-            } else {
+            }
+            else {
                 for (int i = 0; i < (lData.length - 1); i++) {
                     Pair lBindingPair = (Pair) lData[i];
                     lCtx.defBinding((String) lBindingPair.getLeft(), lBindingPair.getRight());
                 }
             }
             aStack.push(lLstExpr.get(2), lCtx);
-        } else {
+        }
+        else {
             // Done evaluating everyting.
             aFrame.setResult(lData[lData.length - 1]);
         }
@@ -1224,7 +1262,8 @@ class GetHandler
         if (lDataPtr == 0) {
             // Evaluate the expression.
             aStack.push(lLstExpr.get(1), lCtx);
-        } else {
+        }
+        else {
             // Pick up the result.
             // Check the type of the name.
             if (!(lData[0] instanceof String))
@@ -1327,7 +1366,8 @@ class DefunHandler
             // Evaluate the lambda.
             // Bind the resulting lambda to the name GLOBALLY!
             aStack.push(lLambdaMacro, lCtx);
-        } else {
+        }
+        else {
             lCtx.getRootContext().defBinding((String) lName, lData[0]);
             aFrame.setResult(lData[0]);
         }
@@ -1359,7 +1399,8 @@ class TimerHandler
             aFrame.pushData(lStart);
             aStack.push(lLstExpr.get(1), lCtx);
             return;
-        } else {
+        }
+        else {
             long lStop = System.currentTimeMillis();
             long lStart = (Long) lData[0];
             aFrame.setResult(lStop - lStart);
@@ -1407,15 +1448,18 @@ class MacroHandler
                 final List lArgs = new ArrayList(lLstExpr.size());
                 lArgs.addAll(lLstExpr);
                 aStack.push(lMacro.execute(aEval, lCtx, lArgs.toArray()), lCtx);
-            } catch (CommandException e) {
+            }
+            catch (CommandException e) {
                 Eval2.EvalStack lNestedStack = e.getStack();
                 e.setStack(aStack.merge(lNestedStack));
                 throw e;
-            } catch (Exception e) {
-                // A non-CommandException is converted into a command exception here.
-                throw new CommandException(String.format("Macro '%s' failed.\n%s", lLstExpr.get(0), e.getMessage()), aStack);
             }
-        } else {
+            catch (Exception e) {
+                // A non-CommandException is converted into a command exception here.
+                throw new CommandException(String.format("Macro '%s' failed.%n%s", lLstExpr.get(0), e.getMessage()), aStack);
+            }
+        }
+        else {
             aFrame.setResult(lData[0]);
         }
     }

@@ -64,7 +64,8 @@ public class TeaLibrary {
             MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
             digest.update(aString.getBytes());
             return digest.digest();
-        } catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e) {
             throw new CommandException("Cannot calculate MD5 hash.");
         }
     }
@@ -110,7 +111,8 @@ class TeaEncrypter {
             String lTxtCipherPiece = aCipherText.substring(k, j);
             try {
                 lLongCipherPieces.add(Long.decode("0x" + lTxtCipherPiece));
-            } catch (NumberFormatException numberformatexception) {
+            }
+            catch (NumberFormatException numberformatexception) {
                 return "";
             }
         }

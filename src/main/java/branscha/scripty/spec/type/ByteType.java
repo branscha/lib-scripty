@@ -26,25 +26,29 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.IContext;
 
-public class ByteType
-        implements ITypeSpec<Byte> {
+public class ByteType implements ITypeSpec<Byte> {
+
     public String getSpecName() {
         return "Byte";
     }
 
     public Byte guard(Object aArg, IContext aCtx)
     throws TypeSpecException {
-        if (aArg instanceof ByteType) {
+        if (aArg instanceof Byte) {
             return (Byte) aArg;
-        } else if (aArg instanceof Number) {
+        }
+        else if (aArg instanceof Number) {
             return ((Number) aArg).byteValue();
-        } else if (aArg instanceof String) {
+        }
+        else if (aArg instanceof String) {
             try {
                 return Byte.parseByte((String) aArg);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
             }
-        } else {
+        }
+        else {
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
         }
     }

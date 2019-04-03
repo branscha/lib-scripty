@@ -78,7 +78,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return BIGDECIMAL_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -89,7 +90,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return INTEGER_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -100,7 +102,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return BIGINTEGER_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -111,7 +114,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return BOOLEAN_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -122,7 +126,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return BYTE_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -149,7 +154,8 @@ public class ArgListBuilderUtil {
                 int lMax = (Integer) aArgs[3];
 
                 return new TypeTuple(new CheckedListType(lSpec, lMin, lMax), lMappings);
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -160,7 +166,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return DOUBLE_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -171,7 +178,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return FLOAT_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -196,7 +204,8 @@ public class ArgListBuilderUtil {
                 ITypeSpec lSpec = (ITypeSpec) lTypeCandidate;
 
                 return new TypeTuple(new InstanceOrBinding(lSpec), lMappings);
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -215,11 +224,13 @@ public class ArgListBuilderUtil {
                 try {
                     Class lClass = Class.forName(lClassName);
                     return new TypeTuple(new InstanceType(lClass, lNullAllowed), null);
-                } catch (ClassNotFoundException e) {
+                }
+                catch (ClassNotFoundException e) {
                     String lMsg = String.format("Could not find class '%s' for type Instance [CLASS].", lClassName);
                     throw new CommandException(lMsg);
                 }
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -234,7 +245,8 @@ public class ArgListBuilderUtil {
                 aArgs = ANY_ARGLIST.guard(aArgs, aCtx);
                 boolean lNullAllowed = (Boolean) aArgs[1];
                 return new TypeTuple(new AnyType(lNullAllowed), null);
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -250,7 +262,8 @@ public class ArgListBuilderUtil {
                 int lMin = (Integer) aArgs[1];
                 int lMax = (Integer) aArgs[2];
                 return new TypeTuple(new IntegerRangeType(lMin, lMax), null);
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -261,7 +274,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return LONG_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -272,7 +286,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return SHORT_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -283,7 +298,8 @@ public class ArgListBuilderUtil {
             try {
                 NOARGS.guard(aArgs, aCtx);
                 return STRING_TUPLE;
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -304,7 +320,8 @@ public class ArgListBuilderUtil {
                     if (lTuple.getY() != null) lMappings.putAll(lTuple.getY());
                 }
                 return new TypeTuple(new OrType(lSpecs), lMappings);
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -324,21 +341,26 @@ public class ArgListBuilderUtil {
                     if (ITypeSpec.class.isAssignableFrom(lClass)) {
                         ITypeSpec lSpec = (ITypeSpec) lClass.newInstance();
                         return new TypeTuple(lSpec, null);
-                    } else {
+                    }
+                    else {
                         String lMsg = String.format("The class '%s' does not seem to implement ITypeSpec.", lClassName);
                         throw new CommandException(lMsg);
                     }
-                } catch (ClassNotFoundException e) {
+                }
+                catch (ClassNotFoundException e) {
                     String lMsg = String.format("Could not find class '%s'.", lClassName);
                     throw new CommandException(lMsg);
-                } catch (InstantiationException e) {
-                    String lMsg = String.format("Could not instantiate the custom typespec '%s'.", lClassName);
-                    throw new CommandException(lMsg);
-                } catch (IllegalAccessException e) {
+                }
+                catch (InstantiationException e) {
                     String lMsg = String.format("Could not instantiate the custom typespec '%s'.", lClassName);
                     throw new CommandException(lMsg);
                 }
-            } catch (ArgSpecException e) {
+                catch (IllegalAccessException e) {
+                    String lMsg = String.format("Could not instantiate the custom typespec '%s'.", lClassName);
+                    throw new CommandException(lMsg);
+                }
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -357,7 +379,8 @@ public class ArgListBuilderUtil {
                     lValues.add((String) aArgs[i]);
                 }
                 return new TypeTuple(new EnumType(lValues), null);
-            } catch (ArgSpecException e) {
+            }
+            catch (ArgSpecException e) {
                 throw new CommandException(e.getMessage());
             }
         }
@@ -366,7 +389,8 @@ public class ArgListBuilderUtil {
     static {
         try {
             typeProcessor.addLibraryClasses(TypeCommands.class);
-        } catch (ExtensionException e) {
+        }
+        catch (ExtensionException e) {
             throw new Error("Internal Scripty error, could not initialize the internal type system.");
         }
     }
@@ -434,8 +458,9 @@ public class ArgListBuilderUtil {
                 lMappings.put(lArgName, new IndexedMapping(i + 1));
 
                 i++;
-            } catch (ReplEngineException e) {
-                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
+            }
+            catch (ReplEngineException e) {
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.%n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -461,8 +486,9 @@ public class ArgListBuilderUtil {
 
                 i++;
                 j++;
-            } catch (ReplEngineException e) {
-                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
+            }
+            catch (ReplEngineException e) {
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.%n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -488,8 +514,9 @@ public class ArgListBuilderUtil {
 
                 i++;
                 k++;
-            } catch (ReplEngineException e) {
-                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
+            }
+            catch (ReplEngineException e) {
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.%n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -532,8 +559,9 @@ public class ArgListBuilderUtil {
                 lMappings.put(lArgName, new IndexedMapping(i + 1));
 
                 i++;
-            } catch (ReplEngineException e) {
-                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
+            }
+            catch (ReplEngineException e) {
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.%n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -557,8 +585,9 @@ public class ArgListBuilderUtil {
 
                 i++;
                 k++;
-            } catch (ReplEngineException e) {
-                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
+            }
+            catch (ReplEngineException e) {
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.%n%s", lArgType, e.getMessage())));
             }
         }
 
@@ -576,8 +605,9 @@ public class ArgListBuilderUtil {
                 if (lTypeMappings != null) lMappings.putAll(lTypeMappings);
                 // Offset with 1, the mappings should skip element 0 which is the name of the command.
                 lMappings.put(lArgName, new PartialMapping(i + 1, -1));
-            } catch (ReplEngineException e) {
-                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.\n%s", lArgType, e.getMessage())));
+            }
+            catch (ReplEngineException e) {
+                throw new ArgSpecException(String.format(String.format("Badly formed type expression '%s' encountered.%n%s", lArgType, e.getMessage())));
             }
 
         }

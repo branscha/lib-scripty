@@ -38,7 +38,8 @@ public class SetResultMapping implements IResultMapping {
     throws ResultMappingException {
         try {
             aContext.setBinding(binding, aResult);
-        } catch (CommandException e) {
+        }
+        catch (CommandException e) {
             throw new ResultMappingException(String.format("The result could not be bound to '%s' in the context because the binding does not exist.", binding));
         }
     }
