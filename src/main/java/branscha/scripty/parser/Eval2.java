@@ -24,12 +24,16 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
+import sun.misc.CEFormatException;
+
+import java.awt.color.CMMException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
 
 public class Eval2 extends AbstractEval {
+
     public Eval2() {
         this(new BasicContext());
     }
@@ -282,11 +286,12 @@ public class Eval2 extends AbstractEval {
     private final EvalEvent EVENT = new EvalEvent(this);
 
     public static interface EvalListener {
-        void startEval(EvalEvent aEvent);
 
-        void stepEvent(EvalEvent aEvent);
+        void startEval(EvalEvent aEvent) throws CommandException;
 
-        void finishedEval(EvalEvent aEvent);
+        void stepEvent(EvalEvent aEvent) throws CommandException;
+
+        void finishedEval(EvalEvent aEvent) throws CommandException;
 
         void receivedException(EvalEvent aEvent);
     }
@@ -308,21 +313,21 @@ public class Eval2 extends AbstractEval {
         listeners = lListeners.toArray(listeners);
     }
 
-    private void fireStepEvent(EvalStack aStack) {
+    private void fireStepEvent(EvalStack aStack) throws CommandException {
         EVENT.stack = aStack;
         EVENT.result = null;
         EVENT.exception = null;
         for (EvalListener lListener : listeners) lListener.stepEvent(EVENT);
     }
 
-    private void fireStartEval(EvalStack aStack) {
+    private void fireStartEval(EvalStack aStack) throws CommandException {
         EVENT.stack = aStack;
         EVENT.result = null;
         EVENT.exception = null;
         for (EvalListener lListener : listeners) lListener.startEval(EVENT);
     }
 
-    private void fireFinishedEval(EvalStack aStack, Object aResult) {
+    private void fireFinishedEval(EvalStack aStack, Object aResult) throws CommandException {
         EVENT.stack = aStack;
         EVENT.result = aResult;
         EVENT.exception = null;
@@ -524,8 +529,8 @@ public class Eval2 extends AbstractEval {
     }
 }
 
-class AtomicHandler
-        implements Eval2.IFrameHandler {
+class AtomicHandler implements Eval2.IFrameHandler {
+
     public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         // No stack frame space needed for atoms.
@@ -580,8 +585,8 @@ class PairHandler
     }
 }
 
-class StandardHandler
-        implements Eval2.IFrameHandler {
+class StandardHandler implements Eval2.IFrameHandler {
+
     private CommandRepository commands = new CommandRepository();
 
     public StandardHandler() {

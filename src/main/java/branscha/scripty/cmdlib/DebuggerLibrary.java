@@ -38,17 +38,17 @@ import java.util.List;
                 @ScriptyStdArgList(name = "one argument", fixed = {@ScriptyArg(name = "arg", type = "Any")}),
                 @ScriptyStdArgList(name = "no arguments"),
                 @ScriptyStdArgList(name = "no arguments + quiet option", named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")}),
-                @ScriptyStdArgList(name = "breakpoint", fixed = {@ScriptyArg(name = "arg", type = "Instance EvalTrace$IBreakpoint")}),
+                @ScriptyStdArgList(name = "breakpoint", fixed = {@ScriptyArg(name = "arg", type = "Instance branscha.scripty.parser.EvalTrace$IBreakpoint")}),
                 @ScriptyStdArgList(name = "name", fixed = {@ScriptyArg(name = "name", type = "String")}),
                 @ScriptyStdArgList(name = "name + bool", fixed = {@ScriptyArg(name = "name", type = "String"), @ScriptyArg(name = "bool", type = "Boolean")}),
                 @ScriptyStdArgList(name = "string + name", fixed = {@ScriptyArg(name = "str", type = "String")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
                 @ScriptyStdArgList(name = "posint + name", fixed = {@ScriptyArg(name = "posint", type = "IntegerRange min=0")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
                 @ScriptyStdArgList(name = "obj + name", fixed = {@ScriptyArg(name = "obj", type = "Any")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "breakpoint + name", fixed = {@ScriptyArg(name = "bpt", type = "Instance EvalTrace$IBreakpoint")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
+                @ScriptyStdArgList(name = "breakpoint + name", fixed = {@ScriptyArg(name = "bpt", type = "Instance branscha.scripty.parser.EvalTrace$IBreakpoint")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
         },
         var = {
                 @ScriptyVarArgList(name = "at least one argument", vararg = @ScriptyArg(name = "arg", type = "Any"), minLength = 1),
-                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance EvalTrace$IBreakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
+                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance branscha.scripty.parser.EvalTrace$IBreakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
         }
 )
 public class DebuggerLibrary {
@@ -57,23 +57,41 @@ public class DebuggerLibrary {
     private static final String MSG_NOSTACK = "No current stack.";
     private static final String MSG_NOFRAME = "No current frame.";
 
+    /**
+     * The evaluation state for the expression being debugged.
+     * In the current implementation there is only one such instance so only one expression
+     * can be degugged at a time.
+     */
     private EvalTrace trace = null;
     private EvalTrace.BreakpointSet breakpoints = null;
     private int breakpointcounter = 0;
 
-    private static List quoteMacro(String intName, List anExpr)
+    /**
+     * Macro to replace a command with an alternative command and quote the arguments to prevent
+     * automatic evaluation. Example (cmd (+ 1 2)) => (cmd-other (quote (+ 1 2))).
+     * The replacement command will receive the original argument AST.
+     *
+     * @param newCmdName The replacement command name.
+     * @param expr The complete original expression.
+     * @return An S-expression with the new command and quoted argument list.
+     * @throws CommandException
+     */
+    private static List renameAndQuoteArgs(String newCmdName, List<Object> expr)
     throws CommandException {
-        List<? super Object> lMacro = new ArrayList<Object>();
-        lMacro.add(intName);
 
-        List<? super Object> lQuoted = new ArrayList<Object>();
-        // Quote the first argument.
-        lQuoted.add("quote");
-        lQuoted.add(anExpr.get(1));
-        lMacro.add(lQuoted);
+        // Construct the quoted argument list.
+        List<? super Object> quotedArgs = new ArrayList<Object>();
+        quotedArgs.add("quote");
+        quotedArgs.add(expr.get(1));
+
+        // Construct the replacement expression.
+        final List<? super Object> macro = new ArrayList<Object>();
+        macro.add(newCmdName);
+        macro.add(quotedArgs);
+
         // Copy the other arguments as-is.
-        lMacro.addAll(anExpr.subList(2, anExpr.size()));
-        return lMacro;
+        macro.addAll(expr.subList(2, expr.size()));
+        return macro;
     }
 
     private void checkTrace()
@@ -86,22 +104,27 @@ public class DebuggerLibrary {
         if (breakpoints == null) throw new CommandException(MSG_NOBREAKPOINTS);
     }
 
-    // Start the debugger with the expression.
-    // The debugger is halted in the beginning of evaluation.
-    // Starting a new debugging session wil end the previous session if one was active.
-    //
-    // Macro needed to prevent evaluation of the first argument.
-    // Applies following transformation:
-    // (dbg-expr <expr>) ==> (dbg-expr-x (quote <expr>))
-    //
+    /**
+     * Start the debugger with the expression.
+     * The debugger is halted in the beginning of evaluation.
+     * Starting a new debugging session wil end the previous session if one was active.
+     * Macro needed to prevent evaluation of the first argument.
+     * Applies following transformation:
+     * <br>
+     * <code>(dbg-expr &lt;expr>) ==> (dbg-expr-x (quote &lt;expr>))</code>
+     *
+     * @param aArgs
+     * @return
+     * @throws CommandException
+     */
     @ScriptyMacro(name = "dbg-expr")
     @ScriptyRefArgList(ref = "at least one argument")
     public static List dbgExpr(Object[] aArgs)
     throws CommandException {
-        return quoteMacro("dbg-expr-x", Arrays.asList(aArgs));
+        return renameAndQuoteArgs("dbg-expr-x", Arrays.asList(aArgs));
     }
 
-    // Evaluate an expression in the context of the top level stack frame.
+    // Evaluate an expression in the context of the current stack frame.
     // This allows you to examine or modify the frame context during debugging.
     // Use dbg-ctx to print this context and to examine the values.
     //
@@ -113,7 +136,7 @@ public class DebuggerLibrary {
     @ScriptyRefArgList(ref = "at least one argument")
     public static List dbgEval(Object[] aArgs)
     throws CommandException {
-        return quoteMacro("dbg-eval-x", Arrays.asList(aArgs));
+        return renameAndQuoteArgs("dbg-eval-x", Arrays.asList(aArgs));
     }
 
     // Create a breakpoint that breaks when a condition is met.
@@ -130,26 +153,26 @@ public class DebuggerLibrary {
     @ScriptyRefArgList(ref = "at least one argument")
     public static List bptWhen(Object[] aArgs)
     throws CommandException {
-        return quoteMacro("bpt-when-x", Arrays.asList(aArgs));
+        return renameAndQuoteArgs("bpt-when-x", Arrays.asList(aArgs));
     }
 
     // Internal (effective) command.
     //
     @ScriptyCommand(name = "dbg-expr-x")
     @ScriptyRefArgList(ref = "one argument")
-    public void dbgExprInternal(IEval aEval, IContext aContext, @ScriptyParam("arg") Object aExpr) {
+    public void dbgExprInternal(IEval currentEval, IContext context, @ScriptyParam("arg") Object expr) {
         // Halt the previous debug session in order not
         // to clutter up our debugger.
         if (trace != null) trace.terminate();
 
         // Now create a new one.
-        final Eval2 lEval = new Eval2();
-        lEval.setCommandRepo(aEval.getCommandRepo());
-        lEval.setMacroRepo(aEval.getMacroRepo());
-        lEval.setContext(aContext);
+        final Eval2 dbgEval = new Eval2();
+        dbgEval.setCommandRepo(currentEval.getCommandRepo());
+        dbgEval.setMacroRepo(currentEval.getMacroRepo());
+        dbgEval.setContext(context);
 
         // Create a new tracer and save it.
-        trace = new EvalTrace(lEval, aExpr);
+        trace = new EvalTrace(dbgEval, expr);
 
         // Wire up the breakpoints.
         if (breakpoints == null) breakpoints = trace.getBreakpoints();

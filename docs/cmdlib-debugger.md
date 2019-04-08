@@ -45,7 +45,7 @@ Start the debugger with the expression. The debugger is halted in the beginning 
 
 **dbg-eval**
 
-Evaluate an expression in the context of the top level stack frame. This allows you to examine or modify the frame context during debugging. Use dbg-ctx to print this context and to examine the values. While you are debugging you can execute stuff in the current context where the debugger is halted.
+Evaluate an expression in the context of the current stack frame. This allows you to examine or modify the frame context during debugging. Use dbg-ctx to print this context and to examine the values. While you are debugging you can execute stuff in the current context where the debugger is halted.
 
 This command does not change the evaluation of the current execution, it allows to examine the context.
 

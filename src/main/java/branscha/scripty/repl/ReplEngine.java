@@ -48,8 +48,8 @@ import java.util.List;
  * nice formatting.</li>
  * </ul>
  */
-public class ReplEngine
-        implements IExtensions {
+public class ReplEngine implements IExtensions {
+
     private ExtensionRepositoryBuilder extensions = new ExtensionRepositoryBuilder();
 
     public static final String INPUT = "*input";

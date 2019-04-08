@@ -40,8 +40,8 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExtensionRepositoryBuilder
-        implements IExtensions {
+public class ExtensionRepositoryBuilder implements IExtensions {
+
     private CommandRepository commandRepo;
     private CommandRepository macroRepo;
 

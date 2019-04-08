@@ -111,7 +111,7 @@ public class FileLibrary {
                     @ScriptyArg(name = "files", type = "Boolean", value = "true", optional = true),
                     @ScriptyArg(name = "dirs", type = "Boolean", value = "true", optional = true),
                     @ScriptyArg(name = "grep", type = "String", value = ".*", optional = true),
-                    @ScriptyArg(name = "exec", type = "Instance Lambda nullAllowed=true", value = "{null}", optional = true),
+                    @ScriptyArg(name = "exec", type = "Instance branscha.scripty.parser.Lambda nullAllowed=true", value = "{null}", optional = true),
                     @ScriptyArg(name = "recursive", type = "Boolean", value = "false", optional = true)
             })
     public Object[] ls(

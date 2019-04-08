@@ -30,10 +30,11 @@ import java.util.List;
 
 /**
  * Debugger.
- * Protocol: consructor - step* - getresult.
+ * Protocol: consructor - step* - getResult.
  * - Resultaat *moet* opgehaald worden, de eval wacht op een step of een getresult.
  */
 public class EvalTrace {
+
     private Eval2 eval;
     private Eval2.EvalStack stack;
 
@@ -63,6 +64,7 @@ public class EvalTrace {
     }
 
     public static class BreakpointSet {
+
         private List<IBreakpoint> breakpoints = new ArrayList<IBreakpoint>();
 
         public void addBreakpoint(IBreakpoint aBpt) {
@@ -119,8 +121,8 @@ public class EvalTrace {
         }
     }
 
-    public static class BreakpointFunc
-            implements EvalTrace.IBreakpoint {
+    public static class BreakpointFunc implements EvalTrace.IBreakpoint {
+
         private String name;
         private String func;
         private boolean enabled = true;
@@ -162,8 +164,8 @@ public class EvalTrace {
         }
     }
 
-    public static class BreakpointWhen
-            implements IBreakpoint {
+    public static class BreakpointWhen implements IBreakpoint {
+
         private String name;
         private Object lWhenExpr;
         private IEval eval = new Eval();
@@ -199,8 +201,8 @@ public class EvalTrace {
         }
     }
 
-    public static class BreakpointStackdepth
-            implements IBreakpoint {
+    public static class BreakpointStackdepth implements IBreakpoint {
+
         private String name;
         private boolean enabled = true;
         private int depth;
@@ -230,8 +232,8 @@ public class EvalTrace {
         }
     }
 
-    public static class BreakpointNot
-            implements IBreakpoint {
+    public static class BreakpointNot implements IBreakpoint {
+
         private String name;
         private boolean enabled = true;
         private IBreakpoint bp;
@@ -262,8 +264,8 @@ public class EvalTrace {
         }
     }
 
-    public static class BreakpointAnd
-            implements IBreakpoint {
+    public static class BreakpointAnd implements IBreakpoint {
+
         private String name;
         private boolean enabled = true;
         private List<IBreakpoint> bps;
@@ -300,8 +302,8 @@ public class EvalTrace {
         }
     }
 
-    public static class BreakpointOr
-            implements IBreakpoint {
+    public static class BreakpointOr implements IBreakpoint {
+
         private String name;
         private boolean enabled = true;
         private List<IBreakpoint> bps;
@@ -344,6 +346,7 @@ public class EvalTrace {
         // Add an event listener to it.
         eval = aEval;
         eval.addEvalListener(new Eval2.EvalListener() {
+
             public void finishedEval(Eval2.EvalEvent aEvent) {
                 synchronized (EvalTrace.this) {
                     try {
@@ -355,7 +358,7 @@ public class EvalTrace {
                         result = aEvent.getResult();
                         stack = aEvent.getStack();
                         exception = null;
-                        // Awake the debugger.
+                        // Awake the debugger (after we release the lock on EvalTrace).
                         EvalTrace.this.notifyAll();
                         // The eval must wait, otherwise it might attempt
                         // to evaluate a brand new expression which will destroy the result of
@@ -380,9 +383,9 @@ public class EvalTrace {
                         exception = null;
                         // The eval makes its stack available for the debugger.
                         stack = aEvent.getStack();
-                        // It wakes up the debugger.
+                        // It wakes up the debugger (after we release the lock on EvalTrace).
                         EvalTrace.this.notifyAll();
-                        // The eval puts itself in wait on te trace manager.
+                        // The eval puts itself in wait on te trace manager, release the lock.
                         EvalTrace.this.wait();
                         // If we pass through the wait method, the eval kicks into action.
                         halted = false;
@@ -400,7 +403,7 @@ public class EvalTrace {
                         halted = true;
                         // Provide the stack for the debugger to examine.
                         stack = aEvent.getStack();
-                        // Wake up the debugger.
+                        // Wake up the debugger (after we release the lock on EvalTrace)
                         EvalTrace.this.notifyAll();
                         // If there are more steps to take, we let the eval wait a bit.
                         // If this was the last step, we can let the eval worker finish its job
@@ -675,7 +678,6 @@ public class EvalTrace {
             }
             else step();
     }
-
 
     public synchronized void stepOut() {
         // First we run until the current frame has been evaluated.

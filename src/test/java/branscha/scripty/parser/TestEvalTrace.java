@@ -37,18 +37,19 @@ public class TestEvalTrace {
     @Test
     public void testTrace()
     throws CommandException, ExtensionException, InterruptedException {
+
         Parser parser = new Parser();
         Eval2 eval = new Eval2();
 
-        ExtensionRepositoryBuilder lBuilder = new ExtensionRepositoryBuilder();
-        lBuilder.addLibraryClasses(MathLibrary.class);
-        eval.setMacroRepo(lBuilder.getMacroRepository());
-        eval.setCommandRepo(lBuilder.getCommandRepository());
+        ExtensionRepositoryBuilder extensionBuilder = new ExtensionRepositoryBuilder();
+        extensionBuilder.addLibraryClasses(MathLibrary.class);
+        eval.setMacroRepo(extensionBuilder.getMacroRepository());
+        eval.setCommandRepo(extensionBuilder.getCommandRepository());
 
         eval.eval(parser.parseExpression("(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))"));
-        Object lExpr = parser.parseExpression("(fac 3)");
+        Object expr = parser.parseExpression("(fac 3)");
 
-        EvalTrace trace = new EvalTrace(eval, lExpr);
+        EvalTrace trace = new EvalTrace(eval, expr);
         while (trace.hasMoreSteps()) {
             System.out.println(trace.getStack());
             trace.step();
@@ -58,7 +59,7 @@ public class TestEvalTrace {
         Thread.sleep(500);
         Object lResult = trace.getResult();
         Assert.assertEquals(new BigDecimal("6"), lResult);
-        //trace.terminate();
+//        trace.terminate();
     }
 
 }
