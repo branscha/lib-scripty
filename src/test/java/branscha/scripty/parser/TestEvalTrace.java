@@ -46,7 +46,8 @@ public class TestEvalTrace {
     ExtensionRepositoryBuilder extBldr;
 
     @Before
-    public void setup() throws ExtensionException{
+    public void setup()
+    throws ExtensionException {
         parser = new Parser();
         eval = new Eval2();
 
@@ -85,7 +86,7 @@ public class TestEvalTrace {
         EvalTrace trace = new EvalTrace(eval, expr);
 
         // Take some steps (but not all).
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             trace.step();
         }
 
@@ -96,5 +97,56 @@ public class TestEvalTrace {
         assertFalse(trace.hasResult());
         assertTrue(trace.isExcepted());
         assertThat(trace.getException().getMessage(), containsString("EvalTrace/010"));
+    }
+
+    @Test
+    public void testStack() {
+        String[] stacks = {
+                "[+, 1, 2]",
+                "+\n[+, 1, 2]:0 ~ [null, null, null]",
+                "+ ==> +\n[+, 1, 2]:0 ~ [null, null, null]",
+                "[+, 1, 2]:1 ~ [+, null, null]",
+                "1\n[+, 1, 2]:1 ~ [+, null, null]",
+                "1 ==> 1\n[+, 1, 2]:1 ~ [+, null, null]",
+                "[+, 1, 2]:2 ~ [+, 1, null]",
+                "2\n[+, 1, 2]:2 ~ [+, 1, null]",
+                "2 ==> 2\n[+, 1, 2]:2 ~ [+, 1, null]",
+                "[+, 1, 2]:3! ~ [+, 1, 2]"
+        };
+
+        Object expr = parser.parseExpression("(+ 1 2)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+
+        assertEquals(stacks[0], trace.getStack().toString().trim());
+        for (int step = 1; step < stacks.length; step++) {
+            trace.step();
+            assertEquals(stacks[step], trace.getStack().toString().trim());
+
+            assertEquals(false, trace.isTerminated());
+            assertFalse(trace.hasResult());
+            assertFalse(trace.isExcepted());
+        }
+        trace.step();
+
+        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        Object lResult = trace.getResult();
+        assertEquals(new BigDecimal("3"), lResult);
+    }
+
+    @Test
+    public void testReset() {
+        Object expr = parser.parseExpression("(+ 1 2)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+        for (int i = 0; i < 3; i++) trace.step();
+        assertEquals("[+, 1, 2]:1 ~ [+, null, null]", trace.getStack().toString().trim());
+
+        trace.reset();
+        assertEquals("[+, 1, 2]:0 ~ [null, null, null]", trace.getStack().toString().trim());
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
     }
 }
