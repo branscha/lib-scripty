@@ -86,16 +86,8 @@ Man pages
 * [Embedding Scripty](docs/man-embedding-scripty.md)
 * [Scripty Syntax](docs/man-scripty-syntax.md)
 
-#### 6.13. Record Editor Library
-
-A record editor that allows key-value pair editing in a GUI property editor.
-
-#### 6.14. String Library
-
-### 7. Create a Scripty Command or Macro
-
-### 8. Using the Command Line
-#### 8.1. Optional Outer Parentheses
+### Using the Command Line
+#### Optional Outer Parentheses
 
 Outer parenthesis can be omitted on the command line as a convenience for short commands. Using the parenthesis is off course allowed, it is the only way to enter nested expressions.
 
@@ -110,7 +102,7 @@ Hello World
 Hello World
 ```
 
-#### 8.2. Multi Line Commands
+#### Multi Line Commands
 
 Commands can be spread over multiple lines. This can happen automatically when the command is not complete. You can also ask for this explicitly by terminating the line with a backslash. When you want to quit the multi line command without execution you can issue the break command. It is not really a command since it is directly interpreted by the read-eval-print loop. So you cannot use this command in external scripts.
 
@@ -141,6 +133,6 @@ Example 3: Terminating a multi line command without execution.
 Canceling the command.
 ```
 
-#### 8.3.print
+#### print
 
 Print stuff on the standard output. Scripty does not automatically print the result of an evaluation on the command line, often you have to use the print command explicitly. It is not uncommon for a command to show something on the standard output and to have something else as the result of the evaluation.

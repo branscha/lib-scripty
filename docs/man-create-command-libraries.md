@@ -1,5 +1,5 @@
-### 7. Create a Scripty Command or Macro
-#### 7.1. Defining commands
+### Create a Scripty Command or Macro
+#### Defining commands
 
 **Static methods**. Scripty will scan the static methods of the class for annotations and transform each annotated method in a Command or macro.
 
@@ -22,7 +22,7 @@ If the command or macro name is not provided, the method name will be used autom
 @ScriptyMacro(name="macro-name")
 ```
 
-#### 7.2. Command arguments
+#### Command arguments
 
 Without parameter mappings the command invoker will look at the signature of the command method and provide following resources automatically. All other parameters will receive a null value.
 
@@ -31,15 +31,15 @@ Without parameter mappings the command invoker will look at the signature of the
 * IContext will receive the current context.
 * (CommandRep/MacroRepo)
 
-#### 7.3. Macro arguments
+#### Macro arguments
 
 The first list parameter will receive the expression. All other values will be set to null.
 
-### 10. Argument Specifications
+### Argument Specifications
 
 When writing your own commands, one of the tasks will be the validation of the command parameters, the types and consistency. This can be a repititive chore, the Scripty engine provides a number of annotations so that much of the checking can be done by the Scripty engine itself.
 
-#### 10.1. Annotations
+#### Annotations
 
 If an argument list specification will be used, the provided argument list will be converted in a normalized argument list where each argument has a fixed location, and default values will be provided. The normalized argument list will provide guarantees as specified by the argument list specification.
 
@@ -83,8 +83,8 @@ Nested expressions
 * CustomType "classname", add your own custom type specification. The class should implement ITypeSpec<T>. Your implementation class should have a default constructor.
 * TypeChain (String) (Integer) ..., worden na elkaar toegepast in volgorde. Dit kan nuttig zijn om eerst alles naar een string om te zetten met @ScriptyString en vervolgens de String naar iets anders om te zetten met bvb. een custom type.
 
-#### 10.2. Examples
-##### 10.2.1. Annotated static methods
+#### Examples
+##### Annotated static methods
 
 ```Java
 @ScriptyVarArgList(
@@ -106,7 +106,7 @@ public class MyCommands {
 }
 ```
 
-##### 10.2.2. Annotated command class
+##### Annotated command class
 
 ```Java
 @ScriptyVarArgList(
@@ -121,11 +121,11 @@ public class Add {
 }
 ```
 
-### 11. Parameter Mapping
+### Parameter Mapping
 
 These annotations are here to delegate the parameter mapping to the Scripty engine. Since Scripty is aware of the command line structure, it can map the parameters to the parameters of the command implementation.
 
-#### 11.1. Annotations
+#### Annotations
 
 Parameter mapping can be done if there is an argument list specification which names the arguments. The names can be used while annotating the command parameters.
 
@@ -145,7 +145,7 @@ These method annotations define what to do with the return value. Only one of th
 
 **@ScriptySetBinding("name")** It will change an existing binding, it will throw an exception if the binding does not exist.
 
-#### 11.2. Examples
+#### Examples
 
 ```
 @ScriptyStdArgList(

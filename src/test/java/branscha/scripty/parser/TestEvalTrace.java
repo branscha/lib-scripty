@@ -28,38 +28,73 @@ import branscha.scripty.ExtensionException;
 import branscha.scripty.cmdlib.MathLibrary;
 import branscha.scripty.repl.ExtensionRepositoryBuilder;
 import junit.framework.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.TreeSet;
+
+import static java.lang.Thread.sleep;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 
 public class TestEvalTrace {
+
+    Parser parser;
+    Eval2 eval;
+    ExtensionRepositoryBuilder extBldr;
+
+    @Before
+    public void setup() throws ExtensionException{
+        parser = new Parser();
+        eval = new Eval2();
+
+        extBldr = new ExtensionRepositoryBuilder();
+        extBldr.addLibraryClasses(MathLibrary.class);
+        eval.setMacroRepo(extBldr.getMacroRepository());
+        eval.setCommandRepo(extBldr.getCommandRepository());
+    }
+
     @Test
     public void testTrace()
-    throws CommandException, ExtensionException, InterruptedException {
-
-        Parser parser = new Parser();
-        Eval2 eval = new Eval2();
-
-        ExtensionRepositoryBuilder extensionBuilder = new ExtensionRepositoryBuilder();
-        extensionBuilder.addLibraryClasses(MathLibrary.class);
-        eval.setMacroRepo(extensionBuilder.getMacroRepository());
-        eval.setCommandRepo(extensionBuilder.getCommandRepository());
+    throws CommandException, InterruptedException {
 
         eval.eval(parser.parseExpression("(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))"));
         Object expr = parser.parseExpression("(fac 3)");
 
         EvalTrace trace = new EvalTrace(eval, expr);
+        int stepCounter = 0;
         while (trace.hasMoreSteps()) {
-            System.out.println(trace.getStack());
+            stepCounter++;
             trace.step();
         }
-        System.out.println(trace.getStack());
 
-        Thread.sleep(500);
+        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals(147, stepCounter);
         Object lResult = trace.getResult();
-        Assert.assertEquals(new BigDecimal("6"), lResult);
-//        trace.terminate();
+        assertEquals(new BigDecimal("6"), lResult);
     }
 
+    @Test
+    public void testInterrupt() {
+        // Construct endless loop.
+        Object expr = parser.parseExpression("(while true (+ 1 1))");
+        EvalTrace trace = new EvalTrace(eval, expr);
+
+        // Take some steps (but not all).
+        for(int i = 0; i < 10; i++) {
+            trace.step();
+        }
+
+        assertFalse(trace.isTerminated());
+        trace.terminate();
+
+        assertTrue(trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertTrue(trace.isExcepted());
+        assertThat(trace.getException().getMessage(), containsString("EvalTrace/010"));
+    }
 }

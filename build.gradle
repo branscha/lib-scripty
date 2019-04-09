@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.1'
+    testCompile 'junit:junit:4.12'
 }
 
 group = 'branscha'

@@ -1,4 +1,4 @@
-#### 6.1. Bean Library
+#### JavaBean Library
 
 Access JavaBeans as a nested directory structure. This command library provides a number of commands to manipulate the JavaBeans in the context. It has a Naked Objects flavor. There is a current JavaBean like there is a current directory, it tries to apply the same traversal logic from file systems to JavaBeans. Obviously you need to put the JavaBeans in the context using your own custom commands.
 
