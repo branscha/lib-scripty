@@ -1,7 +1,7 @@
 ;;; Compress & Uncompress functions.
 ;;; ANSI Common Lisp, Paul Graham
 ;;;
-;;; Depenencies: LispCmd, MathCmd.
+;;; Dependencies: LispCmd, MathCmd.
 
 ;; Compress a list with run-length-encoding.
 ;; Example: (compress '(1 1 1 0 1 0 0 0 0 1)) ==> ((3 1) 0 1 (4 0) 1)

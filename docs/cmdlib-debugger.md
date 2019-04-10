@@ -35,6 +35,10 @@ This is how we should understand this:
 
 The list right of the '~' shows the evaluated parts of the expression. In this case we see that the expression [*, 2, 3]:1 is evaluating the first parameter of the expression which is the atomic 2. On the right side we have another representation [*, null, null] which indicates that we already resolved the operation * but we still need to evaluate the two arguments.
 
+An exclamation mark means that the complete frame is ready to be evaluated and be replaced by its result. This is shown in the next example:
+
+    [+, 1, 2]:3! ~ [+, 1, 2]
+
 ## Debugger Command Reference
 
 Debug commands to interactively debug Scripty programs.
@@ -60,6 +64,7 @@ A synonym for dbg-step, it was added to be the inverse for dbg-stepout.
 **dbg-back**
 
 Take a step back, it might not work as expected because it does not undo bindings, nor other side effects. It could be useful to replay some sequences.
+It jumps from argument to argument without showing the intermediate evaluation, it is the inverse command of `dbg-stepover`.
 
 **dbg-stepout**
 
@@ -68,6 +73,7 @@ Run until the current expression on top of the stack is completely evaluated and
 **dbg-stepover**
 
 Evaluate the next parameter without stepping trough it or execute the expression. We remain positioned at the same stack level. Use this if you want to evaluate each parameter in turn, without seeing the details of it.
+The inverse command is `dbg-back`.
 
 **dbg-stack**
 
@@ -211,16 +217,25 @@ These macros are provided for your convenience. You have to load these explicitl
 * **e 'expr**, Start debugging an expression. Don't forget the quote!
 * **t**, Terminate the debug session.
 * **x**, Stack dump.
-* **s**, Step + stack.
+* **s**, Step over + stack.
 * **b**, Backstep + stack.
 * **sover**, Step over (the parameter) + stack.
+* **sin**, Step + stack.
 * **sout**, Step out (of the expression) + stack.
 * **r**, Run until finished.
-* **rready**, Run until the parmeters of the topmost expression are evaluated and the expression itself can be executed.
+* **rready**, Run until the parameters of the topmost expression are evaluated and the expression itself can be executed.
 * **rresult**, Run until a result is reached.
 * **result**, Print the result.
 * **ctx**, Print the current context (of the topmost expression).
 * **v 'expr**, View an expression, evaluated in the topmost context. Don't forget the quote!
 * **restart**, Restart evaluation, start from the beginning.
 * **df**, Drop the topmostframe + stack.
+
+### Stepping Granularity
+
+From fastest (less detail) to slowest (most detail):
+
+* dbg-ready/rready: The current frame is ready for evaluation, all parameters have been evaluated.
+* dbg-stepover/sover; From argument to argument, we stay on the same frame. 
+* dbg-step/s, dbg-stepin/s: Each argument evaluation is shown as well.
 

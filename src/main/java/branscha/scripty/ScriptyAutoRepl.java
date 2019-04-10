@@ -25,8 +25,10 @@
 package branscha.scripty;
 
 import branscha.scripty.cmdlib.DebuggerLibrary;
+import branscha.scripty.cmdlib.LoadLibrary;
 import branscha.scripty.cmdlib.MathLibrary;
 import branscha.scripty.cmdlib.PrintLibrary;
+import branscha.scripty.parser.CommandException;
 
 import java.awt.*;
 
@@ -70,11 +72,12 @@ public class ScriptyAutoRepl extends ScriptyCapable {
     }
 
     public static void main(String[] args)
-    throws ExtensionException {
+    throws ExtensionException, CommandException {
         String mode = System.getProperty("mode", "gui");
         ScriptyAutoRepl repl = new ScriptyAutoRepl();
         repl.setForceTextMode("text".equalsIgnoreCase(mode));
-        repl.addLibraryClasses(PrintLibrary.class, MathLibrary.class, DebuggerLibrary.class);
+        repl.addLibraryClasses(PrintLibrary.class, MathLibrary.class, DebuggerLibrary.class, LoadLibrary.class);
+        repl.getReplEngine().exec("(load cp:/dbgutil.lsp)");
         repl.startLoop();
     }
 }

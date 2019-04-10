@@ -32,8 +32,7 @@ import static java.lang.Thread.sleep;
 
 /**
  * Debugger.
- * Protocol: consructor - step* - getResult.
- * - Resultaat *moet* opgehaald worden, de eval wacht op een {@link #step()} of een {@link #getResult()}.
+ * Protocol: constructor - step* - getResult.
  */
 public class EvalTrace {
 
@@ -629,7 +628,7 @@ public class EvalTrace {
     }
 
     /**
-     * Restart the evaluation of the current expression to the beginning.
+     * Restart the evaluation of the current expression from the beginning.
      * Ignore all intermediate results obtained so far.
      */
     public synchronized void reset() {
@@ -650,6 +649,8 @@ public class EvalTrace {
 
     /**
      * Step backwards. Note that side effects (context changes) will not be undone.
+     * Stepping backwards is like an inverse {@link #stepOver}, it jumps to the previous argument
+     * evaluation without showing the details.
      */
     public synchronized void backStep() {
         verifyEvalState("backStep");
@@ -673,7 +674,7 @@ public class EvalTrace {
         stepcount = 0;
         breakpoint = false;
 
-        // Take some steps.
+        // Take all the steps there are.
         while (hasMoreSteps() && !excepted)
             if (stepcount > 0 && breakpoints.breakHere(stack)) {
                 breakpoint = true;
@@ -701,6 +702,10 @@ public class EvalTrace {
             else step();
     }
 
+    /**
+     * Evaluates the current frame and substitute the result of the evaluation
+     * in the parent expression.
+     */
     public synchronized void stepOut() {
         // First we run until the current frame has been evaluated.
         // Note that we keep holding on to the same frame for testing,
@@ -722,6 +727,10 @@ public class EvalTrace {
             else step();
     }
 
+    /**
+     * Run until all the arguments in the current frame have been evaluated and the complete
+     * frame can be evaluated.
+     */
     public synchronized void runToReady() {
         // We run until the current frame has been evaluated.
         // Note that we keep holding on to the same frame for testing,
@@ -744,13 +753,17 @@ public class EvalTrace {
             else step();
     }
 
+    /**
+     * It works like a {@link #step()} but it jumps from argument to argument
+     * without showing the intermediate results. The inverse of stepOver is {@link #backStep()}.
+     */
     public synchronized void stepOver() {
         if (excepted) return;
 
         final Eval2.StackFrame lFrame = getStack().top();
         final int lStartSlot = lFrame.getDataptr();
 
-        // Initialize runstatistics.
+        // Initialize run statistics.
         stepcount = 0;
         breakpoint = false;
 

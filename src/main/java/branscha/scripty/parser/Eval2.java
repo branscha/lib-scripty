@@ -24,14 +24,16 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
-import sun.misc.CEFormatException;
-
-import java.awt.color.CMMException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
 
+/**
+ * An Eval implementation suited to create a debugger environment.
+ * it provides a number of hooks where an external controller can hook  into.
+ * It is a bit slower though.
+ */
 public class Eval2 extends AbstractEval {
 
     public Eval2() {

@@ -26,8 +26,8 @@ package branscha.scripty.parser;
 
 import java.util.Collection;
 
-public abstract class AbstractEval
-        implements IEval {
+public abstract class AbstractEval implements IEval {
+
     private IContext context;
 
     public AbstractEval(IContext aContext) {
