@@ -585,9 +585,9 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "bpt-when-x")
     @ScriptyRefArgList(ref = "obj + name")
-    public EvalTrace.IBreakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName) {
+    public EvalTrace.IBreakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName, IEval srcEval) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
-        return new EvalTrace.BreakpointWhen(aBptName, aExpr);
+        return new EvalTrace.BreakpointWhen(aBptName, aExpr, srcEval);
     }
 
     @ScriptyCommand(name = "bpt-not")

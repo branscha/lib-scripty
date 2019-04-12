@@ -36,9 +36,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public class TestEval {
     protected Parser parser;
     protected IEval eval;
+    protected List<IEval> evals = Arrays.asList(new Eval(), new Eval2());
 
     @Before
     public void setup() {
@@ -47,14 +50,20 @@ public class TestEval {
     }
 
     @Test
-    public void createBinding()
-    throws CommandException {
-        eval.eval(parser.parseExpression("(defvar oele=plopperdeplop)"));
-        Object lResult = eval.eval(parser.parseExpression("$oele"));
-        Assert.assertEquals("plopperdeplop", lResult);
+    public void createBinding() {
+        evals.stream().forEach((eval) -> {
+            try {
+                eval.eval(parser.parseExpression("(defvar oele=plopperdeplop)"));
+                Object lResult = eval.eval(parser.parseExpression("$oele"));
+                assertEquals("plopperdeplop", lResult);
 
-        lResult = eval.eval(parser.parseExpression("(get oele)"));
-        Assert.assertEquals("plopperdeplop", lResult);
+                lResult = eval.eval(parser.parseExpression("(get oele)"));
+                assertEquals("plopperdeplop", lResult);
+            }
+            catch (CommandException e) {
+                fail(e.getMessage());
+            }
+        });
     }
 
     @Test
@@ -63,13 +72,15 @@ public class TestEval {
         // Try to change an unknown binding.
         // It should generate an error stating that you tried to change an unknown binding.
 
-        try {
-            eval.eval(parser.parseExpression("(set thiswasneverdefined=alloallo)"));
-            Assert.fail();
-        }
-        catch (CommandException e) {
-            Assert.assertTrue(e.getMessage().indexOf("no binding") > 0);
-        }
+        evals.stream().forEach((eval) -> {
+            try {
+                eval.eval(parser.parseExpression("(set thiswasneverdefined=alloallo)"));
+                fail("Should have thrown a CommandExeption.");
+            }
+            catch (CommandException e) {
+                assertTrue(e.getMessage().indexOf("no binding") > 0);
+            }
+        });
     }
 
     @Test

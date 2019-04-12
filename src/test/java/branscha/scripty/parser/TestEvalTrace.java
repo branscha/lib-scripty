@@ -31,12 +31,24 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 
 public class TestEvalTrace {
+
+    public static final String FUN_FAC = "(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))";
+
+    public static final String FAC_STACK_8 = "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]\n" +
+            "[fac, [-, $n, 1]]:2! ~ [fac, 8]\n" +
+            "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 9, null]\n" +
+            "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+            "[fac, [-, $n, 1]]:2! ~ [fac, 9]\n" +
+            "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 10, null]\n" +
+            "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+            "[fac, 10]:2! ~ [fac, 10]";
 
     Parser parser;
     Eval2 eval;
@@ -58,7 +70,7 @@ public class TestEvalTrace {
     public void testTrace()
     throws CommandException, InterruptedException {
 
-        eval.eval(parser.parseExpression("(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))"));
+        eval.eval(parser.parseExpression(FUN_FAC));
         Object expr = parser.parseExpression("(fac 3)");
 
         EvalTrace trace = new EvalTrace(eval, expr);
@@ -268,5 +280,199 @@ public class TestEvalTrace {
         assertFalse(trace.isExcepted());
         Object lResult = trace.getResult();
         assertEquals(new BigDecimal("42"), lResult);
+    }
+
+    @Test
+    public void testStackDepthBpt()
+    throws CommandException {
+
+        eval.eval(parser.parseExpression(FUN_FAC));
+
+        Object expr = parser.parseExpression("(fac 100000000)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointStackdepth("sdepth", 10);
+        trace.getBreakpoints().addBreakpoint(bpt);
+
+        trace.run();
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals(">\n" +
+                "[>, $n, 0]:0 ~ [null, null, null]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:0 ~ [null, null]\n" +
+                "[fac, [-, $n, 1]]:2! ~ [fac, 99999998]\n" +
+                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 99999999, null]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, [-, $n, 1]]:2! ~ [fac, 99999999]\n" +
+                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 100000000, null]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, 100000000]:2! ~ [fac, 100000000]", trace.getStack().toString().trim());
+
+        trace.terminate();
+        assertEquals(true, trace.isTerminated());
+    }
+
+    @Test
+    public void testFuncBtp()
+    throws CommandException {
+
+        eval.eval(parser.parseExpression(FUN_FAC));
+
+        Object expr = parser.parseExpression("(fac 100)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointFunc("func", "*");
+        trace.getBreakpoints().addBreakpoint(bpt);
+
+        trace.run();
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, 100]:2! ~ [fac, 100]", trace.getStack().toString().trim());
+
+        trace.run();
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, [-, $n, 1]]:2! ~ [fac, 99]\n" +
+                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 100, null]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, 100]:2! ~ [fac, 100]", trace.getStack().toString().trim());
+
+        trace.run();
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, [-, $n, 1]]:2! ~ [fac, 98]\n" +
+                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 99, null]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, [-, $n, 1]]:2! ~ [fac, 99]\n" +
+                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 100, null]\n" +
+                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
+                "[fac, 100]:2! ~ [fac, 100]", trace.getStack().toString().trim());
+
+        trace.terminate();
+        assertEquals(true, trace.isTerminated());
+    }
+
+    @Test
+    public void testWhenBtp()
+    throws CommandException {
+
+        eval.eval(parser.parseExpression(FUN_FAC));
+
+        Object expr = parser.parseExpression("(fac 10)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (< $n 9) false)"), eval);
+        trace.getBreakpoints().addBreakpoint(bpt);
+
+        trace.run();
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals(FAC_STACK_8, trace.getStack().toString().trim());
+
+        trace.terminate();
+        assertEquals(true, trace.isTerminated());
+    }
+
+    @Test
+    public void testAndBpt()
+    throws CommandException {
+
+        eval.eval(parser.parseExpression(FUN_FAC));
+
+        Object expr = parser.parseExpression("(fac 10)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+
+        EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when1", parser.parseExpression("$n"), eval);
+        EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when2", parser.parseExpression("(< $n 9)"), eval);
+        EvalTrace.IBreakpoint bpt3 = new EvalTrace.BreakpointAnd("and", Arrays.asList(bpt1, bpt2));
+        trace.getBreakpoints().addBreakpoint(bpt3);
+
+        trace.run();
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals(FAC_STACK_8, trace.getStack().toString().trim());
+
+        trace.terminate();
+        assertEquals(true, trace.isTerminated());
+    }
+
+    @Test
+    public void testBtpNot()
+    throws CommandException {
+
+        eval.eval(parser.parseExpression(FUN_FAC));
+
+        Object expr = parser.parseExpression("(fac 10)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (>~ $n 9) true)"), eval);
+        EvalTrace.IBreakpoint bptNot = new EvalTrace.BreakpointNot("not", bpt);
+        trace.getBreakpoints().addBreakpoint(bptNot);
+
+        trace.run();
+
+        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        assertEquals(FAC_STACK_8, trace.getStack().toString().trim());
+
+        trace.terminate();
+        assertEquals(true, trace.isTerminated());
+    }
+
+    @Test
+    public void testBptOr()
+    throws CommandException {
+
+        EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
+        EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color blue)"), eval);
+        EvalTrace.IBreakpoint bptOr = new EvalTrace.BreakpointOr("or", Arrays.asList(bpt1, bpt2));
+
+        // No red nor blue
+        Object expr = parser.parseExpression("(progn (defvar color=none) (set color=black) (set color=green) (set color=cyan ) (set color=yellow))");
+        EvalTrace trace = new EvalTrace(eval, expr);
+        trace.getBreakpoints().addBreakpoint(bptOr);
+
+        trace.run();
+        assertTrue(trace.isTerminated());
+        assertFalse((trace.isExcepted()));
+
+        // red is there
+        expr = parser.parseExpression("(progn (defvar color=none) (set color=black) (set color=green) (set color=red ) (set color=yellow))");
+        trace = new EvalTrace(eval, expr);
+        trace.getBreakpoints().addBreakpoint(bptOr);
+
+        trace.run();
+        assertFalse(trace.isTerminated());
+        assertFalse((trace.isExcepted()));
+        assertEquals("[set, pair(color,red)]:2! ~ [color, red] ==> red\n" +
+                "[progn, [defvar, pair(color,none)], [set, pair(color,black)], [set, pair(color,green)], [set, pair(color,red)], [set, pair(color,yellow)]]:4 ~ [progn, none, black, green, null, null]", trace.getStack().toString().trim());
+        trace.terminate();
+
+        // blue is there
+        expr = parser.parseExpression("(progn (defvar color=none)  (set color=black) (set color=green) (set color=blue ) (set color=yellow))");
+        trace = new EvalTrace(eval, expr);
+        trace.getBreakpoints().addBreakpoint(bptOr);
+
+        trace.run();
+        assertFalse(trace.isTerminated());
+        assertFalse((trace.isExcepted()));
+        assertEquals("progn\n" +
+                "[progn, [defvar, pair(color,none)], [set, pair(color,black)], [set, pair(color,green)], [set, pair(color,blue)], [set, pair(color,yellow)]]:0 ~ [null, null, null, null, null, null]", trace.getStack().toString().trim());
+        trace.terminate();
     }
 }

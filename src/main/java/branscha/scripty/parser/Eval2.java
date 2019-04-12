@@ -315,6 +315,10 @@ public class Eval2 extends AbstractEval {
         listeners = lListeners.toArray(listeners);
     }
 
+    public void removeAllEventListeners() {
+        listeners = new EvalListener[0];
+    }
+
     private void fireStepEvent(EvalStack aStack) throws CommandException {
         EVENT.stack = aStack;
         EVENT.result = null;
@@ -441,6 +445,7 @@ public class Eval2 extends AbstractEval {
 
     public void step(EvalStack aStack)
     throws CommandException {
+
         final StackFrame lFrame = aStack.top();
         final Object lExpr = lFrame.getExpr();
         final IFrameHandler lHandler = lFrame.getHandler();
@@ -557,10 +562,11 @@ class AtomicHandler implements Eval2.IFrameHandler {
     }
 }
 
-class PairHandler
-        implements Eval2.IFrameHandler {
+class PairHandler implements Eval2.IFrameHandler {
+
     public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
+
         // Allocate stack data.
         aFrame.allocateData(2);
     }
@@ -1040,42 +1046,43 @@ class NotHandler
     }
 }
 
-class SetHandler
-        implements Eval2.IFrameHandler {
-    private static class PairHandler
-            implements Eval2.IFrameHandler {
+class SetHandler implements Eval2.IFrameHandler {
+
+    private static class PairHandler implements Eval2.IFrameHandler {
+
         public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
         throws CommandException {
-            final List lLstExpr = (List) aFrame.getExpr();
-            final IContext lCtx = aFrame.getCtx();
-            final Object[] lData = aFrame.getData();
-            final int lDataPtr = aFrame.getDataptr();
 
-            switch (lDataPtr) {
+            final List lstExpr = (List) aFrame.getExpr();
+            final IContext ctx = aFrame.getCtx();
+            final Object[] data = aFrame.getData();
+            final int dataPtr = aFrame.getDataptr();
+
+            switch (dataPtr) {
                 case 0:
-                    Object lPairCand = lLstExpr.get(1);
+                    Object lPairCand = lstExpr.get(1);
                     if (!(lPairCand instanceof Pair))
-                        throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lLstExpr.get(0), lLstExpr.get(0)), aStack);
+                        throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lstExpr.get(0), lstExpr.get(0)), aStack);
                     Pair lPair = (Pair) lPairCand;
-                    aStack.push(lPair.getLeft(), lCtx);
+                    aStack.push(lPair.getLeft(), ctx);
                     return;
                 case 1:
-                    lPairCand = lLstExpr.get(1);
+                    lPairCand = lstExpr.get(1);
                     if (!(lPairCand instanceof Pair))
-                        throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lLstExpr.get(0), lLstExpr.get(0)), aStack);
+                        throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lstExpr.get(0), lstExpr.get(0)), aStack);
                     lPair = (Pair) lPairCand;
-                    aStack.push(lPair.getRight(), lCtx);
+                    aStack.push(lPair.getRight(), ctx);
                     return;
                 default:
                     // Check the type of the name.
-                    if (!(lData[0] instanceof String))
-                        throw new CommandException(String.format("The first argument in the '%s' form should evaluate to a string.", lLstExpr.get(0)), aStack);
-                    final String lNameRepr = (String) lData[0];
+                    if (!(data[0] instanceof String))
+                        throw new CommandException(String.format("The first argument in the '%s' form should evaluate to a string.", lstExpr.get(0)), aStack);
+                    final String lNameRepr = (String) data[0];
 
-                    if ("set".equals(lLstExpr.get(0))) lCtx.setBinding(lNameRepr, lData[1]);
-                    else lCtx.getRootContext().defBinding(lNameRepr, lData[1]);
+                    if ("set".equals(lstExpr.get(0))) ctx.setBinding(lNameRepr, data[1]);
+                    else ctx.getRootContext().defBinding(lNameRepr, data[1]);
 
-                    aFrame.setResult(lData[1]);
+                    aFrame.setResult(data[1]);
             }
         }
 

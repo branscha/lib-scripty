@@ -66,25 +66,27 @@ And the text mode repl:
 
 The scripty component contains a number of pre-defined command libraries that are at your disposal.
 
-* [JavaBean Library](docs/cmdlib-javabean.md)
+### Essential
+
 * [Debugger Library](docs/cmdlib-debugger.md)
-* [Text editor](docs/cmdlib-editor.md)
-* [Record Editor Library](docs/cmdlib-receditor.md)
 * [Exit Command](docs/cmdlib-exit.md)
-* [File Dialog Library](docs/cmdlib-filedialog.md)
-* [File System Library](docs/cmdlib-filsystem.md)
-* [Lisp Functions](docs/cmdlib-lisp.md)
 * [Load Library](docs/cmdlib-scriptloader.md)
 * [Map Functions](docs/cmdlib-map.md)
 * [Math Functions](docs/cmdlib-math.md)
-* [Pair Functions](docs/cmdlib-pair.md)
 * [string Functions](docs/cmdlib-string.md)
+* [File System Library](docs/cmdlib-filsystem.md)
 
-Man pages
+### Interactive
 
-* [Create Command Libraries](docs/man-create-command-libraries.md)
-* [Embedding Scripty](docs/man-embedding-scripty.md)
-* [Scripty Syntax](docs/man-scripty-syntax.md)
+* [Text editor](docs/cmdlib-editor.md)
+* [Record Editor Library](docs/cmdlib-receditor.md)
+* [File Dialog Library](docs/cmdlib-filedialog.md)
+
+### Other
+
+* [Pair Functions](docs/cmdlib-pair.md)
+* [JavaBean Library](docs/cmdlib-javabean.md)
+* [Lisp Functions](docs/cmdlib-lisp.md)
 
 ### Using the Command Line
 #### Optional Outer Parentheses
@@ -136,3 +138,9 @@ Canceling the command.
 #### print
 
 Print stuff on the standard output. Scripty does not automatically print the result of an evaluation on the command line, often you have to use the print command explicitly. It is not uncommon for a command to show something on the standard output and to have something else as the result of the evaluation.
+
+## Advanced Topics
+
+* [Create Command Libraries](docs/man-create-command-libraries.md)
+* [Embedding Scripty](docs/man-embedding-scripty.md)
+* [Scripty Syntax](docs/man-scripty-syntax.md)

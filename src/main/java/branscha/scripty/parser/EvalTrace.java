@@ -68,7 +68,7 @@ public class EvalTrace {
 
         void setEnabled(boolean aEnabled);
 
-        boolean breakHere(Eval2.EvalStack aStack);
+        boolean breakHere(Eval2.EvalStack stack);
     }
 
     /**
@@ -183,12 +183,22 @@ public class EvalTrace {
 
         private String name;
         private Object lWhenExpr;
-        private IEval eval = new Eval();
+        private IEval bptEval = new Eval();
         private boolean enabled = true;
 
-        public BreakpointWhen(String aName, Object aExpr) {
+        public BreakpointWhen(String aName, Object aExpr, IEval srcEval) {
             this.name = aName;
+
+            if (aExpr instanceof Token && ((Token) aExpr).isErroneous()) {
+                Token token = (Token) aExpr;
+                throw new IllegalArgumentException("Expression was not parsed correctly: " + token.getValue());
+            }
             this.lWhenExpr = aExpr;
+
+            // Copy the eval environment in our breakpoint eval.
+            bptEval.setMacroRepo(srcEval.getMacroRepo());
+            bptEval.setCommandRepo(srcEval.getCommandRepo());
+            bptEval.setContext(srcEval.getContext());
         }
 
         public String getName() {
@@ -199,12 +209,12 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack) {
+        public boolean breakHere(Eval2.EvalStack stack) {
             try {
-                return enabled && AbstractEval.boolEval(eval.eval(lWhenExpr, aStack.top().getCtx()));
+                return enabled && AbstractEval.boolEval(bptEval.eval(lWhenExpr, stack.top().getCtx()));
             }
             catch (CommandException e) {
-                return false;
+                throw new IllegalArgumentException("Breakpoint expression failure.", e);
             }
         }
 
@@ -342,14 +352,9 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack) {
+        public boolean breakHere(Eval2.EvalStack stack) {
             if (!enabled) return false;
-            boolean lBreak = false;
-            for (IBreakpoint lBp : bps) {
-                lBreak = lBp.breakHere(aStack);
-                if (lBreak) return lBreak;
-            }
-            return lBreak;
+            return bps.stream().anyMatch((bp)->bp.breakHere(stack));
         }
 
         @Override
@@ -435,6 +440,10 @@ public class EvalTrace {
         // Keep track of the eval under scrutiny.
         // Add an event listener to it.
         eval = aEval;
+        // First remove any  previous listeners.
+        // We currently do not allow other listeners.
+        eval.removeAllEventListeners();
+        // Attach our own listener.
         eval.addEvalListener(new Eval2.EvalListener() {
 
             public void finishedEval(Eval2.EvalEvent aEvent) {
@@ -500,9 +509,8 @@ public class EvalTrace {
             }
             catch (CommandException e) {
                 // The eval will have notified any listeners.
-                // Our EvalTrace will have received the exception event and should have
-                // taken appropriate action.
-                // We can let this thread die.
+                // We must show that something bad happened so that he user can examine the debugger info.
+                System.out.println(String.format("The debugger is terminated by exception: %s%nThe exception information is avaiable in the debugger using getExcepton().", e.getMessage()));
             }
         });
 
