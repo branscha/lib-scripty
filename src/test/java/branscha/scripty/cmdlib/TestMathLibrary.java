@@ -191,56 +191,56 @@ public class TestMathLibrary {
     @Test
     public void le1()
     throws ProcessorException {
-        Object lResult = scripty.process("<~ 13 14");
+        Object lResult = scripty.process("<= 13 14");
         Assert.assertTrue((Boolean) lResult);
     }
 
     @Test
     public void le2()
     throws ProcessorException {
-        Object lResult = scripty.process("<~ 13 13");
+        Object lResult = scripty.process("<= 13 13");
         Assert.assertTrue((Boolean) lResult);
     }
 
     @Test
     public void le3()
     throws ProcessorException {
-        Object lResult = scripty.process("<~ 14 13");
+        Object lResult = scripty.process("<= 14 13");
         Assert.assertFalse((Boolean) lResult);
     }
 
     @Test
     public void ge1()
     throws ProcessorException {
-        Object lResult = scripty.process(">~ 23 22");
+        Object lResult = scripty.process(">= 23 22");
         Assert.assertTrue((Boolean) lResult);
     }
 
     @Test
     public void ge2()
     throws ProcessorException {
-        Object lResult = scripty.process(">~ 22 22");
+        Object lResult = scripty.process(">= 22 22");
         Assert.assertTrue((Boolean) lResult);
     }
 
     @Test
     public void ge3()
     throws ProcessorException {
-        Object lResult = scripty.process(">~ 22 23");
+        Object lResult = scripty.process(">= 22 23");
         Assert.assertFalse((Boolean) lResult);
     }
 
     @Test
     public void eq1()
     throws ProcessorException {
-        Object lResult = scripty.process("~ 13 13");
+        Object lResult = scripty.process("= 13 13");
         Assert.assertTrue((Boolean) lResult);
     }
 
     @Test
     public void eq2()
     throws ProcessorException {
-        Object lResult = scripty.process("~ 14 13");
+        Object lResult = scripty.process("= 14 13");
         Assert.assertFalse((Boolean) lResult);
     }
 

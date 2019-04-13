@@ -27,8 +27,8 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.IContext;
 import branscha.scripty.parser.IEval;
 
-public class BindingMapping
-        implements IArgMapping {
+public class BindingMapping implements IArgMapping {
+
     private String binding;
     private boolean excIfNull;
 

@@ -149,7 +149,7 @@ public class MathLibrary {
         return aArg1.compareTo(aArg2) < 0;
     }
 
-    @ScriptyCommand(name = "<~")
+    @ScriptyCommand(name = "<=")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isLE(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) <= 0;
@@ -161,13 +161,13 @@ public class MathLibrary {
         return aArg1.compareTo(aArg2) > 0;
     }
 
-    @ScriptyCommand(name = ">~")
+    @ScriptyCommand(name = ">=")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isGE(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) >= 0;
     }
 
-    @ScriptyCommand(name = "~")
+    @ScriptyCommand(name = "=")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isEQ(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) == 0;

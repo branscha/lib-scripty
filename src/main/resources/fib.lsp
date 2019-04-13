@@ -2,9 +2,9 @@
 ;; Inefficient, recursive implementation.
 ;;
 (defun fib (n)
-    (if (~ $n 0)
+    (if (= $n 0)
         1
-        (if (~ $n 1 )
+        (if (= $n 1 )
             1
             (+ (fib (- $n 1))
                (fib (- $n 2))))))

@@ -198,6 +198,7 @@ public class ReplEngine implements IExtensions {
                 // Time for evaluation.
                 try {
                     lastResult = eval.eval(lAst);
+                    if(interactiveMode && (lastResult !=  null)) writeLine(lastResult.toString());
                 }
                 catch (CommandException e) {
                     // Normal command error.
@@ -225,7 +226,9 @@ public class ReplEngine implements IExtensions {
     }
 
     public void startInteractive() {
-        this.startInteractive(System.in, System.out, System.err);
+        // Interactive mode should only use out (not err) because otherwise the
+        // two streams interfere with each other.
+        this.startInteractive(System.in, System.out, System.out);
     }
 
     public void startInteractive(InputStream aIn, OutputStream aOut, OutputStream aErr) {

@@ -24,8 +24,9 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A minimal parser. Only lists, strings (delimited or not) and pairs (to make named parameters possible).
@@ -48,7 +49,14 @@ import java.util.List;
  * </pre>
  */
 public class Parser {
+
+    private static final char PAIR_CHAR = '=';
+    private static final String PAIR_STR = "=";
+
+    private static final char COMMENT_CHAR = ';';
+
     private Token pushback = null;
+    private Token previous = null;
 
     /**
      * Lexer method.
@@ -79,18 +87,25 @@ public class Parser {
                     return new Token(Token.TokenType.endlist, ")", lLine, lCol);
                 case '\'':
                     return new Token(Token.TokenType.quote, "'", lLine, lCol);
-                case '=':
-                    return new Token(Token.TokenType.pair, "=", lLine, lCol);
-                case ';': {
+                case PAIR_CHAR:
+                    if(previous != null && !previous.isEndList() && !previous.isString()) {
+                        String value = consumeIdentifier(PAIR_CHAR, aBuffer);
+                        return new Token(Token.TokenType.string, value, lLine, lCol);
+                    }
+                    else {
+                        return new Token(Token.TokenType.pair, PAIR_STR, lLine, lCol);
+                    }
+                case COMMENT_CHAR: {
                     // Comments, skip until end of line.
-                    char lPeek = aBuffer.peekChar();
-                    while (!aBuffer.eof() && ('\n' != lPeek)) {
-                        aBuffer.consumeChar();
-                        lPeek = aBuffer.peekChar();
+                    StringBuilder comments = new StringBuilder();
+                    char peekChar = aBuffer.peekChar();
+                    while (!aBuffer.eof() && ('\n' != peekChar)) {
+                        comments.append(aBuffer.consumeChar());
+                        peekChar = aBuffer.peekChar();
                     }
                     // Consume newline as well.
-                    if ('\n' == lPeek) aBuffer.consumeChar();
-                    return new Token(Token.TokenType.whitespace, "<comment>", lLine, lCol);
+                    if ('\n' == peekChar) aBuffer.consumeChar();
+                    return new Token(Token.TokenType.whitespace, comments.toString(), lLine, lCol);
                 }
                 case '"': {
                     // String literal encountered.
@@ -169,39 +184,84 @@ public class Parser {
                     if (Character.isWhitespace(lChar)) {
                         // Whitespace encountered. In this mode we gobble all whitespace and put it in 
                         // a single token.
-                        final StringBuilder lValue = new StringBuilder();
-                        lValue.append(lChar);
-                        while (!aBuffer.eof() && Character.isWhitespace(aBuffer.peekChar()))
-                            lValue.append(aBuffer.consumeChar());
-                        // We return the accumulated whitespace.
-                        return new Token(Token.TokenType.whitespace, lValue.toString(), lLine, lCol);
+                        String whitespace = consumeWhitespace(lChar, aBuffer);
+                        return new Token(Token.TokenType.whitespace, whitespace, lLine, lCol);
                     }
                     else {
                         // Normal identifier encountered. We turn this into a string as well.
                         // We have to test on set of characters that do not appear in any of the
                         // previous branches.
-                        final StringBuilder lValue = new StringBuilder();
-                        lValue.append(lChar);
-                        char lPeek = aBuffer.peekChar();
-                        while (!aBuffer.eof() && '(' != lPeek && ')' != lPeek && '"' != lPeek && !Character.isWhitespace(lPeek) && '=' != lPeek && ';' != lPeek) {
-                            lValue.append(aBuffer.consumeChar());
-                            lPeek = aBuffer.peekChar();
-                        }
-                        return new Token(Token.TokenType.string, lValue.toString(), lLine, lCol);
+                        String tokenValue = consumeIdentifier(lChar, aBuffer);
+                        return new Token(Token.TokenType.string, tokenValue, lLine, lCol);
                     }
                 }
             }
         }
     }
 
-    private void pushBackToken(Token lToken) {
-        pushback = lToken;
+    private static final Set<Character> IDENTIFIER_BREAKERS = Stream
+            .of('(', ')', '"', PAIR_CHAR, COMMENT_CHAR)
+            .collect(Collectors.toCollection(HashSet::new));
+
+    private static final Set<Character> EQUALS_EATERS_INIT = Stream
+            .of('<', '>', '-', '+','@', '=', '#', '$', '*')
+            .collect(Collectors.toCollection(HashSet::new));
+
+    private static final Set<Character> EQUALS_EATERS_INTERNAL = Stream
+            .of('<', '>', '-', '+','@', '=', '#', '$', '*')
+            .filter((c)->c!=PAIR_CHAR)
+            .collect(Collectors.toCollection(HashSet::new));
+
+    private String consumeIdentifier(char firstChar, IParserInput inputBuffer) {
+        final StringBuilder identifier = new StringBuilder();
+        //
+        identifier.append(firstChar);
+        boolean eatEquals = EQUALS_EATERS_INIT.contains(firstChar);
+        //
+        char peekChar = inputBuffer.peekChar();
+//        while (!inputBuffer.eof() &&  !Character.isWhitespace(peekChar) && !breakers.contains(peekChar)) {
+        while (!inputBuffer.eof() &&  !Character.isWhitespace(peekChar)) {
+            if(!eatEquals && EQUALS_EATERS_INTERNAL.contains(peekChar)) {
+                identifier.append(inputBuffer.consumeChar());
+                eatEquals = true;
+            }
+            else {
+                if(eatEquals && (peekChar == PAIR_CHAR)) {
+                    identifier.append(inputBuffer.consumeChar());
+                }
+                else {
+                    if(IDENTIFIER_BREAKERS.contains(peekChar)){
+                        break;
+                    }
+                    else {
+                        identifier.append(inputBuffer.consumeChar());
+                    }
+                }
+                eatEquals = false;
+            }
+            peekChar = inputBuffer.peekChar();
+        }
+        return identifier.toString();
     }
 
-    private Token getNextNonWhitespaceToken(IParserInput aBuffer) {
-        Token lToken = getNextToken(aBuffer);
-        while (lToken.isWhitespace()) lToken = getNextToken(aBuffer);
-        return lToken;
+    private String consumeWhitespace(char firstChar, IParserInput aBuffer) {
+        final StringBuilder whitespace = new StringBuilder();
+        whitespace.append(firstChar);
+        while (!aBuffer.eof() && Character.isWhitespace(aBuffer.peekChar()))
+            whitespace.append(aBuffer.consumeChar());
+        // We return the accumulated whitespace.
+        return whitespace.toString();
+    }
+
+    private void pushBackToken(Token token) {
+        pushback = token;
+    }
+
+    private Token getNextNonWhitespaceToken(IParserInput inputBuffer) {
+        Token token = getNextToken(inputBuffer);
+        while (token.isWhitespace()) token = getNextToken(inputBuffer);
+        previous = token;
+        return token;
     }
 
     /**
@@ -293,8 +353,8 @@ public class Parser {
 
             // Now we check if the expression is part of a pairing or not.
             // Take a look at the next token.
-            final Token lPeek = getNextNonWhitespaceToken(aBuffer);
-            if (lPeek.isPair()) {
+            final Token peekToken = getNextNonWhitespaceToken(aBuffer);
+            if (peekToken.isPair()) {
                 // Yes, we found a pair.
                 final Object lValueExpr = parseExpression(aBuffer);
                 // If something bad happened with the value part of the pair,
@@ -305,7 +365,7 @@ public class Parser {
             }
             else {
                 // No, not part of pairing at all.
-                pushBackToken(lPeek);
+                pushBackToken(peekToken);
                 return lResultExpr;
             }
         }

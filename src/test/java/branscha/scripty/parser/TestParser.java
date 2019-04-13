@@ -24,12 +24,12 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
-import java.io.InputStream;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.List;
 
 public class TestParser {
     private Parser parser;
@@ -75,6 +75,39 @@ public class TestParser {
         Object lResult = parser.parseExpression("(� � � � �)");
         Assert.assertTrue(lResult instanceof List);
         Assert.assertEquals(((List) lResult).size(), 5);
+    }
+
+    @Test
+    public void equals() {
+        Object lResult = parser.parseExpression("(= 5 3)");
+        Assert.assertTrue(lResult instanceof List);
+        Assert.assertEquals("=", ((List) lResult).get(0));
+        Assert.assertEquals("5", ((List) lResult).get(1));
+        Assert.assertEquals("3", ((List) lResult).get(2));
+
+        lResult = parser.parseExpression("(+= 5 3)");
+        Assert.assertTrue(lResult instanceof List);
+        Assert.assertEquals("+=", ((List) lResult).get(0));
+        Assert.assertEquals("5", ((List) lResult).get(1));
+        Assert.assertEquals("3", ((List) lResult).get(2));
+
+        lResult = parser.parseExpression("(== 5 3)");
+        Assert.assertTrue(lResult instanceof List);
+        Assert.assertEquals("==", ((List) lResult).get(0));
+        Assert.assertEquals("5", ((List) lResult).get(1));
+        Assert.assertEquals("3", ((List) lResult).get(2));
+
+        lResult = parser.parseExpression("(*name=val 5 3)");
+        Assert.assertTrue(lResult instanceof List);
+        Assert.assertEquals(new Pair("*name", "val"), ((List) lResult).get(0));
+        Assert.assertEquals("5", ((List) lResult).get(1));
+        Assert.assertEquals("3", ((List) lResult).get(2));
+
+        lResult = parser.parseExpression("(x a=3)");
+        Assert.assertTrue(lResult instanceof List);
+        Assert.assertEquals(2, ((List) lResult).size());
+        Assert.assertEquals("x", ((List) lResult).get(0));
+        Assert.assertEquals(new Pair("a", "3"), ((List) lResult).get(1));
     }
 
     @Test

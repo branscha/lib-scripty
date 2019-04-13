@@ -56,7 +56,7 @@ public class TestEvalTrace {
 
     @Before
     public void setup()
-    throws ExtensionException {
+    throws ExtensionException, CommandException {
         parser = new Parser();
         eval = new Eval2();
 
@@ -390,25 +390,51 @@ public class TestEvalTrace {
     public void testAndBpt()
     throws CommandException {
 
-        eval.eval(parser.parseExpression(FUN_FAC));
+        EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
+        EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $size large)"), eval);
+        EvalTrace.IBreakpoint bptAnd = new EvalTrace.BreakpointAnd("and", Arrays.asList(bpt1, bpt2));
 
-        Object expr = parser.parseExpression("(fac 10)");
+        // No red nor large -> run to end.
+        Object expr = parser.parseExpression("(progn (defvar color=black) (defvar size=small))");
         EvalTrace trace = new EvalTrace(eval, expr);
-
-        EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when1", parser.parseExpression("$n"), eval);
-        EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when2", parser.parseExpression("(< $n 9)"), eval);
-        EvalTrace.IBreakpoint bpt3 = new EvalTrace.BreakpointAnd("and", Arrays.asList(bpt1, bpt2));
-        trace.getBreakpoints().addBreakpoint(bpt3);
+        trace.getBreakpoints().addBreakpoint(bptAnd);
 
         trace.run();
+        assertTrue(trace.isTerminated());
+        assertFalse((trace.isExcepted()));
+        eval.getContext().removeBinding("color");
+        eval.getContext().removeBinding("size");
 
-        assertEquals(false, trace.isTerminated());
-        assertFalse(trace.hasResult());
-        assertFalse(trace.isExcepted());
-        assertEquals(FAC_STACK_8, trace.getStack().toString().trim());
+        // No red only large -> run to end.
+        expr = parser.parseExpression("(progn (defvar color=black) (defvar size=large))");
+        trace = new EvalTrace(eval, expr);
+        trace.getBreakpoints().addBreakpoint(bptAnd);
 
-        trace.terminate();
-        assertEquals(true, trace.isTerminated());
+        trace.run();
+        assertTrue(trace.isTerminated());
+        assertFalse((trace.isExcepted()));
+        eval.getContext().removeBinding("color");
+        eval.getContext().removeBinding("size");
+
+        // Only red not large -> run to end.
+        expr = parser.parseExpression("(progn (defvar color=red) (defvar size=small))");
+        trace = new EvalTrace(eval, expr);
+        trace.getBreakpoints().addBreakpoint(bptAnd);
+
+        trace.run();
+        assertTrue(trace.isTerminated());
+        assertFalse((trace.isExcepted()));
+        eval.getContext().removeBinding("color");
+        eval.getContext().removeBinding("size");
+
+        // BOth conditions are met - the breakpoint halts eval.
+        expr = parser.parseExpression("(progn (defvar color=red) (defvar size=large) )");
+        trace = new EvalTrace(eval, expr);
+        trace.getBreakpoints().addBreakpoint(bptAnd);
+
+        trace.run();
+        assertFalse(trace.isTerminated());
+        assertFalse((trace.isExcepted()));
     }
 
     @Test
@@ -419,7 +445,7 @@ public class TestEvalTrace {
 
         Object expr = parser.parseExpression("(fac 10)");
         EvalTrace trace = new EvalTrace(eval, expr);
-        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (>~ $n 9) true)"), eval);
+        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (>= $n 9) true)"), eval);
         EvalTrace.IBreakpoint bptNot = new EvalTrace.BreakpointNot("not", bpt);
         trace.getBreakpoints().addBreakpoint(bptNot);
 
@@ -442,7 +468,7 @@ public class TestEvalTrace {
         EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color blue)"), eval);
         EvalTrace.IBreakpoint bptOr = new EvalTrace.BreakpointOr("or", Arrays.asList(bpt1, bpt2));
 
-        // No red nor blue
+        // No red nor blue -> run to end.
         Object expr = parser.parseExpression("(progn (defvar color=none) (set color=black) (set color=green) (set color=cyan ) (set color=yellow))");
         EvalTrace trace = new EvalTrace(eval, expr);
         trace.getBreakpoints().addBreakpoint(bptOr);
@@ -451,7 +477,7 @@ public class TestEvalTrace {
         assertTrue(trace.isTerminated());
         assertFalse((trace.isExcepted()));
 
-        // red is there
+        // red is there -> breakpoint hit.
         expr = parser.parseExpression("(progn (defvar color=none) (set color=black) (set color=green) (set color=red ) (set color=yellow))");
         trace = new EvalTrace(eval, expr);
         trace.getBreakpoints().addBreakpoint(bptOr);
@@ -463,7 +489,7 @@ public class TestEvalTrace {
                 "[progn, [defvar, pair(color,none)], [set, pair(color,black)], [set, pair(color,green)], [set, pair(color,red)], [set, pair(color,yellow)]]:4 ~ [progn, none, black, green, null, null]", trace.getStack().toString().trim());
         trace.terminate();
 
-        // blue is there
+        // blue is there -> breakpoint hit.
         expr = parser.parseExpression("(progn (defvar color=none)  (set color=black) (set color=green) (set color=blue ) (set color=yellow))");
         trace = new EvalTrace(eval, expr);
         trace.getBreakpoints().addBreakpoint(bptOr);

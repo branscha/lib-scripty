@@ -508,9 +508,11 @@ public class EvalTrace {
                 eval.eval(aExpr);
             }
             catch (CommandException e) {
-                // The eval will have notified any listeners.
-                // We must show that something bad happened so that he user can examine the debugger info.
-                System.out.println(String.format("The debugger is terminated by exception: %s%nThe exception information is avaiable in the debugger using getExcepton().", e.getMessage()));
+                // The Eval2 will have notified any listeners at this point and the debugger should be in a consistent state.
+                // It is not the task of the debugger-eval to print something on an output stream, that
+                // should be the responsibility of the embedding system of this debugging trace. We don't know
+                // in what context the EvalTrace will be used. The embedding system should verify the {@link #isExcepted()}
+                // flag and show the message.
             }
         });
 

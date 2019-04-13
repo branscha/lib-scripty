@@ -52,10 +52,17 @@ import java.util.List;
         }
 )
 public class DebuggerLibrary {
-    private static final String MSG_NOTRACE = "No current trace. First start debugging an expression.";
-    private static final String MSG_NOBREAKPOINTS = "No current breakpoints.";
-    private static final String MSG_NOSTACK = "No current stack.";
-    private static final String MSG_NOFRAME = "No current frame.";
+
+    private static final String ERR010 = "DebuggerLibrary/010: Exception while debugging:%n%s";
+    private static final String ERR020 = "DebuggerLibrary/020: Debugger not started. Use 'dbg-expr' to start debugging.";
+    private static final String ERR030 = "DebuggerLibrary/030: No breakpoints.";
+    private static final String ERR040 = "DebuggerLibrary/040: No expression stack.";
+    private static final String ERR050 = "DebuggerLibrary/050: No current expression frame.";
+
+    private static final String MSG_NOSTEPS = "No expression steps.";
+    private static final String MSG_RESULT = "There is a result.";
+    private static final String MSG_EXCEPTION = "There is an exception";
+    private static final String MSG_EMPTYSTACK = "Empty expression stack.";
 
     /**
      * The evaluation state for the expression being debugged.
@@ -96,12 +103,12 @@ public class DebuggerLibrary {
 
     private void checkTrace()
     throws CommandException {
-        if (trace == null) throw new CommandException(MSG_NOTRACE);
+        if (trace == null) throw new CommandException(ERR020);
     }
 
     private void checkBreakpoints()
     throws CommandException {
-        if (breakpoints == null) throw new CommandException(MSG_NOBREAKPOINTS);
+        if (breakpoints == null) throw new CommandException(ERR030);
     }
 
     /**
@@ -185,18 +192,18 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-stepin")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStepIn(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgStepIn(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.STEPIN, aWriter);
+        return internalStep(StepType.STEPIN, writer);
     }
 
     // Step into an expression, it takes the smallest step possible.
     //
     @ScriptyCommand(name = "dbg-step")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStep(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgStep(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.STEPIN, aWriter);
+        return internalStep(StepType.STEPIN, writer);
     }
 
     // Run until the current expression on top of the stack is completely  evaluated
@@ -206,9 +213,9 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-stepout")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStepOut(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgStepOut(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.STEPOUT, aWriter);
+        return internalStep(StepType.STEPOUT, writer);
     }
 
     // Evaluate the next parameter without stepping trough it or execute the expression.
@@ -217,9 +224,9 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-stepover")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgStepOver(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgStepOver(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.STEPOVER, aWriter);
+        return internalStep(StepType.STEPOVER, writer);
     }
 
     // Take a step back, it might not work as expected because it
@@ -228,18 +235,18 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-back")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgBack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgBack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.BACKSTEP, aWriter);
+        return internalStep(StepType.BACKSTEP, writer);
     }
 
     // Keep on running until a result has been produced.
     //
     @ScriptyCommand(name = "dbg-runresult")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgRunResult(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgRunResult(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.RUNTORESULT, aWriter);
+        return internalStep(StepType.RUNTORESULT, writer);
     }
 
     // Keep on running until all parameters in the current frame have
@@ -248,21 +255,21 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-runready")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgRunReady(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgRunReady(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.RUNTOREADY, aWriter);
+        return internalStep(StepType.RUNTOREADY, writer);
     }
 
     // Keep on running.
     //
     @ScriptyCommand(name = "dbg-run")
     @ScriptyRefArgList(ref = "no arguments")
-    public boolean dbgRun(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter)
+    public boolean dbgRun(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
-        return internalStep(StepType.RUN, aWriter);
+        return internalStep(StepType.RUN, writer);
     }
 
-    private boolean internalStep(StepType op, PrintWriter aWriter)
+    private boolean internalStep(StepType op, PrintWriter writer)
     throws CommandException {
         checkTrace();
         if (trace.hasMoreSteps()) {
@@ -293,9 +300,7 @@ public class DebuggerLibrary {
 
             // Check if there was an exception.
             if (trace.isExcepted()) {
-                aWriter.println("An exception occurred during this step. The exception message:\n");
-                //noinspection ThrowableResultOfMethodCallIgnored
-                aWriter.println(trace.getException().getMessage());
+                writer.println(String.format(ERR010, trace.getException().getMessage()));
                 return Boolean.FALSE;
             }
 
@@ -306,13 +311,13 @@ public class DebuggerLibrary {
                 final List<EvalTrace.IBreakpoint> lBpts = trace.getBreakpoints().findAllMatchingBreakpoints(trace.getStack());
                 StringBuilder lBuilder = new StringBuilder();
                 for (EvalTrace.IBreakpoint lBpt : lBpts) lBuilder.append(lBpt.getName());
-                aWriter.println("Breakpoint(s) reached: " + lBuilder.toString() + ".");
+                writer.println("Breakpoint(s) reached: " + lBuilder.toString() + ".");
             }
         }
         else {
-            aWriter.println("There are no steps anymore.");
-            if (trace.hasResult()) aWriter.println("There is a result though.");
-            if (trace.isExcepted()) aWriter.println("The eval was stalled by an exception.");
+            writer.println(MSG_NOSTEPS);
+            if (trace.hasResult()) writer.println(MSG_RESULT);
+            if (trace.isExcepted()) writer.println(MSG_EXCEPTION);
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
@@ -324,17 +329,17 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-stack")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
-    public Eval2.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter,
-                                    @ScriptyParam("quiet") boolean aQuiet)
+    public Eval2.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
+                                    @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
         final Eval2.EvalStack lStack = trace.getStack();
-        if (!aQuiet) {
-            if (lStack != null) aWriter.print(lStack.toString());
+        if (!isQuiet) {
+            if (lStack != null) writer.print(lStack.toString());
             else {
-                aWriter.println("The stack is empty.");
-                if (trace.hasResult()) aWriter.println("There is a result though.");
-                if (trace.isExcepted()) aWriter.println("The eval was stalled by an exception.");
+                writer.println(MSG_EMPTYSTACK);
+                if (trace.hasResult()) writer.println(MSG_RESULT);
+                if (trace.isExcepted()) writer.println(MSG_EXCEPTION);
             }
         }
         return lStack;
@@ -348,14 +353,14 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-ctx")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
-    public IContext dbgCtx(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter,
-                           @ScriptyParam("quiet") boolean aQuiet)
+    public IContext dbgCtx(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
+                           @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
         final Eval2.EvalStack lStack = trace.getStack();
-        if (lStack == null) throw new CommandException(MSG_NOSTACK);
+        if (lStack == null) throw new CommandException(ERR040);
         final IContext lCtx = lStack.top().getCtx();
-        if (!aQuiet) aWriter.print(lCtx.toString());
+        if (!isQuiet) writer.print(lCtx.toString());
         return lCtx;
     }
 
@@ -398,7 +403,7 @@ public class DebuggerLibrary {
     public void dbgRestart()
     throws CommandException {
         checkTrace();
-        if (trace.getStack() == null) throw new CommandException(MSG_NOSTACK);
+        if (trace.getStack() == null) throw new CommandException(ERR040);
         trace.reset();
     }
 
@@ -410,7 +415,7 @@ public class DebuggerLibrary {
     public void dbgDropFrame()
     throws CommandException {
         checkTrace();
-        if (trace.getStack() == null) throw new CommandException(MSG_NOSTACK);
+        if (trace.getStack() == null) throw new CommandException(ERR040);
         trace.dropFrame();
     }
 
@@ -422,9 +427,9 @@ public class DebuggerLibrary {
     throws CommandException {
         checkTrace();
         Eval2.EvalStack lStack = trace.getStack();
-        if (lStack == null) throw new CommandException(MSG_NOSTACK);
+        if (lStack == null) throw new CommandException(ERR040);
         Eval2.StackFrame lFrame = lStack.top();
-        if (lFrame == null) throw new CommandException(MSG_NOFRAME);
+        if (lFrame == null) throw new CommandException(ERR050);
         final IContext lCtx = lFrame.getCtx();
         return aEval.eval(aArg, lCtx);
     }
@@ -503,11 +508,11 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-breakpoints")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
-    public EvalTrace.BreakpointSet dbgBreakpoints(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter aWriter,
-                                                  @ScriptyParam("quiet") boolean aQuiet)
+    public EvalTrace.BreakpointSet dbgBreakpoints(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
+                                                  @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkBreakpoints();
-        if (!aQuiet && aWriter != null) aWriter.println(breakpoints.toString());
+        if (!isQuiet && writer != null) writer.println(breakpoints.toString());
         return breakpoints;
     }
 

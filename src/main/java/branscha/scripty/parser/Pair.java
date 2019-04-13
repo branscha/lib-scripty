@@ -24,6 +24,8 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
+import java.util.Objects;
+
 /**
  * A Pair is an <b>immutable</b> basic type returned by the parser.
  * It is immutable by design, because it is a parser artifact. It does not have to
@@ -50,5 +52,19 @@ public class Pair {
     @Override
     public String toString() {
         return "pair(" + (left == null ? "null" : left.toString()) + "," + (right == null ? "null" : right.toString()) + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pair pair = (Pair) o;
+        return Objects.equals(left, pair.left) &&
+                Objects.equals(right, pair.right);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, right);
     }
 }
