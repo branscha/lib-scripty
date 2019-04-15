@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,9 +24,9 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public interface IResultMapping {
-    public void map(Object aResult, IContext aContext)
+    public void map(Object aResult, Context aContext)
     throws ResultMappingException;
 }

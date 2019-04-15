@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.IEval;
 
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class PartialMapping
         length = aLength;
     }
 
-    public Object map(IEval aEval, IContext aContext, Object aArgs)
+    public Object map(IEval aEval, Context aContext, Object aArgs)
     throws ArgMappingException {
         // TODO TODO
         // Add code for lists/collections

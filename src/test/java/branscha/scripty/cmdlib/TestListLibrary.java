@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -28,11 +28,15 @@ import branscha.scripty.ExtensionException;
 import branscha.scripty.ProcessorException;
 import branscha.scripty.ScriptyStreamProcessor;
 import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static junit.framework.TestCase.*;
+import static org.junit.Assert.assertFalse;
 
 public class TestListLibrary {
     private ScriptyStreamProcessor scripty;
@@ -49,8 +53,8 @@ public class TestListLibrary {
     public void createList1()
     throws ProcessorException {
         Object lResult = scripty.process("list");
-        Assert.assertTrue(lResult instanceof java.util.List);
-        Assert.assertTrue(((List) lResult).isEmpty());
+        assertTrue(lResult instanceof java.util.List);
+        assertTrue(((List) lResult).isEmpty());
     }
 
     @Test
@@ -58,8 +62,8 @@ public class TestListLibrary {
     public void createList2()
     throws ProcessorException {
         Object lResult = scripty.process("list 1 2 3 4 5");
-        Assert.assertTrue(lResult instanceof java.util.List);
-        Assert.assertTrue(((List) lResult).size() == 5);
+        assertTrue(lResult instanceof java.util.List);
+        assertEquals(5, ((List) lResult).size());
     }
 
     @Test
@@ -67,7 +71,7 @@ public class TestListLibrary {
     public void isEmpty1()
     throws ProcessorException {
         Object lResult = scripty.process("empty? (list)");
-        Assert.assertTrue(Boolean.TRUE.equals(lResult));
+        assertEquals(Boolean.TRUE, lResult);
     }
 
     @Test
@@ -75,7 +79,7 @@ public class TestListLibrary {
     public void isEmpty2()
     throws ProcessorException {
         Object lResult = scripty.process("empty? (list 1 2 3 4 5)");
-        Assert.assertTrue(Boolean.FALSE.equals(lResult));
+        assertEquals(Boolean.FALSE, lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -83,7 +87,7 @@ public class TestListLibrary {
     public void isEmpty3()
     throws ProcessorException {
         scripty.process("empty?");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
@@ -91,7 +95,7 @@ public class TestListLibrary {
     public void isList1()
     throws ProcessorException {
         scripty.process("list?");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -99,7 +103,7 @@ public class TestListLibrary {
     public void isList2()
     throws ProcessorException {
         Object lResult = scripty.process("list? (list 1 2 3 4 5)");
-        Assert.assertTrue(Boolean.TRUE.equals(lResult));
+        assertEquals(Boolean.TRUE, lResult);
     }
 
     @Test
@@ -107,7 +111,7 @@ public class TestListLibrary {
     public void isList3()
     throws ProcessorException {
         Object lResult = scripty.process("list? (list)");
-        Assert.assertTrue(Boolean.TRUE.equals(lResult));
+        assertEquals(Boolean.TRUE, lResult);
     }
 
     @Test
@@ -115,7 +119,7 @@ public class TestListLibrary {
     public void isList4()
     throws ProcessorException {
         Object lResult = scripty.process("list? abc");
-        Assert.assertTrue(Boolean.FALSE.equals(lResult));
+        assertEquals(Boolean.FALSE, lResult);
     }
 
     @Test
@@ -123,42 +127,42 @@ public class TestListLibrary {
     public void isList5()
     throws ProcessorException {
         Object lResult = scripty.process("list? $null");
-        Assert.assertTrue(Boolean.FALSE.equals(lResult));
+        assertEquals(Boolean.FALSE, lResult);
     }
 
     @Test
     public void isMember1()
     throws ProcessorException {
         Object lResult = scripty.process("member? (list 1 2 3 4 5) 13");
-        Assert.assertTrue(Boolean.FALSE.equals(lResult));
+        assertEquals(Boolean.FALSE, lResult);
     }
 
     @Test
     public void isMember2()
     throws ProcessorException {
         Object lResult = scripty.process("member? (list 1 2 3 4 5) 3");
-        Assert.assertTrue(Boolean.TRUE.equals(lResult));
+        assertEquals(Boolean.TRUE, lResult);
     }
 
     @Test
     public void car1()
     throws ProcessorException {
         Object lResult = scripty.process("car (list 17 13 19 23)");
-        Assert.assertTrue("17".equals(lResult));
+        assertEquals("17", lResult);
     }
 
     @Test(expected = ProcessorException.class)
     public void car2()
     throws ProcessorException {
         scripty.process("car (list)");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
     public void car3()
     throws ProcessorException {
         scripty.process("car ()");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -168,48 +172,48 @@ public class TestListLibrary {
                 "   (let " +
                         "      (lst=(list 17 13 19 23)) " +
                         "      (progn (car $lst) $lst))");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 4);
+        assertTrue(lResult instanceof List);
+        assertTrue(((List) lResult).size() == 4);
     }
 
     @Test
     public void cdr1()
     throws ProcessorException {
         Object lResult = scripty.process("cdr (list 17 13 19 23)");
-        Assert.assertTrue(lResult instanceof List);
+        assertTrue(lResult instanceof List);
         List lList = (List) lResult;
-        Assert.assertTrue(lList.size() == 3);
-        Assert.assertTrue("13".equals(lList.get(0)));
-        Assert.assertTrue("19".equals(lList.get(1)));
-        Assert.assertTrue("23".equals(lList.get(2)));
+        assertEquals(3, lList.size());
+        assertEquals("13", lList.get(0));
+        assertEquals("19", lList.get(1));
+        assertEquals("23", lList.get(2));
     }
 
     @Test(expected = ProcessorException.class)
     public void cdr2()
     throws ProcessorException {
         scripty.process("cdr ()");
-        Assert.fail();
+        fail();
     }
 
     @Test
     public void shift1()
     throws ProcessorException {
         Object lResult = scripty.process("shift (list 17 13 19 23)");
-        Assert.assertTrue("17".equals(lResult));
+        assertEquals("17", lResult);
     }
 
     @Test(expected = ProcessorException.class)
     public void shift2()
     throws ProcessorException {
         scripty.process("shift (list)");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
     public void shift3()
     throws ProcessorException {
         scripty.process("shift ()");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -219,8 +223,8 @@ public class TestListLibrary {
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
                         " (progn (shift $lst) $lst))");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 3);
+        assertTrue(lResult instanceof List);
+        assertEquals(3, ((List) lResult).size());
     }
 
     @Test
@@ -230,11 +234,11 @@ public class TestListLibrary {
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
                         " (progn (unshift $lst 2 3 5) $lst))");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 7);
-        Assert.assertTrue("5".equals(((List) lResult).get(0)));
-        Assert.assertTrue("3".equals(((List) lResult).get(1)));
-        Assert.assertTrue("2".equals(((List) lResult).get(2)));
+        assertTrue(lResult instanceof List);
+        assertEquals(7, ((List) lResult).size());
+        assertEquals("5", ((List) lResult).get(0));
+        assertEquals("3", ((List) lResult).get(1));
+        assertEquals("2", ((List) lResult).get(2));
     }
 
     @Test
@@ -245,9 +249,9 @@ public class TestListLibrary {
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
                         " (progn (cons 5 $lst) $lst))");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 5);
-        Assert.assertTrue("5".equals(((List) lResult).get(0)));
+        assertTrue(lResult instanceof List);
+        assertEquals(5, ((List) lResult).size());
+        assertEquals("5", ((List) lResult).get(0));
     }
 
     @Test
@@ -259,11 +263,11 @@ public class TestListLibrary {
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
                         " (progn (pop $lst) $lst))");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 3);
-        Assert.assertTrue("17".equals(((List) lResult).get(0)));
-        Assert.assertTrue("13".equals(((List) lResult).get(1)));
-        Assert.assertTrue("19".equals(((List) lResult).get(2)));
+        assertTrue(lResult instanceof List);
+        assertEquals(3, ((List) lResult).size());
+        assertEquals("17", ((List) lResult).get(0));
+        assertEquals("13", ((List) lResult).get(1));
+        assertEquals("19", ((List) lResult).get(2));
     }
 
     @Test
@@ -275,7 +279,7 @@ public class TestListLibrary {
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
                         " (pop $lst))");
-        Assert.assertTrue("23".equals(lResult));
+        assertEquals("23", lResult);
     }
 
     @Test
@@ -286,11 +290,11 @@ public class TestListLibrary {
                 " (let " +
                         " (lst=(list 17 13 19 23)) " +
                         " (progn (push $lst 2 3 5) $lst))");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 7);
-        Assert.assertTrue("5".equals(((List) lResult).get(6)));
-        Assert.assertTrue("3".equals(((List) lResult).get(5)));
-        Assert.assertTrue("2".equals(((List) lResult).get(4)));
+        assertTrue(lResult instanceof List);
+        assertEquals(7, ((List) lResult).size());
+        assertEquals("5", ((List) lResult).get(6));
+        assertEquals("3", ((List) lResult).get(5));
+        assertEquals("2", ((List) lResult).get(4));
     }
 
     @Test
@@ -302,10 +306,10 @@ public class TestListLibrary {
                         " (lst1=(list 1 2 3) lst2=(list 4 5 6) lst3=(list 7 8 9)) " +
                         " (append $lst1 $lst2 $lst3)" +
                         ")");
-        Assert.assertTrue(lResult instanceof List);
+        assertTrue(lResult instanceof List);
         List lList = (List) lResult;
-        Assert.assertTrue(lList.size() == 9);
-        for (int i = 1; i < 10; i++) Assert.assertTrue(lList.contains("" + i));
+        assertEquals(9, lList.size());
+        for (int i = 1; i < 10; i++) assertTrue(lList.contains("" + i));
     }
 
     @Test
@@ -318,10 +322,10 @@ public class TestListLibrary {
                         " (lst1=(list 1 2 3) lst2=(list 4 5 6) lst3=(list 7 8 9)) " +
                         " (progn (append $lst1 $lst2 $lst3) $lst1)" +
                         ")");
-        Assert.assertTrue(lResult instanceof List);
+        assertTrue(lResult instanceof List);
         List lList = (List) lResult;
-        Assert.assertTrue(lList.size() == 3);
-        for (int i = 1; i < 4; i++) Assert.assertTrue(lList.contains("" + i));
+        assertEquals(3, lList.size());
+        for (int i = 1; i < 4; i++) assertTrue(lList.contains("" + i));
     }
 
     @Test
@@ -333,7 +337,7 @@ public class TestListLibrary {
                         " (lst1=(list 1 2 3 4 5 6 7 8 9)) " +
                         " (size $lst1)" +
                         ")");
-        Assert.assertTrue("9".equals(lResult));
+        assertEquals("9", lResult);
     }
 
     @Test
@@ -345,7 +349,7 @@ public class TestListLibrary {
                         " (lst1='()) " +
                         " (size $lst1)" +
                         ")");
-        Assert.assertTrue("0".equals(lResult));
+        assertEquals("0", lResult);
     }
 
     @Test
@@ -361,8 +365,8 @@ public class TestListLibrary {
         Object lResult = scripty.process("dup $lst");
 
         // Test that it is equals but not the same.
-        Assert.assertTrue(lResult.equals(lOrig));
-        Assert.assertTrue(lResult != lOrig);
+        assertEquals(lOrig, lResult);
+        assertNotSame(lOrig, lResult);
     }
 
     @Test
@@ -374,7 +378,7 @@ public class TestListLibrary {
         scripty.getContext().defBinding("one", null);
         scripty.getContext().defBinding("two", "abc");
 
-        Assert.assertTrue((Boolean) scripty.process("null? $one"));
-        Assert.assertFalse((Boolean) scripty.process("null? $two"));
+        assertTrue((Boolean) scripty.process("null? $one"));
+        assertFalse((Boolean) scripty.process("null? $two"));
     }
 }

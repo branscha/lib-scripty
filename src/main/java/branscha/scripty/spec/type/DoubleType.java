@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,15 +24,15 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
-public class DoubleType
-        implements ITypeSpec {
+public class DoubleType implements ITypeSpec {
+
     public String getSpecName() {
         return "Double";
     }
 
-    public Object guard(Object aArg, IContext aCtx)
+    public Object guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (aArg instanceof Double) {
             return aArg;

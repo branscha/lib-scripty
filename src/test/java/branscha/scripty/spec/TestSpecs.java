@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import branscha.scripty.parser.Pair;
 import branscha.scripty.spec.args.ArgSpecException;
-import branscha.scripty.spec.args.IArgSpec;
+import branscha.scripty.spec.args.ArgSpec;
 import branscha.scripty.spec.args.NamedArg;
 import branscha.scripty.spec.type.CheckedListType;
 import branscha.scripty.spec.type.ITypeSpec;
@@ -62,7 +62,7 @@ public class TestSpecs {
     @Test
     public void testNamedArgs()
     throws ArgSpecException {
-        IArgSpec lSpec = new NamedArg("oele", new IntegerType(), Integer.valueOf(13), true);
+        ArgSpec lSpec = new NamedArg("oele", new IntegerType(), Integer.valueOf(13), true);
         Object[] args = new Object[]{1, 2, 3, new Pair("oele", Integer.valueOf(17))};
         lSpec.guard(args, 0, null);
         System.out.println(Arrays.toString(args));

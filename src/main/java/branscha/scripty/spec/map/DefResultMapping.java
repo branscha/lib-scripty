@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class DefResultMapping
         implements IResultMapping {
@@ -34,7 +34,7 @@ public class DefResultMapping
         binding = aBinding;
     }
 
-    public void map(Object aResult, IContext aContext)
+    public void map(Object aResult, Context aContext)
     throws ResultMappingException {
         aContext.defBinding(binding, aResult);
     }

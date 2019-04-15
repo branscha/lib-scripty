@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 
 import java.beans.*;
@@ -55,7 +55,7 @@ public class BeanLibrary {
     //
     @ScriptyCommand(name = "bean-cd")
     @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
-    public Object beanCd(@ScriptyParam("path") String aPath, IContext aCtx)
+    public Object beanCd(@ScriptyParam("path") String aPath, Context aCtx)
     throws CommandException {
         // Follow the path to see if it leads somewhere.
         final Resolution lRes = resolve(aPath, aCtx);
@@ -80,7 +80,7 @@ public class BeanLibrary {
     //
     @ScriptyCommand(name = "bean-ls")
     @ScriptyRefArgList(ref = "path")
-    public Object beanLs(@ScriptyParam("path") String aPath, IContext aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
+    public Object beanLs(@ScriptyParam("path") String aPath, Context aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
     throws CommandException {
         // Resolve the path.
         final Resolution lRes = resolve(aPath, aCtx);
@@ -97,7 +97,7 @@ public class BeanLibrary {
     //
     @ScriptyCommand(name = "bean-cat")
     @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
-    public Object beanCat(@ScriptyParam("path") String aPath, IContext aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
+    public Object beanCat(@ScriptyParam("path") String aPath, Context aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
     throws CommandException {
         // Resolve the path.
         final Resolution lRes = resolve(aPath, aCtx);
@@ -114,7 +114,7 @@ public class BeanLibrary {
     //
     @ScriptyCommand(name = "bean-rslv")
     @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
-    public Object beanRslv(@ScriptyParam("path") String aPath, IContext aCtx)
+    public Object beanRslv(@ScriptyParam("path") String aPath, Context aCtx)
     throws CommandException {
         // Resolve the path.
         final Resolution lRes = resolve(aPath, aCtx);
@@ -129,7 +129,7 @@ public class BeanLibrary {
     // rslv method above to accomplish argument resolution as well.
     //
     @ScriptyCommand(name = "bean-call")
-    public Object beanCall(Object[] aArgs, IContext aCtx)
+    public Object beanCall(Object[] aArgs, Context aCtx)
     throws CommandException {
         try {
             final String lPath = guardStringOther(aArgs);
@@ -165,7 +165,7 @@ public class BeanLibrary {
     // (bean-upd BEAN prop1=val1 prop2=val2 ...)
     //
     @ScriptyCommand(name = "bean-upd")
-    public void beanUpd(Object[] aArgs, IContext aCtx)
+    public void beanUpd(Object[] aArgs, Context aCtx)
     throws CommandException {
         final String lPath = guardStringOther(aArgs);
         final Resolution lRes = resolve(lPath, aCtx);
@@ -213,29 +213,31 @@ public class BeanLibrary {
         }
     }
 
-    public Resolution resolve(String aPath, IContext aCtx)
+    public Resolution resolve(String path, Context ctx)
     throws CommandException {
-        if (aPath.startsWith("/")) {
-            final String lRelPath = aPath.substring(1);
-            List<String> lPieces = canonize(lRelPath);
+        if (path.startsWith("/")) {
+            final String relPath = path.substring(1);
+            List<String> pieces = canonize(relPath);
 
-            Object lVal;
-            if ("".equals(lRelPath)) lVal = aCtx;
-            else lVal = resolveCanonical(lPieces, 0, aCtx);
+            Object value;
+            if ("".equals(relPath)) value = ctx;
+            else value = resolveCanonical(pieces, 0, ctx);
 
-            final StringBuilder lBuilder = new StringBuilder("/");
-            for (String lPart : lPieces) {
-                lBuilder.append(lPart);
-                if (lPieces.get(lPieces.size() - 1) != lPart)
-                    lBuilder.append("/");
+            final StringBuilder stringBuilder = new StringBuilder("/");
+            for (int i = 0; i < pieces.size(); i++) {
+                String part = pieces.get(i);
+                stringBuilder.append(part);
+                if (i < (pieces.size() - 1)) {
+                    stringBuilder.append("/");
+                }
             }
-            return new Resolution(lBuilder.toString(), lVal);
+            return new Resolution(stringBuilder.toString(), value);
         }
         else {
             String lAbsPath;
-            if ("/".equals(currentDirectory)) lAbsPath = currentDirectory + aPath;
-            else lAbsPath = currentDirectory + "/" + aPath;
-            return resolve(lAbsPath, aCtx);
+            if ("/".equals(currentDirectory)) lAbsPath = currentDirectory + path;
+            else lAbsPath = currentDirectory + "/" + path;
+            return resolve(lAbsPath, ctx);
         }
     }
 
@@ -251,8 +253,8 @@ public class BeanLibrary {
             // Ignore this exception!
         }
 
-        if (aBase instanceof IContext && lIdx < 0) {
-            final IContext lCtx = (IContext) aBase;
+        if (aBase instanceof Context && lIdx < 0) {
+            final Context lCtx = (Context) aBase;
             if (lCtx.isBound(lPiece))
                 return resolveCanonical(aPieces, aCurrPiece + 1, lCtx.getBinding(lPiece));
             else
@@ -425,8 +427,8 @@ public class BeanLibrary {
     throws CommandException {
         if (aWriter == null) return;
 
-        if (aObj instanceof IContext) {
-            IContext lCtx = (IContext) aObj;
+        if (aObj instanceof Context) {
+            Context lCtx = (Context) aObj;
             Map<String, Object> lDump = lCtx.dumpBindings();
             for (Map.Entry<String, Object> entry : lDump.entrySet()) {
                 aWriter.print(entry.getKey());

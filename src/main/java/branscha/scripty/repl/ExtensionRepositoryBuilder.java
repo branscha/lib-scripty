@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -25,14 +25,14 @@
 package branscha.scripty.repl;
 
 import branscha.scripty.ExtensionException;
-import branscha.scripty.IExtensions;
+import branscha.scripty.ExtensionManager;
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandRepository;
-import branscha.scripty.parser.ICommand;
+import branscha.scripty.parser.Command;
 import branscha.scripty.parser.MethodCommand;
 import branscha.scripty.spec.args.ArgListBuilderUtil;
 import branscha.scripty.spec.args.ArgSpecException;
-import branscha.scripty.spec.args.IArgList;
+import branscha.scripty.spec.args.ArgList;
 import branscha.scripty.spec.map.*;
 
 import java.lang.reflect.Method;
@@ -40,7 +40,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExtensionRepositoryBuilder implements IExtensions {
+public class ExtensionRepositoryBuilder implements ExtensionManager {
 
     private CommandRepository commandRepo;
     private CommandRepository macroRepo;
@@ -50,12 +50,12 @@ public class ExtensionRepositoryBuilder implements IExtensions {
         macroRepo = new CommandRepository();
     }
 
-    public void addCommand(String aName, ICommand aCommand)
+    public void addCommand(String aName, Command aCommand)
     throws ExtensionException {
         commandRepo.registerCommand(aName, aCommand);
     }
 
-    public void addMacro(String aName, ICommand aMacro)
+    public void addMacro(String aName, Command aMacro)
     throws ExtensionException {
         macroRepo.registerCommand(aName, aMacro);
     }
@@ -94,7 +94,7 @@ public class ExtensionRepositoryBuilder implements IExtensions {
         }
     }
 
-    private void registerClassArgList(Class aClass, ScriptyStdArgList aStdLst, Map<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>> aNamedLists)
+    private void registerClassArgList(Class aClass, ScriptyStdArgList aStdLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>> aNamedLists)
     throws ExtensionException {
         final String lName = aStdLst.name();
         if (lName.length() == 0) {
@@ -104,7 +104,7 @@ public class ExtensionRepositoryBuilder implements IExtensions {
 
         try {
             // Build it.
-            final ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aStdLst);
+            final ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aStdLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
         }
@@ -114,7 +114,7 @@ public class ExtensionRepositoryBuilder implements IExtensions {
         }
     }
 
-    private void registerClassArgList(Class aClass, ScriptyVarArgList aVarLst, Map<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>> aNamedLists)
+    private void registerClassArgList(Class aClass, ScriptyVarArgList aVarLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>> aNamedLists)
     throws ExtensionException {
         final String lName = aVarLst.name();
         if (lName.length() == 0) {
@@ -124,7 +124,7 @@ public class ExtensionRepositoryBuilder implements IExtensions {
 
         try {
             // Build it.
-            final ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aVarLst);
+            final ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aVarLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
         }
@@ -137,7 +137,7 @@ public class ExtensionRepositoryBuilder implements IExtensions {
     private void addLibrary(String aLibName, Object aLibInstance, Class aClass)
     throws ExtensionException {
         // We keep track of the named arglists in this datastructure. 
-        Map<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>> lNamedArgLists = new HashMap<String, ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>>>();
+        Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>> lNamedArgLists = new HashMap<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>>();
 
         // Library (Class) annotations.
         ///////////////////////////////
@@ -202,7 +202,7 @@ public class ExtensionRepositoryBuilder implements IExtensions {
             // Argument list specifications.
             ////////////////////////////////
 
-            IArgList lArgList = null;
+            ArgList lArgList = null;
             Map<String, IArgMapping> lMappings = null;
 
             ScriptyStdArgList lStdArgListAnnot = lMethod.getAnnotation(ScriptyStdArgList.class);
@@ -221,7 +221,7 @@ public class ExtensionRepositoryBuilder implements IExtensions {
             if (lRefArgListAnnot != null) {
                 final String lRef = lRefArgListAnnot.ref();
                 if (lNamedArgLists.containsKey(lRef)) {
-                    ArgListBuilderUtil.Tuple<IArgList, Map<String, IArgMapping>> lTuple = lNamedArgLists.get(lRef);
+                    ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>> lTuple = lNamedArgLists.get(lRef);
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
                 }

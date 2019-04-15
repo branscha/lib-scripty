@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -22,19 +22,27 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package branscha.scripty.spec.args;
+package branscha.scripty.parser;
 
-import branscha.scripty.parser.IContext;
+import java.util.Map;
 
-/**
- * Argument list check. Can consider all arguments.
- * Is aware of the location within the arguments list.
- *
- * @param <T>
- */
-public interface IArgSpec<T> {
-    T guard(Object[] aArgs, int aPos, IContext aCtx)
-    throws ArgSpecException;
+public interface Context {
+    // Changes an existing binding.
+    // The change can occur at a nested level.
+    public void setBinding(String aKey, Object aValue)
+    throws CommandException;
 
-    String getSpecName();
+    // Define a  binding in the current context. The value can be null.
+    // The new binding will always be at the top level.
+    public void defBinding(String aKey, Object aValue);
+
+    public Object getBinding(String aKey);
+
+    public boolean isBound(String aKey);
+
+    public void removeBinding(String aKey);
+
+    public Context getRootContext();
+
+    public Map<String, Object> dumpBindings();
 }

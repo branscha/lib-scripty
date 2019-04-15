@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.spec.type;
 
 import java.math.BigInteger;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class BigIntegerType
         implements ITypeSpec<BigInteger> {
@@ -34,7 +34,7 @@ public class BigIntegerType
         return "BigInteger";
     }
 
-    public BigInteger guard(Object aArg, IContext aCtx)
+    public BigInteger guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (aArg instanceof BigInteger) {
             return (BigInteger) aArg;

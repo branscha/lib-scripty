@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -31,7 +31,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 @SuppressWarnings("UnusedDeclaration")
-public class ScriptyEmbeddedRepl extends ScriptyCapable {
+public class ScriptyEmbeddedRepl
+extends ScriptyCapable {
+
     public ScriptyEmbeddedRepl() {
     }
 
@@ -111,8 +113,8 @@ class ReplServer {
  * It will always run in a separate thread from the server so that the
  * main server can keep listening for incoming connections.
  */
-class RequestHandler
-        implements Runnable {
+class RequestHandler implements Runnable {
+
     private Socket socket;
     private ReplEngine scripty;
     private String uid;

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 
 /**
@@ -36,8 +36,8 @@ import branscha.scripty.parser.Pair;
  * The named parameters can have a default value.
  */
 public class StdArgList
-        implements IArgList {
-    public static final IArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
+        implements ArgList {
+    public static final ArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
 
     private FixedArg req[];
     private OptionalArg[] opt;
@@ -52,7 +52,7 @@ public class StdArgList
     /**
      * The ars are expected to have the form ("CMD", arg-1, arg-2, ... arg-n).
      */
-    public Object[] guard(Object[] aArgs, IContext aCtx)
+    public Object[] guard(Object[] aArgs, Context aCtx)
     throws ArgSpecException {
         // Create a new argument list where we will accumulate the
         // converted results.
@@ -73,7 +73,7 @@ public class StdArgList
         // Check the optional ones.
         // Start looking after the fixed args, 
         // Provide the expected index.
-        for (IArgSpec lSpec : opt) {
+        for (ArgSpec lSpec : opt) {
             lNewArgs[lArgIdx] = lSpec.guard(aArgs, lArgIdx++, aCtx);
         }
 
@@ -88,7 +88,7 @@ public class StdArgList
         int lStartNamed = aArgs.length - 1;
         while (lStartNamed > 0 && (aArgs[lStartNamed] instanceof Pair)) lStartNamed--;
         // Now we can resolve the named arguments within this range.
-        for (IArgSpec lSpec : named) {
+        for (ArgSpec lSpec : named) {
             lNewArgs[lArgIdx++] = lSpec.guard(aArgs, lStartNamed, aCtx);
         }
         // Finally we go looking for spurious named parameters that were not specified ...

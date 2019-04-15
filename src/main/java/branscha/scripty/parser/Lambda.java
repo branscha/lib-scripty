@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -38,22 +38,22 @@ public class Lambda {
     private Object expr;
     // Lexical context the context that was in effect
     // when the function was defined.
-    private IContext lexicalCtx;
+    private Context lexicalCtx;
 
-    public Lambda(String[] aParams, Object aExpr, IContext aLexicalCtx) {
-        params = aParams;
-        expr = aExpr;
-        lexicalCtx = aLexicalCtx;
+    public Lambda(String[] aParams, Object aExpr, Context aLexicalCtx) {
+        this.params = aParams;
+        this.expr = aExpr;
+        this.lexicalCtx = aLexicalCtx;
     }
 
-    public IContext createContext(Object[] aArgs, int aFrom, int aTo)
+    public Context createContext(Object[] aArgs, int aFrom, int aTo)
     throws CommandException {
         if ((aTo - aFrom) != params.length) {
             final List<String> lPretty = new ArrayList<String>(params.length);
             for (int i = 0; i < params.length; i++) lPretty.add(params[i]);
             throw new CommandException(String.format("Wrong number of arguments. Expected %d named %s and received %d.", params.length, lPretty, (aTo - aFrom)));
         }
-        IContext lCallContext = new BasicContext();
+        Context lCallContext = new BasicContext();
         for (int i = 0; i < params.length; i++) lCallContext.defBinding(params[i], aArgs[i + aFrom]);
         return new CompositeContext(lCallContext, lexicalCtx);
     }

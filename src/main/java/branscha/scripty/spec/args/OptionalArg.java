@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 import branscha.scripty.spec.type.ITypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
@@ -40,7 +40,7 @@ import branscha.scripty.spec.type.TypeSpecException;
  * with the named parameters which are grouped at the end of the list.
  */
 public class OptionalArg
-        implements IArgSpec {
+        implements ArgSpec {
     private ITypeSpec spec;
     private String specName;
     private Object defaultVal;
@@ -55,7 +55,7 @@ public class OptionalArg
         return specName;
     }
 
-    public Object guard(Object[] aArgs, int aPos, IContext aCtx)
+    public Object guard(Object[] aArgs, int aPos, Context aCtx)
     throws ArgSpecException {
         try {
             if (aPos < 0 || aPos >= aArgs.length) return spec.guard(defaultVal, aCtx);

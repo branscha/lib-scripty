@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,10 +24,18 @@
  ******************************************************************************/
 package branscha.scripty;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Command;
 
-public interface IContextHolder {
-    public IContext getContext();
+public interface ExtensionManager {
+    void addCommand(String aName, Command aCommand)
+    throws ExtensionException;
 
-    public void setContext(IContext aContext);
+    void addMacro(String aName, Command aMacro)
+    throws ExtensionException;
+
+    void addLibraryClasses(Class... aLibraryClasses)
+    throws ExtensionException;
+
+    void addLibraryInstances(Object... aLibraryInstances)
+    throws ExtensionException;
 }

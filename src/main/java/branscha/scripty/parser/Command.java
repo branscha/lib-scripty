@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,14 +24,8 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
-public interface IParserInput {
-    public abstract char consumeChar();
-
-    public abstract char peekChar();
-
-    public abstract boolean eof();
-
-    public abstract int getColNr();
-
-    public abstract int getLineNr();
+public interface Command {
+    public Object execute(IEval aEval, Context aCtx, Object[] aArgs)
+    throws CommandException;
 }
+

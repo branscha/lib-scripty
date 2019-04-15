@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestQueens {
+
     private ScriptyStreamProcessor scripty;
     private PrintPlusCmd printer;
 

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class ShortType
         implements ITypeSpec {
@@ -32,7 +32,7 @@ public class ShortType
         return "Short";
     }
 
-    public Object guard(Object aArg, IContext aCtx)
+    public Object guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (aArg instanceof Short) {
             return aArg;

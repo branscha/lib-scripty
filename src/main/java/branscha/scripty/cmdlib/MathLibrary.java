@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.spec.type.BigDecimalType;
 import branscha.scripty.spec.type.TypeSpecException;
 
@@ -109,7 +109,7 @@ public class MathLibrary {
 
     @ScriptyCommand(name = "number?")
     @ScriptyRefArgList(ref = "1object")
-    public boolean isNumber(@ScriptyParam("arg") Object aArg, IContext aCtx) {
+    public boolean isNumber(@ScriptyParam("arg") Object aArg, Context aCtx) {
         try {
             new BigDecimalType().guard(aArg, aCtx);
         }

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -22,10 +22,12 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package branscha.scripty.parser;
+package branscha.scripty;
 
-public interface ICommand {
-    public Object execute(IEval aEval, IContext aCtx, Object[] aArgs)
-    throws CommandException;
+import branscha.scripty.parser.Context;
+
+public interface ContextHolder {
+    Context getContext();
+
+    void setContext(Context aContext);
 }
-

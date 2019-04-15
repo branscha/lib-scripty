@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -41,20 +41,20 @@ public @interface ScriptyArg {
     /**
      * The name of the argument.
      */
-    public String name();
+    String name();
 
     /**
      * The type of the argument, the description is in the type DSL.
      */
-    public String type();
+    String type();
 
     /**
      * The default value of the argument.
      */
-    public String value() default "";
+    String value() default "";
 
     /**
      * Flag to indicate if the  argument is optional or not.
      */
-    public boolean optional() default false;
+    boolean optional() default false;
 }

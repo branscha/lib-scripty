@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,11 +26,13 @@ package branscha.scripty;
 
 import branscha.scripty.testlib.MyCommandLib;
 import branscha.scripty.testlib.MyCommandLib2;
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class TestScriptyStreamProcessor {
+
     private ScriptyStreamProcessor scripty;
 
     @Before
@@ -42,17 +44,17 @@ public class TestScriptyStreamProcessor {
     public void testMyCommandLib()
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(MyCommandLib.class);
-        Object lResult = scripty.process("add 1 2");
-        Assert.assertNotNull(lResult);
-        Assert.assertTrue(lResult instanceof Integer);
-        Assert.assertEquals("expression result", 3, lResult);
+        Object result = scripty.process("add 1 2");
+        assertNotNull(result);
+        assertTrue(result instanceof Integer);
+        assertEquals("expression result", 3, result);
 
-        lResult = scripty.process("inverse 11 12 add");
-        Assert.assertNotNull(lResult);
+        result = scripty.process("inverse 11 12 add");
+        assertNotNull(result);
 
         scripty.process("def-bruno abc");
         Object val = scripty.getContext().getBinding("bruno");
-        Assert.assertEquals("abc", val);
+        assertEquals("abc", val);
     }
 
     @Test

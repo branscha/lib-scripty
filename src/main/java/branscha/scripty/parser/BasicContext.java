@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class BasicContext
-        implements IContext {
+        implements Context {
     private Map<String, Object> context = new HashMap<String, Object>();
 
     public Object getBinding(String aKey) {
@@ -52,7 +52,7 @@ public class BasicContext
         context.remove(aKey);
     }
 
-    public IContext getRootContext() {
+    public Context getRootContext() {
         return this;
     }
 

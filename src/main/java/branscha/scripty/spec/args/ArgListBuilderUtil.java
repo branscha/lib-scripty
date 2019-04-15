@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -30,7 +30,7 @@ import branscha.scripty.annot.ScriptyCommand;
 import branscha.scripty.annot.ScriptyStdArgList;
 import branscha.scripty.annot.ScriptyVarArgList;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.repl.ReplEngine;
 import branscha.scripty.repl.ReplEngineException;
 import branscha.scripty.spec.map.IArgMapping;
@@ -73,7 +73,7 @@ public class ArgListBuilderUtil {
         private static StdArgList NOARGS = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
 
         @ScriptyCommand(name = "BigDecimal")
-        public static TypeTuple bigDecimalType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple bigDecimalType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -85,7 +85,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "Integer")
-        public static TypeTuple integerType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple integerType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -97,7 +97,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "BigInteger")
-        public static TypeTuple bigIntegerType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple bigIntegerType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -109,7 +109,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "Boolean")
-        public static TypeTuple booleanType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple booleanType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -121,7 +121,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "Byte")
-        public static TypeTuple byteType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple byteType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -136,7 +136,7 @@ public class ArgListBuilderUtil {
         private static StdArgList LISTOF_ARGLIST = new StdArgList(new FixedArg[]{FIXED_TYPE}, new OptionalArg[]{}, new NamedArg[]{NAMED_MINLEN, NAMED_MAXLEN});
 
         @ScriptyCommand(name = "ListOf")
-        public static TypeTuple listOfType(IContext aCtx, Object[] aArgs)
+        public static TypeTuple listOfType(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 aArgs = LISTOF_ARGLIST.guard(aArgs, aCtx);
@@ -161,7 +161,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "Double")
-        public static TypeTuple doubleType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple doubleType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -173,7 +173,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "Float")
-        public static TypeTuple floatType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple floatType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -188,7 +188,7 @@ public class ArgListBuilderUtil {
         private static StdArgList INSTANCEORBINDING_ARGLIST = new StdArgList(new FixedArg[]{FIXED_TYPE}, new OptionalArg[]{}, new NamedArg[]{});
 
         @ScriptyCommand(name = "InstanceOrBinding")
-        public static TypeTuple instanceOrBindingType(IContext aCtx, Object[] aArgs)
+        public static TypeTuple instanceOrBindingType(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 aArgs = INSTANCEORBINDING_ARGLIST.guard(aArgs, aCtx);
@@ -214,7 +214,7 @@ public class ArgListBuilderUtil {
         private static StdArgList INSTANCE_ARGLIST = new StdArgList(new FixedArg[]{FIXED_CLASSNAME}, new OptionalArg[]{}, new NamedArg[]{NAMED_NULLALLOWED});
 
         @ScriptyCommand(name = "Instance")
-        public static TypeTuple instanceType(IContext aCtx, Object[] aArgs)
+        public static TypeTuple instanceType(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 aArgs = INSTANCE_ARGLIST.guard(aArgs, aCtx);
@@ -239,7 +239,7 @@ public class ArgListBuilderUtil {
         private static StdArgList ANY_ARGLIST = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{NAMED_NULLALLOWED});
 
         @ScriptyCommand(name = "Any")
-        public static TypeTuple anyType(IContext aCtx, Object[] aArgs)
+        public static TypeTuple anyType(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 aArgs = ANY_ARGLIST.guard(aArgs, aCtx);
@@ -255,7 +255,7 @@ public class ArgListBuilderUtil {
         private static StdArgList INTEGERRANGE_ARGLIST = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{NAMED_MIN, NAMED_MAX});
 
         @ScriptyCommand(name = "IntegerRange")
-        public static TypeTuple integerRangeType(IContext aCtx, Object[] aArgs)
+        public static TypeTuple integerRangeType(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 aArgs = INTEGERRANGE_ARGLIST.guard(aArgs, aCtx);
@@ -269,7 +269,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "Long")
-        public static TypeTuple longType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple longType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -281,7 +281,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "Short")
-        public static TypeTuple shortType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple shortType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -293,7 +293,7 @@ public class ArgListBuilderUtil {
         }
 
         @ScriptyCommand(name = "String")
-        public static TypeTuple stringType(Object[] aArgs, IContext aCtx)
+        public static TypeTuple stringType(Object[] aArgs, Context aCtx)
         throws CommandException {
             try {
                 NOARGS.guard(aArgs, aCtx);
@@ -308,7 +308,7 @@ public class ArgListBuilderUtil {
         private static VarArgList ONEOF_ARGLIST = new VarArgList(new FixedArg[]{}, new VarArg(SPEC_TYPE), 2, -1, new NamedArg[]{});
 
         @ScriptyCommand(name = "OneOf")
-        public static TypeTuple oneOfType(IContext aCtx, Object[] aArgs)
+        public static TypeTuple oneOfType(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 ONEOF_ARGLIST.guard(aArgs, aCtx);
@@ -330,7 +330,7 @@ public class ArgListBuilderUtil {
         private static StdArgList CUSTOM_ARGLIST = new StdArgList(new FixedArg[]{FIXED_CLASSNAME}, new OptionalArg[]{}, new NamedArg[]{});
 
         @ScriptyCommand(name = "Custom")
-        public static TypeTuple customSpec(IContext aCtx, Object[] aArgs)
+        public static TypeTuple customSpec(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 aArgs = CUSTOM_ARGLIST.guard(aArgs, aCtx);
@@ -370,7 +370,7 @@ public class ArgListBuilderUtil {
         private static VarArgList ENUM_ARGLIST = new VarArgList(new FixedArg[]{}, VAR_STRING, 1, -1, new NamedArg[]{});
 
         @ScriptyCommand(name = "Enum")
-        public static TypeTuple enumType(IContext aCtx, Object[] aArgs)
+        public static TypeTuple enumType(Context aCtx, Object[] aArgs)
         throws CommandException {
             try {
                 aArgs = ENUM_ARGLIST.guard(aArgs, aCtx);
@@ -419,8 +419,8 @@ public class ArgListBuilderUtil {
         }
     }
 
-    public static class ArgListTuple extends Tuple<IArgList, Map<String, IArgMapping>> {
-        public ArgListTuple(IArgList x, Map<String, IArgMapping> y) {
+    public static class ArgListTuple extends Tuple<ArgList, Map<String, IArgMapping>> {
+        public ArgListTuple(ArgList x, Map<String, IArgMapping> y) {
             super(x, y);
         }
     }
@@ -520,7 +520,7 @@ public class ArgListBuilderUtil {
             }
         }
 
-        IArgList lStdArgList = new StdArgList(lFixedSpecs, lOptionalSpecs, lNamedSpecs);
+        ArgList lStdArgList = new StdArgList(lFixedSpecs, lOptionalSpecs, lNamedSpecs);
         return new ArgListTuple(lStdArgList, lMappings);
     }
 
@@ -612,7 +612,7 @@ public class ArgListBuilderUtil {
 
         }
 
-        IArgList lStdArgList = new VarArgList(lFixedSpecs, lVarArgSpec, lVarArgMinLength, lVarArgMaxLength, lNamedSpecs);
+        ArgList lStdArgList = new VarArgList(lFixedSpecs, lVarArgSpec, lVarArgMinLength, lVarArgMaxLength, lNamedSpecs);
         return new ArgListTuple(lStdArgList, lMappings);
     }
 }

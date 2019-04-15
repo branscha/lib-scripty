@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -69,15 +69,15 @@ class RowEditorModel {
 
     @SuppressWarnings("unchecked")
     public void addEditorForRow(int row, TableCellEditor e) {
-        data.put(new Integer(row), e);
+        data.put(Integer.valueOf(row), e);
     }
 
     public void removeEditorForRow(int row) {
-        data.remove(new Integer(row));
+        data.remove(Integer.valueOf(row));
     }
 
     public TableCellEditor getEditor(int row) {
-        return (TableCellEditor) data.get(new Integer(row));
+        return (TableCellEditor) data.get(Integer.valueOf(row));
     }
 }
 

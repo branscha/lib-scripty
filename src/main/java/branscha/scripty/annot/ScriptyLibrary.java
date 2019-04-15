@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -39,10 +39,10 @@ public @interface ScriptyLibrary {
     /**
      * The command library name.
      */
-    public String name() default "";
+    String name() default "";
 
     /**
      * The command library type.
      */
-    public ScriptyLibraryType type() default ScriptyLibraryType.AUTO;
+    ScriptyLibraryType type() default ScriptyLibraryType.AUTO;
 }

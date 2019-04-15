@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -122,7 +122,7 @@ public class TestParser {
         lResult = parser.parseExpression("(abc 123 oele boele makkis voele)");
         Assert.assertTrue(lResult instanceof List);
         lList = (List<Object>) lResult;
-        Assert.assertTrue(lList.size() == 6);
+        Assert.assertEquals(6, lList.size());
         Assert.assertEquals(lList.get(0), "abc");
         Assert.assertEquals(lList.get(1), "123");
         Assert.assertEquals(lList.get(2), "oele");
@@ -138,7 +138,7 @@ public class TestParser {
         Object lResult = parser.parseExpression("(        abc 123 oele \tboele   makkis voele                )");
         Assert.assertTrue(lResult instanceof List);
         List<Object> lList = (List<Object>) lResult;
-        Assert.assertTrue(lList.size() == 6);
+        Assert.assertEquals(6, lList.size());
         Assert.assertEquals(lList.get(0), "abc");
         Assert.assertEquals(lList.get(1), "123");
         Assert.assertEquals(lList.get(2), "oele");
@@ -153,7 +153,7 @@ public class TestParser {
         Object lResult = parser.parseExpression("(abc 123 \"oele boele makkis\" voele)");
         Assert.assertTrue(lResult instanceof List);
         List<Object> lList = (List<Object>) lResult;
-        Assert.assertTrue(lList.size() == 4);
+        Assert.assertEquals(4, lList.size());
         Assert.assertEquals(lList.get(0), "abc");
         Assert.assertEquals(lList.get(1), "123");
         Assert.assertEquals(lList.get(2), "oele boele makkis");
@@ -166,7 +166,7 @@ public class TestParser {
         Object lResult = parser.parseExpression("(abc () (123 oele boele (makkis) voele))");
         Assert.assertTrue(lResult instanceof List);
         List<Object> lList = (List<Object>) lResult;
-        Assert.assertTrue(lList.size() == 3);
+        Assert.assertEquals(3, lList.size());
 
         // Exreme nesting
         lResult = parser.parseExpression("((((((((((x))))))))))");
@@ -193,7 +193,7 @@ public class TestParser {
         Object lResult = parser.parseExpression("(key1=val1 key2=() key3=(a b c))");
         Assert.assertTrue(lResult instanceof List);
         List<Object> lList = (List<Object>) lResult;
-        Assert.assertTrue(lList.size() == 3);
+        Assert.assertEquals(3, lList.size());
         Assert.assertTrue(lList.get(0) instanceof Pair);
         Assert.assertTrue(lList.get(1) instanceof Pair);
         Assert.assertTrue(lList.get(2) instanceof Pair);
@@ -224,7 +224,7 @@ public class TestParser {
         StreamBuffer lBuf = new StreamBuffer(lIn);
         while (!lBuf.eof()) {
             Object lResult = parser.parseExpression(lBuf);
-            Assert.assertTrue(lResult != null);
+            Assert.assertNotNull(lResult);
         }
     }
 }

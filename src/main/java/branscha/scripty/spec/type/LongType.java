@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class LongType
         implements ITypeSpec<Long> {
@@ -32,7 +32,7 @@ public class LongType
         return "Long";
     }
 
-    public Long guard(Object aArg, IContext aCtx)
+    public Long guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (aArg instanceof Long) {
             return (Long) aArg;

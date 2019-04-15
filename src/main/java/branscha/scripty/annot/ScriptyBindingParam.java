@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -39,10 +39,10 @@ public @interface ScriptyBindingParam {
     /**
      * The name of the Scripty context variable that should be bound to the parameter.
      */
-    public String value();
+    String value();
 
     /**
      * The binding behavior if there is no context variable with specified name.
      */
-    public boolean unboundException() default false;
+    boolean unboundException() default false;
 }

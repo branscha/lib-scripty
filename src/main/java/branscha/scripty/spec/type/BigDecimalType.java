@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.spec.type;
 
 import java.math.BigDecimal;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class BigDecimalType
         implements ITypeSpec<BigDecimal> {
@@ -34,7 +34,7 @@ public class BigDecimalType
         return "BigDecimal";
     }
 
-    public BigDecimal guard(Object aArg, IContext aCtx)
+    public BigDecimal guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (aArg instanceof BigDecimal) {
             return (BigDecimal) aArg;

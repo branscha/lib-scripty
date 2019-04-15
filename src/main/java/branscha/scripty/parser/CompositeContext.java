@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -28,10 +28,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CompositeContext
-        implements IContext {
-    IContext main, backing;
+        implements Context {
+    Context main, backing;
 
-    public CompositeContext(IContext aChildCtx, IContext aParentCtx) {
+    public CompositeContext(Context aChildCtx, Context aParentCtx) {
         main = aChildCtx;
         backing = aParentCtx;
     }
@@ -58,7 +58,7 @@ public class CompositeContext
         return main.isBound(aKey) || backing.isBound(aKey);
     }
 
-    public IContext getRootContext() {
+    public Context getRootContext() {
         if (backing != null) return backing.getRootContext();
         else if (main != null) return main.getRootContext();
         else return null;

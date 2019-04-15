@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class BooleanType
         implements ITypeSpec<Boolean> {
@@ -34,7 +34,7 @@ public class BooleanType
         return "Boolean";
     }
 
-    public Boolean guard(Object aArg, IContext aCtx)
+    public Boolean guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (aArg instanceof Boolean) {
             return (Boolean) aArg;

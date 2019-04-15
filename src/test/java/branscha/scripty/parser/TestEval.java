@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,6 @@ package branscha.scripty.parser;
 
 import branscha.scripty.cmdlib.MathLibrary;
 import branscha.scripty.repl.ExtensionRepositoryBuilder;
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,19 +37,17 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class TestEval {
-    protected Parser parser;
-    protected IEval eval;
-    protected List<IEval> evals = Arrays.asList(new Eval(), new Eval2());
+    private Parser parser;
+    private List<IEval> evals = Arrays.asList(new Eval(), new Eval2());
 
     @Before
     public void setup() {
         parser = new Parser();
-        eval = new Eval();
     }
 
     @Test
     public void createBinding() {
-        evals.stream().forEach((eval) -> {
+        evals.forEach((eval) -> {
             try {
                 Object lResult = eval.eval(parser.parseExpression("(bound? oele)"));
                 assertEquals(false, lResult);
@@ -77,7 +74,7 @@ public class TestEval {
         // Try to change an unknown binding.
         // It should generate an error stating that you tried to change an unknown binding.
 
-        evals.stream().forEach((eval) -> {
+        evals.forEach((eval) -> {
             try {
                 eval.eval(parser.parseExpression("(set thiswasneverdefined=alloallo)"));
                 fail("Should have thrown a CommandExeption.");
@@ -90,7 +87,7 @@ public class TestEval {
 
     @Test
     public void let() {
-        evals.stream().forEach((eval) -> {
+        evals.forEach((eval) -> {
             try {
                 // Standard let block.
                 Object lResult = eval.eval(parser.parseExpression("(let (oele=bruno emptybinding boele=fons makkis=bart voele=teck) $oele)"));
@@ -126,13 +123,13 @@ public class TestEval {
 
     @Test
     public void lambda() {
-        evals.stream().forEach((eval) -> {
+        evals.forEach((eval) -> {
             try {
                 Object lResult = eval.eval(parser.parseExpression("(let (fie=(lambda (par) (if (eq $par uno) een twee )) arg=uno) ($fie $arg))"));
-                Assert.assertEquals("een", lResult);
+                assertEquals("een", lResult);
 
                 lResult = eval.eval(parser.parseExpression("(let (fie=(lambda (par) (if (eq $par uno) een twee )) arg=duo) ($fie $arg))"));
-                Assert.assertEquals("twee", lResult);
+                assertEquals("twee", lResult);
             }
             catch (CommandException e) {
                 fail(e.getMessage());
@@ -142,7 +139,7 @@ public class TestEval {
 
     @Test
     public void booleanstuff() {
-        evals.stream().forEach((eval) -> {
+        evals.forEach((eval) -> {
             try {
                 // Boolean primitives.
                 // Truthy.
@@ -197,7 +194,7 @@ public class TestEval {
 
     @Test
     public void call() {
-        evals.stream().forEach((eval) -> {
+        evals.forEach((eval) -> {
             try {
                 ExtensionRepositoryBuilder lExtBldr = new ExtensionRepositoryBuilder();
                 lExtBldr.addLibraryClasses(MathLibrary.class);
@@ -263,27 +260,24 @@ public class TestEval {
     public void macro() {
         evals.forEach((eval) -> {
             try {
-                eval.getMacroRepo().registerCommand("unless", new ICommand() {
-                    // (unless boolexpr then else)  => (if (not boolexpr) then else)
-                    public Object execute(IEval aEval, IContext aCtx, Object[] aArgs)
-                    throws CommandException {
-                        List anExpression = Arrays.asList(aArgs);
-                        Object lBoolExpr = anExpression.get(1);
-                        Object lThenPart = anExpression.get(2);
-                        Object lElsePart = anExpression.get(3);
-                        List macro = new LinkedList();
-                        macro.add("if");
+                // (unless boolexpr then else)  => (if (not boolexpr) then else)
+                eval.getMacroRepo().registerCommand("unless", (aEval, aCtx, aArgs) -> {
+                    List anExpression = Arrays.asList(aArgs);
+                    Object lBoolExpr = anExpression.get(1);
+                    Object lThenPart = anExpression.get(2);
+                    Object lElsePart = anExpression.get(3);
+                    List macro = new LinkedList();
+                    macro.add("if");
 
-                        List lNot = new LinkedList();
-                        lNot.add("not");
-                        lNot.add(lBoolExpr);
+                    List lNot = new LinkedList();
+                    lNot.add("not");
+                    lNot.add(lBoolExpr);
 
-                        macro.add(lNot);
-                        macro.add(lThenPart);
-                        macro.add(lElsePart);
+                    macro.add(lNot);
+                    macro.add(lThenPart);
+                    macro.add(lElsePart);
 
-                        return macro;
-                    }
+                    return macro;
                 });
 
                 // Simple expression evaluation.

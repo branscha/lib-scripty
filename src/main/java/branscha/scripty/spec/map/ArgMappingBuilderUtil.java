@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.spec.map;
 
 import branscha.scripty.annot.ScriptyBindingParam;
 import branscha.scripty.annot.ScriptyParam;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.IEval;
 
 import java.lang.annotation.Annotation;
@@ -58,7 +58,7 @@ public class ArgMappingBuilderUtil {
             if (aParamClass.isAssignableFrom(IEval.class)) {
                 return new EvalMapping();
             }
-            else if (aParamClass.isAssignableFrom(IContext.class)) {
+            else if (aParamClass.isAssignableFrom(Context.class)) {
                 return new ContextMapping();
             }
             else if (aParamClass.isArray() && aParamClass.getComponentType().isAssignableFrom(Object.class)) {

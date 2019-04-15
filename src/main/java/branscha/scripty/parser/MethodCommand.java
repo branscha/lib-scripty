@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.parser;
 
 import branscha.scripty.cmdlib.CmdUtil;
 import branscha.scripty.spec.args.ArgSpecException;
-import branscha.scripty.spec.args.IArgList;
+import branscha.scripty.spec.args.ArgList;
 import branscha.scripty.spec.map.ArgListMapping;
 import branscha.scripty.spec.map.ArgMappingException;
 import branscha.scripty.spec.map.IResultMapping;
@@ -36,8 +36,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class MethodCommand
-        implements ICommand {
-    private IArgList argList;
+        implements Command {
+    private ArgList argList;
     private Object instance;
     private ArgListMapping argMapping;
     private IResultMapping resultMapping;
@@ -51,7 +51,7 @@ public class MethodCommand
         resultMapping = null;
     }
 
-    public MethodCommand(Object aInstance, Method aMethod, IArgList aArgList, ArgListMapping aArgListMapping, IResultMapping aResultMapping) {
+    public MethodCommand(Object aInstance, Method aMethod, ArgList aArgList, ArgListMapping aArgListMapping, IResultMapping aResultMapping) {
         argList = aArgList;
         method = aMethod;
         instance = aInstance;
@@ -59,7 +59,7 @@ public class MethodCommand
         resultMapping = aResultMapping;
     }
 
-    public Object execute(IEval aEval, IContext aCtx, Object[] aArgs)
+    public Object execute(IEval aEval, Context aCtx, Object[] aArgs)
     throws CommandException {
         try {
             Object[] lArgs = aArgs;

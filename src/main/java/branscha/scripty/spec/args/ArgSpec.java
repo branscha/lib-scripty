@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -22,20 +22,19 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package branscha.scripty;
+package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.ICommand;
+import branscha.scripty.parser.Context;
 
-public interface IExtensions {
-    public void addCommand(String aName, ICommand aCommand)
-    throws ExtensionException;
+/**
+ * Argument list check. Can consider all arguments.
+ * Is aware of the location within the arguments list.
+ *
+ * @param <T>
+ */
+public interface ArgSpec<T> {
+    T guard(Object[] aArgs, int aPos, Context aCtx)
+    throws ArgSpecException;
 
-    public void addMacro(String aName, ICommand aMacro)
-    throws ExtensionException;
-
-    public void addLibraryClasses(Class... aLibraryClasses)
-    throws ExtensionException;
-
-    public void addLibraryInstances(Object... aLibraryInstances)
-    throws ExtensionException;
+    String getSpecName();
 }

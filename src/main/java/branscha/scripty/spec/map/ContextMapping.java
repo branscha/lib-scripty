@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,12 +24,12 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.IEval;
 
 public class ContextMapping
         implements IArgMapping {
-    public Object map(IEval aEval, IContext aContext, Object aArgs)
+    public Object map(IEval aEval, Context aContext, Object aArgs)
     throws ArgMappingException {
         return aContext;
     }

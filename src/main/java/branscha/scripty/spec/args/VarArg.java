@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,13 +24,13 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 import branscha.scripty.spec.type.ITypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
 public class VarArg
-        implements IArgSpec {
+        implements ArgSpec {
     private ITypeSpec spec;
     private String specName;
 
@@ -43,7 +43,7 @@ public class VarArg
         return specName;
     }
 
-    public Object guard(Object[] aArgs, int aPos, IContext aCtx)
+    public Object guard(Object[] aArgs, int aPos, Context aCtx)
     throws ArgSpecException {
         try {
             if (aPos < 0 || aPos >= aArgs.length || aArgs[aPos] instanceof Pair)

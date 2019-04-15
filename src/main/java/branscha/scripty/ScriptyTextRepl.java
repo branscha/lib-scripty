@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,9 @@
  ******************************************************************************/
 package branscha.scripty;
 
-public class ScriptyTextRepl extends ScriptyCapable {
+public class ScriptyTextRepl
+extends ScriptyCapable {
+
     public ScriptyTextRepl() {
     }
 

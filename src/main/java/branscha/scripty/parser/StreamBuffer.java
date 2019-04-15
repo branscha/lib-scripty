@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -30,7 +30,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class StreamBuffer
-        implements IParserInput {
+        implements ParserInput {
     private Reader reader;
     private char buff[] = new char[1024];
     private int buffPos = 0;

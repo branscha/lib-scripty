@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class InstanceOrBinding
         implements ITypeSpec {
@@ -34,7 +34,7 @@ public class InstanceOrBinding
         innerSpec = aSpec;
     }
 
-    public Object guard(Object aArg, IContext aCtx)
+    public Object guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         try {
             if (aArg instanceof String && aCtx.isBound((String) aArg)) {

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -43,12 +43,12 @@ public @interface ScriptyStdArgList {
     /**
      * The name of the argument list so that it can be reused later using {@link ScriptyRefArgList}.
      */
-    public String name() default "";
+    String name() default "";
 
-    public ScriptyArg[] fixed() default {};
+    ScriptyArg[] fixed() default {};
 
 
-    public ScriptyArg[] optional() default {};
+    ScriptyArg[] optional() default {};
 
-    public ScriptyArg[] named() default {};
+    ScriptyArg[] named() default {};
 }

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.spec.type.ITypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
@@ -33,7 +33,7 @@ import branscha.scripty.spec.type.TypeSpecException;
  * They are required, the user has to provide them.
  */
 public class FixedArg
-        implements IArgSpec {
+        implements ArgSpec {
     private ITypeSpec spec;
     private String specName;
 
@@ -46,7 +46,7 @@ public class FixedArg
         return specName;
     }
 
-    public Object guard(Object[] aArgs, int aPos, IContext aCtx)
+    public Object guard(Object[] aArgs, int aPos, Context aCtx)
     throws ArgSpecException {
         try {
             if (aPos < 0 || aPos >= aArgs.length)

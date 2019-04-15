@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -25,7 +25,7 @@
 package branscha.scripty.repl;
 
 import branscha.scripty.ExtensionException;
-import branscha.scripty.IExtensions;
+import branscha.scripty.ExtensionManager;
 import branscha.scripty.parser.*;
 
 import java.io.*;
@@ -48,7 +48,7 @@ import java.util.List;
  * nice formatting.</li>
  * </ul>
  */
-public class ReplEngine implements IExtensions {
+public class ReplEngine implements ExtensionManager {
 
     private ExtensionRepositoryBuilder extensions = new ExtensionRepositoryBuilder();
 
@@ -56,7 +56,7 @@ public class ReplEngine implements IExtensions {
     public static final String OUTPUT = "*output";
     public static final String ERROR = "*error";
 
-    private IContext context;
+    private Context context;
     private IEval eval;
     private StringBuilder currCmd = new StringBuilder();
     private Parser parser = new Parser();
@@ -372,11 +372,11 @@ public class ReplEngine implements IExtensions {
         return eval.eval(parser.parseExpression(anExpression));
     }
 
-    public IContext getContext() {
+    public Context getContext() {
         return eval.getContext();
     }
 
-    public void setContext(IContext aContext) {
+    public void setContext(Context aContext) {
         // Remember the context at repl level.
         context = aContext;
         bindStreamsToContext();
@@ -385,12 +385,12 @@ public class ReplEngine implements IExtensions {
         eval.setContext(context);
     }
 
-    public void addCommand(String aName, ICommand aCommand)
+    public void addCommand(String aName, Command aCommand)
     throws ExtensionException {
         extensions.addCommand(aName, aCommand);
     }
 
-    public void addMacro(String aName, ICommand aMacro)
+    public void addMacro(String aName, Command aMacro)
     throws ExtensionException {
         extensions.addMacro(aName, aMacro);
     }

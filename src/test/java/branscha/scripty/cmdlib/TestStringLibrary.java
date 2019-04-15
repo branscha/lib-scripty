@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -27,11 +27,15 @@ package branscha.scripty.cmdlib;
 import branscha.scripty.ExtensionException;
 import branscha.scripty.ProcessorException;
 import branscha.scripty.ScriptyStreamProcessor;
-import junit.framework.Assert;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class TestStringLibrary {
     private ScriptyStreamProcessor scripty;
@@ -47,81 +51,81 @@ public class TestStringLibrary {
     public void isString1()
     throws ProcessorException {
         Object lResult = scripty.process("str? abc");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertTrue((Boolean) lResult);
+        assertTrue(lResult instanceof Boolean);
+        assertTrue((Boolean) lResult);
     }
 
     @Test
     public void isString2()
     throws ProcessorException {
         Object lResult = scripty.process("str? '()");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertFalse((Boolean) lResult);
+        assertTrue(lResult instanceof Boolean);
+        assertFalse((Boolean) lResult);
     }
 
     @Test
     public void isString3()
     throws ProcessorException {
         Object lResult = scripty.process("str? $null");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertFalse((Boolean) lResult);
+        assertTrue(lResult instanceof Boolean);
+        assertFalse((Boolean) lResult);
     }
 
     @Test
     public void trim1()
     throws ProcessorException {
         Object lResult = scripty.process("str-trim \"  abc  \"");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("abc", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("abc", lResult);
     }
 
     @Test
     public void format1()
     throws ProcessorException {
         Object lResult = scripty.process("str-format \"1-%s, 2-%s\" uno duo");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("1-uno, 2-duo", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("1-uno, 2-duo", lResult);
     }
 
     @Test
     public void match1()
     throws ProcessorException {
         Object lResult = scripty.process("str-match \"(a+)(b*)c\" aaabbbbbc");
-        Assert.assertTrue(lResult instanceof List);
+        assertTrue(lResult instanceof List);
         List lListResult = (List) lResult;
-        Assert.assertTrue(lListResult.size() == 3);
-        Assert.assertEquals("aaabbbbbc", lListResult.get(0));
-        Assert.assertEquals("aaa", lListResult.get(1));
-        Assert.assertEquals("bbbbb", lListResult.get(2));
+        TestCase.assertEquals(3, lListResult.size());
+        assertEquals("aaabbbbbc", lListResult.get(0));
+        assertEquals("aaa", lListResult.get(1));
+        assertEquals("bbbbb", lListResult.get(2));
     }
 
     @Test
     public void match2()
     throws ProcessorException {
         Object lResult = scripty.process("str-match* \"(\\d+)\\s*\" \"10 11 12 13\"");
-        Assert.assertTrue(lResult instanceof List);
+        assertTrue(lResult instanceof List);
         List lListResult = (List) lResult;
-        Assert.assertTrue(lListResult.size() == 4);
+        TestCase.assertEquals(4, lListResult.size());
 
-        Assert.assertEquals("10", ((List) lListResult.get(0)).get(1));
-        Assert.assertEquals("11", ((List) lListResult.get(1)).get(1));
-        Assert.assertEquals("12", ((List) lListResult.get(2)).get(1));
-        Assert.assertEquals("13", ((List) lListResult.get(3)).get(1));
+        assertEquals("10", ((List) lListResult.get(0)).get(1));
+        assertEquals("11", ((List) lListResult.get(1)).get(1));
+        assertEquals("12", ((List) lListResult.get(2)).get(1));
+        assertEquals("13", ((List) lListResult.get(3)).get(1));
     }
 
     @Test
     public void isMatch1()
     throws ProcessorException {
         Object lResult = scripty.process("str-match? \"(a+)(b*)c\" aaabbbbbc");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertTrue(((Boolean) lResult));
+        assertTrue(lResult instanceof Boolean);
+        assertTrue(((Boolean) lResult));
     }
 
     @Test
     public void isMatch2()
     throws ProcessorException {
         Object lResult = scripty.process("str-match? \"(a+)(b*)c\" aaabbbbb");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertFalse(((Boolean) lResult));
+        assertTrue(lResult instanceof Boolean);
+        assertFalse(((Boolean) lResult));
     }
 }

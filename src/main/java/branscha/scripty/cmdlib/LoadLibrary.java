@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.IEval;
 import branscha.scripty.repl.ReplEngine;
 import branscha.scripty.repl.ReplEngineException;
@@ -34,10 +34,7 @@ import branscha.scripty.spec.type.ITypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 import branscha.scripty.spec.type.TypeUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +49,7 @@ public class LoadLibrary {
 
     @ScriptyCommand(name = "load")
     @ScriptyVarArgList(vararg = @ScriptyArg(name = "loaders", type = "Custom branscha.scripty.cmdlib.LoadLibrary$LoaderType"))
-    public void load(@ScriptyParam("loaders") Object[] aLoaders, IContext aCtx, IEval aEval)
+    public void load(@ScriptyParam("loaders") Object[] aLoaders, Context aCtx, IEval aEval)
     throws CommandException {
         List<Loader> lLoaders = new ArrayList<Loader>();
         for (Object lLoader : aLoaders) {
@@ -63,14 +60,14 @@ public class LoadLibrary {
 
     @ScriptyCommand(name = "reload")
     @ScriptyStdArgList()
-    public void reload(IContext aContext, IEval aEval)
+    public void reload(Context aContext, IEval aEval)
     throws CommandException {
         List<Loader> lLoaders = new ArrayList<Loader>();
         lLoaders.addAll(loaders);
         internalLoad(lLoaders, aEval, aContext);
     }
 
-    private void internalLoad(List<Loader> aLoaders, IEval aEval, IContext aContext)
+    private void internalLoad(List<Loader> aLoaders, IEval aEval, Context aContext)
     throws CommandException {
         Object lInput = aContext.getBinding(ReplEngine.INPUT);
         Object lOutput = aContext.getBinding(ReplEngine.OUTPUT);
@@ -167,8 +164,13 @@ public class LoadLibrary {
 
         public void checkValidity()
         throws CommandException {
-            if (this.getClass().getResourceAsStream(resource) == null)
-                throw new CommandException(String.format("The resource does not exist: \"%s\".", resource));
+            try (InputStream resourceStream = this.getClass().getResourceAsStream(resource)) {
+                if (resourceStream == null)
+                    throw new CommandException(String.format("The resource does not exist: \"%s\".", resource));
+            }
+            catch (IOException e) {
+                throw new CommandException(String.format("The resource cannot be opened: \"%s\". %s", resource, e.getMessage()));
+            }
         }
 
         public InputStream getStream()
@@ -189,7 +191,7 @@ public class LoadLibrary {
             return "loader";
         }
 
-        public Object guard(Object aArg, IContext aCtx)
+        public Object guard(Object aArg, Context aCtx)
         throws TypeSpecException {
             Loader lCandLdr;
             if (aArg instanceof String) {

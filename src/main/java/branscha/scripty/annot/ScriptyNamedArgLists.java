@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyNamedArgLists {
-    public ScriptyStdArgList[] std() default {};
+    ScriptyStdArgList[] std() default {};
 
-    public ScriptyVarArgList[] var() default {};
+    ScriptyVarArgList[] var() default {};
 }

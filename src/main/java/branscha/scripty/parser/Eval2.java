@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -40,15 +40,15 @@ public class Eval2 extends AbstractEval {
         this(new BasicContext());
     }
 
-    public Eval2(IContext aContext) {
+    public Eval2(Context aContext) {
         super(aContext);
     }
 
-    public static interface IFrameHandler {
-        public void init(EvalStack aStack, StackFrame aFrame)
+    public interface IFrameHandler {
+        void init(EvalStack aStack, StackFrame aFrame)
         throws CommandException;
 
-        public void handleFrame(IEval aEval, EvalStack aStack, StackFrame aFrame)
+        void handleFrame(IEval aEval, EvalStack aStack, StackFrame aFrame)
         throws CommandException;
     }
 
@@ -58,12 +58,12 @@ public class Eval2 extends AbstractEval {
         private Object expr;
         private Object[] data;
         private int dataptr;
-        private IContext ctx;
+        private Context ctx;
         private Object result;
         private boolean evaluated;
         private IFrameHandler handler;
 
-        public StackFrame(Object aExpr, IContext aCtx) {
+        public StackFrame(Object aExpr, Context aCtx) {
             expr = aExpr;
             data = EMPTY;
             dataptr = 0;
@@ -73,7 +73,7 @@ public class Eval2 extends AbstractEval {
             handler = null;
         }
 
-        public IContext getCtx() {
+        public Context getCtx() {
             return ctx;
         }
 
@@ -129,7 +129,7 @@ public class Eval2 extends AbstractEval {
             return handler;
         }
 
-        public void setCtx(IContext aCtx) {
+        public void setCtx(Context aCtx) {
             ctx = aCtx;
         }
 
@@ -167,7 +167,8 @@ public class Eval2 extends AbstractEval {
     }
 
     public static class EvalStack {
-        private List<StackFrame> stack = new ArrayList<StackFrame>();
+
+        private List<StackFrame> stack = new ArrayList<>();
         private EvalStack prevstack;
 
         public EvalStack(EvalStack aPrevious) {
@@ -192,7 +193,7 @@ public class Eval2 extends AbstractEval {
             return stack.remove(stack.size() - 1);
         }
 
-        public void push(Object aExpr, IContext aCtx) {
+        public void push(Object aExpr, Context aCtx) {
             StackFrame lFrame = new StackFrame(aExpr, aCtx);
             stack.add(lFrame);
         }
@@ -263,6 +264,7 @@ public class Eval2 extends AbstractEval {
     }
 
     public static class EvalEvent extends EventObject {
+
         private static final long serialVersionUID = -514101948441517829L;
         private transient EvalStack stack;
         private Object result;
@@ -354,7 +356,7 @@ public class Eval2 extends AbstractEval {
 
     private EvalStack currstack;
 
-    public Object eval(Object aExpr, IContext aCtx)
+    public Object eval(Object aExpr, Context aCtx)
     throws CommandException {
         // Create a new stack, and link the old stack to it.
         // This system is meant to work cross-commands.
@@ -546,7 +548,7 @@ class AtomicHandler implements Eval2.IFrameHandler {
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         final Object lExpr = aFrame.getExpr();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
 
         if (lExpr instanceof String && ((String) lExpr).startsWith("$")) {
             // Syntactic sugar. $name is equivalent to (get name).
@@ -574,7 +576,7 @@ class PairHandler implements Eval2.IFrameHandler {
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         final Object[] lData = aFrame.getData();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Pair lPair = (Pair) aFrame.getExpr();
         switch (aFrame.getDataptr()) {
             case 0:
@@ -621,7 +623,7 @@ class StandardHandler implements Eval2.IFrameHandler {
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
 
@@ -634,148 +636,142 @@ class StandardHandler implements Eval2.IFrameHandler {
 
         // Re-fetch the command candidate, it might have changed by the evaluation.
         Object lCmdCandidate = lData[0];
-        if (lData.length > 0) {
-            // Now we try to execute the list as a command or a function.
+        // Now we try to execute the list as a command or a function.
 
-            if (lCmdCandidate instanceof String) {
-                // Create a String view on the command candidate.
-                final String lCmdName = ((String) lCmdCandidate).trim();
+        if (lCmdCandidate instanceof String) {
+            // Create a String view on the command candidate.
+            final String lCmdName = ((String) lCmdCandidate).trim();
 
-                // Built-in forms.
-                // These are not like the special forms, because they list is
-                // evaluated like all other lists. They should be seen as built-in functionality.
-                /////////////////////////////////////////////////////////////////////////////////
+            // Built-in forms.
+            // These are not like the special forms, because they list is
+            // evaluated like all other lists. They should be seen as built-in functionality.
+            /////////////////////////////////////////////////////////////////////////////////
 
-                if ("eval".equals(lCmdName)) {
-                    if (lLstSize != 2)
-                        throw new CommandException("The 'eval' form should have a single argument.", aStack);
-                    aStack.push(lData[1], lCtx);
+            if ("eval".equals(lCmdName)) {
+                if (lLstSize != 2)
+                    throw new CommandException("The 'eval' form should have a single argument.", aStack);
+                aStack.push(lData[1], lCtx);
+            }
+            else if ("eq".equals(lCmdName)) {
+                if (lLstSize != 3) throw new CommandException("The 'eq' form should have two arguments.", aStack);
+                Object lArg1 = lData[1];
+                Object lArg2 = lData[2];
+                Boolean lResult;
+                if (lArg1 == null && lArg2 == null) lResult = Boolean.TRUE;
+                else if (lArg1 == null) lResult = Boolean.FALSE;
+                else if (lArg2 == null) lResult = Boolean.FALSE;
+                else lResult = lArg1.equals(lArg2);
+                aFrame.setResult(lResult);
+            }
+            else if ("bound?".equals(lCmdName)) {
+                if (lLstSize != 2)
+                    throw new CommandException("The 'bound?' form should have a single argument.", aStack);
+                if (lData[1] instanceof String) {
+                    String lName = (String) lData[1];
+                    aFrame.setResult(lCtx.isBound(lName));
                 }
-                else if ("eq".equals(lCmdName)) {
-                    if (lLstSize != 3) throw new CommandException("The 'eq' form should have two arguments.", aStack);
-                    Object lArg1 = lData[1];
-                    Object lArg2 = lData[2];
-                    Boolean lResult;
-                    if (lArg1 == null && lArg2 == null) lResult = Boolean.TRUE;
-                    else if (lArg1 == null) lResult = Boolean.FALSE;
-                    else if (lArg2 == null) lResult = Boolean.FALSE;
-                    else lResult = lArg1.equals(lArg2);
-                    aFrame.setResult(lResult);
+                else
+                    throw new CommandException("The 'bound?' form should have a single string argument.", aStack);
+            }
+            else if ("progn".equals(lCmdName)) {
+                if (lLstSize < 2)
+                    throw new CommandException("The 'progn' form should have at least one argument.", aStack);
+                aFrame.setResult(lData[lData.length - 1]);
+            }
+            else if ("funcall".equals(lCmdName)) {
+                // This is the 'official' way of executing a method.
+                // The other methods are macro's that will sooner or later evaluate to this construct.
+                // This is the real deal (whereas the other constructs should be seen as syntactic sugar).
+
+                // Quick test on the number of arguments.
+                if (lLstSize < 2)
+                    throw new CommandException("The 'funcall' form should have the format (funcall name <args>).", aStack);
+                // Test the function name / lambda.
+                final Object lName = lData[1];
+
+                // Fetch the function.
+                //////////////////////
+
+                Lambda lFun;
+                if (lName instanceof Lambda) {
+                    // Easy part.
+                    lFun = (Lambda) lName;
                 }
-                else if ("bound?".equals(lCmdName)) {
-                    if (lLstSize != 2)
-                        throw new CommandException("The 'bound?' form should have a single argument.", aStack);
-                    if (lData[1] instanceof String) {
-                        String lName = (String) lData[1];
-                        aFrame.setResult(lCtx.isBound(lName));
-                    }
-                    else
-                        throw new CommandException("The 'bound?' form should have a single string argument.", aStack);
-                }
-                else if ("progn".equals(lCmdName)) {
-                    if (lLstSize < 2)
-                        throw new CommandException("The 'progn' form should have at least one argument.", aStack);
-                    aFrame.setResult(lData[lData.length - 1]);
-                }
-                else if ("funcall".equals(lCmdName)) {
-                    // This is the 'official' way of executing a method.
-                    // The other methods are macro's that will sooner or later evaluate to this construct.
-                    // This is the real deal (whereas the other constructs should be seen as syntactic sugar).
-
-                    // Quick test on the number of arguments.
-                    if (lLstSize < 2)
-                        throw new CommandException("The 'funcall' form should have the format (funcall name <args>).", aStack);
-                    // Test the function name / lambda.
-                    final Object lName = lData[1];
-
-                    // Fetch the function.
-                    //////////////////////
-
-                    Lambda lFun;
-                    if (lName instanceof Lambda) {
-                        // Easy part.
-                        lFun = (Lambda) lName;
-                    }
-                    else if (lName instanceof String) {
-                        // We have to do a lookup.
-                        Object lFunCandidate = lCtx.getBinding((String) lName);
-                        if (!(lFunCandidate instanceof Lambda))
-                            throw new CommandException(String.format("Function \"%s\" was not found in the context.", lName), aStack);
-                        lFun = (Lambda) lFunCandidate;
-                    }
-                    else {
-                        // Trouble.
-                        // We found something in the beginning of the list that does not evaluate to a lambda name or a lambda itself.
-                        if (lName == null)
-                            throw new CommandException("The first argument in the 'funcall' form should evaluate to a string or a lambda, but we received 'null'.", aStack);
-                        throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.%n Received an instance of class '%s'.", lName.getClass().getCanonicalName()), aStack);
-                    }
-
-                    // Context that binds the parameters to the arguments in addition to the lexical context.
-                    // Note that we skip the 'funcall' constant and the function name/lambda when constructing
-                    // the argument list.
-                    final IContext lFunCtx = lFun.createContext(lData, 2, lLstSize);
-                    aStack.push(lFun.getExpr(), lFunCtx);
-
-                }
-                else if (commands.hasCommand(lCmdName)) {
-                    try {
-                        final ICommand lCmd = commands.getCommand(lCmdName);
-                        aFrame.setResult(lCmd.execute(aEval, lCtx, lData));
-                    }
-                    catch (CommandException e) {
-                        // This type of error will be handled by our general mechanism.
-                        // It does not need special handling here.
-                        Eval2.EvalStack lNestedStack = e.getStack();
-                        e.setStack(aStack.merge(lNestedStack));
-                        throw e;
-                    }
-                    catch (Exception e) {
-                        // A non-CommandException is converted into a command exception here.
-                        // Extract information about the exception. For some exceptions this is the only
-                        // way to get some detail in this way (e.g. NullPointerException).
-                        final ByteArrayOutputStream lBos = new ByteArrayOutputStream();
-                        final PrintStream lPrinter = new PrintStream(lBos);
-                        e.printStackTrace(lPrinter);
-                        final String lMsg = lBos.toString();
-                        try {
-                            lPrinter.close();
-                            lBos.close();
-                        }
-                        catch (IOException ignored) {
-                        }
-
-                        // Re-throw the exception with more information.
-                        throw new CommandException(String.format("Command '%s' failed.%n%s", lCmdName, lMsg), e, aStack);
-                    }
-                }
-                else if (lCtx.isBound(lCmdName) && lCtx.getBinding(lCmdName) instanceof Lambda) {
-                    // Immediately execute the lambda.
-                    final Lambda lFun = (Lambda) lCtx.getBinding(lCmdName);
-                    final IContext lFunCtx = lFun.createContext(lData, 1, lLstSize);
-                    aStack.push(lFun.getExpr(), lFunCtx);
+                else if (lName instanceof String) {
+                    // We have to do a lookup.
+                    Object lFunCandidate = lCtx.getBinding((String) lName);
+                    if (!(lFunCandidate instanceof Lambda))
+                        throw new CommandException(String.format("Function \"%s\" was not found in the context.", lName), aStack);
+                    lFun = (Lambda) lFunCandidate;
                 }
                 else {
-                    throw new CommandException(String.format("Command or form '%s' does not exist.", lCmdName), aStack);
+                    // Trouble.
+                    // We found something in the beginning of the list that does not evaluate to a lambda name or a lambda itself.
+                    if (lName == null)
+                        throw new CommandException("The first argument in the 'funcall' form should evaluate to a string or a lambda, but we received 'null'.", aStack);
+                    throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.%n Received an instance of class '%s'.", lName.getClass().getCanonicalName()), aStack);
+                }
+
+                // Context that binds the parameters to the arguments in addition to the lexical context.
+                // Note that we skip the 'funcall' constant and the function name/lambda when constructing
+                // the argument list.
+                final Context lFunCtx = lFun.createContext(lData, 2, lLstSize);
+                aStack.push(lFun.getExpr(), lFunCtx);
+
+            }
+            else if (commands.hasCommand(lCmdName)) {
+                try {
+                    final Command lCmd = commands.getCommand(lCmdName);
+                    aFrame.setResult(lCmd.execute(aEval, lCtx, lData));
+                }
+                catch (CommandException e) {
+                    // This type of error will be handled by our general mechanism.
+                    // It does not need special handling here.
+                    Eval2.EvalStack lNestedStack = e.getStack();
+                    e.setStack(aStack.merge(lNestedStack));
+                    throw e;
+                }
+                catch (Exception e) {
+                    // A non-CommandException is converted into a command exception here.
+                    // Extract information about the exception. For some exceptions this is the only
+                    // way to get some detail in this way (e.g. NullPointerException).
+                    final ByteArrayOutputStream lBos = new ByteArrayOutputStream();
+                    final PrintStream lPrinter = new PrintStream(lBos);
+                    e.printStackTrace(lPrinter);
+                    final String lMsg = lBos.toString();
+                    try {
+                        lPrinter.close();
+                        lBos.close();
+                    }
+                    catch (IOException ignored) {
+                    }
+
+                    // Re-throw the exception with more information.
+                    throw new CommandException(String.format("Command '%s' failed.%n%s", lCmdName, lMsg), e, aStack);
                 }
             }
-            else if (lCmdCandidate instanceof Lambda) {
+            else if (lCtx.isBound(lCmdName) && lCtx.getBinding(lCmdName) instanceof Lambda) {
                 // Immediately execute the lambda.
-                final Lambda lFun = (Lambda) lCmdCandidate;
-                final IContext lFunCtx = lFun.createContext(lData, 1, lLstSize);
+                final Lambda lFun = (Lambda) lCtx.getBinding(lCmdName);
+                final Context lFunCtx = lFun.createContext(lData, 1, lLstSize);
                 aStack.push(lFun.getExpr(), lFunCtx);
             }
             else {
-                // Error, name of the command should be a string or a lambda.
-                if (lCmdCandidate == null)
-                    throw new CommandException(String.format("The command name should evaluate to a string or a lambda. Found null."), aStack);
-                else
-                    throw new CommandException(String.format("The command name should evaluate to a string or a lambda.%nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
+                throw new CommandException(String.format("Command or form '%s' does not exist.", lCmdName), aStack);
             }
         }
+        else if (lCmdCandidate instanceof Lambda) {
+            // Immediately execute the lambda.
+            final Lambda lFun = (Lambda) lCmdCandidate;
+            final Context lFunCtx = lFun.createContext(lData, 1, lLstSize);
+            aStack.push(lFun.getExpr(), lFunCtx);
+        }
         else {
-            // Error, the list does not contain a command.
-            throw new CommandException(String.format("The expression '%s' cannot be executed.", lLstExpr), aStack);
+            // Error, name of the command should be a string or a lambda.
+            if (lCmdCandidate == null)
+                throw new CommandException(String.format("The command name should evaluate to a string or a lambda. Found null."), aStack);
+            else
+                throw new CommandException(String.format("The command name should evaluate to a string or a lambda.%nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
         }
     }
 }
@@ -825,7 +821,7 @@ class IfHandler
 
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
 
         switch (aFrame.getDataptr()) {
@@ -870,7 +866,7 @@ class WhileHandler
 
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         Object[] lData = aFrame.getData();
 
         switch (aFrame.getDataptr()) {
@@ -908,8 +904,8 @@ class WhileHandler
     }
 }
 
-class AndHandler
-        implements Eval2.IFrameHandler {
+class AndHandler implements Eval2.IFrameHandler {
+
     public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
@@ -929,34 +925,31 @@ class AndHandler
 
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
 
-        switch (lDataPtr) {
-            case 0:
-                // Push the first expression on the stack for evaluation.
-                aStack.push(lLstExpr.get(1), lCtx);
-                return;
-            default:
-                // Check the result of the last parameter.
-                if (!Eval2.boolEval(lData[lDataPtr - 1])) {
-                    // We shortcut the evaluation if we find a false value.
-                    // We can stop on the first false value we encounter.
-                    aFrame.setResult(Boolean.FALSE);
+        if (lDataPtr == 0) {// Push the first expression on the stack for evaluation.
+            aStack.push(lLstExpr.get(1), lCtx);
+        }
+        else {// Check the result of the last parameter.
+            if (!Eval2.boolEval(lData[lDataPtr - 1])) {
+                // We shortcut the evaluation if we find a false value.
+                // We can stop on the first false value we encounter.
+                aFrame.setResult(Boolean.FALSE);
+            }
+            else {
+                if (lDataPtr < (lLstSize - 1)) {
+                    // There are still some and-expressions to evaluate, so we
+                    // evaluate the next one.
+                    aStack.push(lLstExpr.get(lDataPtr + 1), lCtx);
                 }
                 else {
-                    if (lDataPtr < (lLstSize - 1)) {
-                        // There are still some and-expressions to evaluate, so we
-                        // evaluate the next one.
-                        aStack.push(lLstExpr.get(lDataPtr + 1), lCtx);
-                    }
-                    else {
-                        // We evaluated all expressions, and the all evaluated
-                        // to true.
-                        aFrame.setResult(Boolean.TRUE);
-                    }
+                    // We evaluated all expressions, and the all evaluated
+                    // to true.
+                    aFrame.setResult(Boolean.TRUE);
                 }
+            }
         }
     }
 }
@@ -977,39 +970,37 @@ class OrHandler
 
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
+
         // It is a special form because it shortcuts evaluation when a single true value
         // was found
 
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
 
-        switch (lDataPtr) {
-            case 0:
-                // Push the first expression on the stack for evaluation.
-                aStack.push(lLstExpr.get(1), lCtx);
-                return;
-            default:
-                // Check the result of the last parameter.
-                if (Eval2.boolEval(lData[lDataPtr - 1])) {
-                    // We shortcut the evaluation if we find a true value.
-                    // We can stop on the first true value we encounter.
-                    aFrame.setResult(Boolean.TRUE);
+        if (lDataPtr == 0) {// Push the first expression on the stack for evaluation.
+            aStack.push(lLstExpr.get(1), lCtx);
+        }
+        else {// Check the result of the last parameter.
+            if (Eval2.boolEval(lData[lDataPtr - 1])) {
+                // We shortcut the evaluation if we find a true value.
+                // We can stop on the first true value we encounter.
+                aFrame.setResult(Boolean.TRUE);
+            }
+            else {
+                if (lDataPtr < (lLstSize - 1)) {
+                    // There are still some and-expressions to evaluate, so we
+                    // evaluate the next one.
+                    aStack.push(lLstExpr.get(lDataPtr + 1), lCtx);
                 }
                 else {
-                    if (lDataPtr < (lLstSize - 1)) {
-                        // There are still some and-expressions to evaluate, so we
-                        // evaluate the next one.
-                        aStack.push(lLstExpr.get(lDataPtr + 1), lCtx);
-                    }
-                    else {
-                        // We evaluated all expressions, and the all evaluated
-                        // to false.
-                        aFrame.setResult(Boolean.FALSE);
-                    }
+                    // We evaluated all expressions, and the all evaluated
+                    // to false.
+                    aFrame.setResult(Boolean.FALSE);
                 }
+            }
         }
     }
 }
@@ -1031,17 +1022,15 @@ class NotHandler
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
 
-        switch (aFrame.getDataptr()) {
-            case 0:
-                // Push the boolean expression on the stack for evaluation.
-                aStack.push(lLstExpr.get(1), lCtx);
-                return;
-            default:
-                if (Eval2.boolEval(lData[0])) aFrame.setResult(Boolean.FALSE);
-                else aFrame.setResult(Boolean.TRUE);
+        if (aFrame.getDataptr() == 0) {// Push the boolean expression on the stack for evaluation.
+            aStack.push(lLstExpr.get(1), lCtx);
+        }
+        else {
+            if (Eval2.boolEval(lData[0])) aFrame.setResult(Boolean.FALSE);
+            else aFrame.setResult(Boolean.TRUE);
         }
     }
 }
@@ -1054,7 +1043,7 @@ class SetHandler implements Eval2.IFrameHandler {
         throws CommandException {
 
             final List lstExpr = (List) aFrame.getExpr();
-            final IContext ctx = aFrame.getCtx();
+            final Context ctx = aFrame.getCtx();
             final Object[] data = aFrame.getData();
             final int dataPtr = aFrame.getDataptr();
 
@@ -1096,7 +1085,7 @@ class SetHandler implements Eval2.IFrameHandler {
         public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
         throws CommandException {
             final List lLstExpr = (List) aFrame.getExpr();
-            final IContext lCtx = aFrame.getCtx();
+            final Context lCtx = aFrame.getCtx();
             final Object[] lData = aFrame.getData();
             final int lDataPtr = aFrame.getDataptr();
 
@@ -1163,7 +1152,7 @@ class LetHandler
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
 
         if (lLstSize != 3)
             throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).", lLstExpr.get(0), lLstExpr.get(0)), aStack);
@@ -1183,7 +1172,7 @@ class LetHandler
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
         final boolean letrec = "let*".equals(lLstExpr.get(0));
@@ -1269,7 +1258,7 @@ class GetHandler
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
 
@@ -1301,7 +1290,7 @@ class LambdaHandler
 
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
 
         //Quick test on the number of arguments.
         if (lLstSize != 3)
@@ -1311,7 +1300,7 @@ class LambdaHandler
         final Object lBody = lLstExpr.get(2);
 
         // Do some checking.
-        if (lParams == null || !(lParams instanceof List))
+        if (!(lParams instanceof List))
             throw new CommandException("The first argument in the 'lambda' form should evaluate to a list of parameters.", aStack);
         List lParamList = (List) lParams;
         for (Object lParam : lParamList)
@@ -1349,7 +1338,7 @@ class DefunHandler
         // should be evaluated at this point.
 
         final List lLstExpr = (List) aFrame.getExpr();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
 
@@ -1360,9 +1349,9 @@ class DefunHandler
 
         if (lDataPtr == 0) {
             // Do some checking.
-            if (lName == null || !(lName instanceof String))
+            if (!(lName instanceof String))
                 throw new CommandException("The first argument in the 'defun' form should evaluate to a string.", aStack);
-            if (lParams == null || !(lParams instanceof List))
+            if (!(lParams instanceof List))
                 throw new CommandException("The second argument in the 'defun' form should evaluate to a list of parameters.", aStack);
             final List lParamList = (List) lParams;
             for (Object lParam : lParamList)
@@ -1372,7 +1361,7 @@ class DefunHandler
                 throw new CommandException("The third argument in the 'defun' form should be an expression.", aStack);
 
             // Create a lambda macro.
-            final List<Object> lLambdaMacro = new ArrayList<Object>(3);
+            final List<Object> lLambdaMacro = new ArrayList<>(3);
             lLambdaMacro.add("lambda");
             lLambdaMacro.add(lParams);
             lLambdaMacro.add(lBody);
@@ -1403,8 +1392,9 @@ class TimerHandler
 
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
+
         final List lLstExpr = (List) aFrame.getExpr();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
 
@@ -1412,7 +1402,6 @@ class TimerHandler
             long lStart = System.currentTimeMillis();
             aFrame.pushData(lStart);
             aStack.push(lLstExpr.get(1), lCtx);
-            return;
         }
         else {
             long lStop = System.currentTimeMillis();
@@ -1422,8 +1411,8 @@ class TimerHandler
     }
 }
 
-class MacroHandler
-        implements Eval2.IFrameHandler {
+class MacroHandler implements Eval2.IFrameHandler {
+
     private CommandRepository macros = new CommandRepository();
 
     public MacroHandler() {
@@ -1451,14 +1440,14 @@ class MacroHandler
     public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
-        final IContext lCtx = aFrame.getCtx();
+        final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
         final int lDataPtr = aFrame.getDataptr();
 
         if (lDataPtr == 0) {
             try {
                 // Built-in macro call.
-                final ICommand lMacro = macros.getCommand((String) lLstExpr.get(0));
+                final Command lMacro = macros.getCommand((String) lLstExpr.get(0));
                 final List lArgs = new ArrayList(lLstExpr.size());
                 lArgs.addAll(lLstExpr);
                 aStack.push(lMacro.execute(aEval, lCtx, lArgs.toArray()), lCtx);

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,9 +24,9 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
-public interface IArgList {
-    public abstract Object[] guard(Object[] aArgs, IContext aCtx)
+public interface ArgList {
+    public abstract Object[] guard(Object[] aArgs, Context aCtx)
     throws ArgSpecException;
 }

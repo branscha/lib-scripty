@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -167,7 +167,7 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-expr-x")
     @ScriptyRefArgList(ref = "one argument")
-    public void dbgExprInternal(IEval currentEval, IContext context, @ScriptyParam("arg") Object expr) {
+    public void dbgExprInternal(IEval currentEval, Context context, @ScriptyParam("arg") Object expr) {
         // Halt the previous debug session in order not
         // to clutter up our debugger.
         if (trace != null) trace.terminate();
@@ -353,13 +353,13 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-ctx")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
-    public IContext dbgCtx(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
-                           @ScriptyParam("quiet") boolean isQuiet)
+    public Context dbgCtx(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
+                          @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
         final Eval2.EvalStack lStack = trace.getStack();
         if (lStack == null) throw new CommandException(ERR040);
-        final IContext lCtx = lStack.top().getCtx();
+        final Context lCtx = lStack.top().getCtx();
         if (!isQuiet) writer.print(lCtx.toString());
         return lCtx;
     }
@@ -430,7 +430,7 @@ public class DebuggerLibrary {
         if (lStack == null) throw new CommandException(ERR040);
         Eval2.StackFrame lFrame = lStack.top();
         if (lFrame == null) throw new CommandException(ERR050);
-        final IContext lCtx = lFrame.getCtx();
+        final Context lCtx = lFrame.getCtx();
         return aEval.eval(aArg, lCtx);
     }
 

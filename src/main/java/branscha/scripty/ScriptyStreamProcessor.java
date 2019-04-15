@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -29,7 +29,13 @@ import branscha.scripty.repl.ReplEngineException;
 import java.io.InputStream;
 import java.io.Reader;
 
-public class ScriptyStreamProcessor extends ScriptyCapable {
+/**
+ * A non-interactive version of Scripty that can execute scripts from strings, files or resources. It can be used to
+ * make an application scriptable, or to read the applications configuration files.
+ */
+public class ScriptyStreamProcessor
+extends ScriptyCapable {
+
     public ScriptyStreamProcessor() {
         // Initialize with a new ReplEngine.
     }

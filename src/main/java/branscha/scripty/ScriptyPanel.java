@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -39,7 +39,11 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.Writer;
 
+/**
+ * It is part of {@link ScriptyGuiRepl}.
+ */
 public class ScriptyPanel extends JPanel {
+
     private static class PanelEngine extends ScriptyCapable {
     }
 

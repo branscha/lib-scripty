@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.IEval;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class ArgListMapping {
         mappings.add(aArgMapping);
     }
 
-    public Object[] map(IEval aEval, IContext aContext, Object[] aArgs)
+    public Object[] map(IEval aEval, Context aContext, Object[] aArgs)
     throws ArgMappingException {
         Object[] lMapped = new Object[mappings.size()];
         int i = 0;

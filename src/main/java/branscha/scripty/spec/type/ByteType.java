@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class ByteType implements ITypeSpec<Byte> {
 
@@ -32,7 +32,7 @@ public class ByteType implements ITypeSpec<Byte> {
         return "Byte";
     }
 
-    public Byte guard(Object aArg, IContext aCtx)
+    public Byte guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (aArg instanceof Byte) {
             return (Byte) aArg;

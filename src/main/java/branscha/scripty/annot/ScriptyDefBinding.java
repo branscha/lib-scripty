@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -41,5 +41,5 @@ public @interface ScriptyDefBinding {
     /**
      * The name of the binding.
      */
-    public String value();
+    String value();
 }

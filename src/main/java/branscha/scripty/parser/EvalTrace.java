@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -508,11 +508,18 @@ public class EvalTrace {
                 eval.eval(aExpr);
             }
             catch (CommandException e) {
-                // The Eval2 will have notified any listeners at this point and the debugger should be in a consistent state.
-                // It is not the task of the debugger-eval to print something on an output stream, that
-                // should be the responsibility of the embedding system of this debugging trace. We don't know
-                // in what context the EvalTrace will be used. The embedding system should verify the {@link #isExcepted()}
-                // flag and show the message.
+                /*
+                    The worker thread should take no action here. By now the eval listener will have been notified
+                    about the exception and it is the task of the event listener to make the exception data available.
+
+                    The user of the {@link EvalTrace} should access the exception information using the
+                    {@link EvalTrace#isExcepted} and the {@link EvalTrace#getException} methods.
+
+                    It is not the task of the worker thread to print nor log the exception nor the stacktrace
+                    because the component is meant to be embedded and it is the responsibility of the embedding
+                    class to decide where or on which stream this information should be mad available. It could
+                    be written to stdout or stderr, to a file or to a GUI, it is not the responsibility of the worker.
+               */
             }
         });
 
@@ -806,11 +813,11 @@ public class EvalTrace {
         return exception;
     }
 
-    public BreakpointSet getBreakpoints() {
+    public synchronized BreakpointSet getBreakpoints() {
         return breakpoints;
     }
 
-    public void setBreakpoints(BreakpointSet breakpoints) {
+    public synchronized void setBreakpoints(BreakpointSet breakpoints) {
         this.breakpoints = breakpoints;
     }
 

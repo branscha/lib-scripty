@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -31,9 +31,9 @@ import java.util.Map;
  * A collection of commands (or macro's). Scripty uses these libraries to lookup macro's and commands.
  */
 public class CommandRepository {
-    protected Map<String, ICommand> commands = new HashMap<String, ICommand>();
+    protected Map<String, Command> commands = new HashMap<String, Command>();
 
-    public ICommand getCommand(String aName) {
+    public Command getCommand(String aName) {
         return commands.get(aName);
     }
 
@@ -41,11 +41,11 @@ public class CommandRepository {
         return commands.containsKey(aName);
     }
 
-    public void registerCommand(String aName, ICommand aCommand) {
+    public void registerCommand(String aName, Command aCommand) {
         commands.put(aName, aCommand);
     }
 
-    public Map<String, ICommand> dumpCommands() {
-        return new HashMap<String, ICommand>(commands);
+    public Map<String, Command> dumpCommands() {
+        return new HashMap<String, Command>(commands);
     }
 }

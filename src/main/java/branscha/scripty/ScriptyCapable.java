@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,18 +24,23 @@
  ******************************************************************************/
 package branscha.scripty;
 
-import branscha.scripty.parser.ICommand;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Command;
+import branscha.scripty.parser.Context;
 import branscha.scripty.repl.ReplEngine;
 
 public abstract class ScriptyCapable
-        implements IExtensions, IContextHolder {
+implements ExtensionManager, ContextHolder {
+
     private ReplEngine replEngine;
 
     public ScriptyCapable() {
         replEngine = new ReplEngine();
     }
 
+    /**
+     * Initialize the Scripty shell based on the contents of an existing shell.
+     * @param aFacade
+     */
     public ScriptyCapable(ScriptyCapable aFacade) {
         replEngine = aFacade.getReplEngine();
     }
@@ -48,20 +53,20 @@ public abstract class ScriptyCapable
         replEngine = aEngine;
     }
 
-    public IContext getContext() {
+    public Context getContext() {
         return getReplEngine().getContext();
     }
 
-    public void setContext(IContext aContext) {
+    public void setContext(Context aContext) {
         getReplEngine().setContext(aContext);
     }
 
-    public void addCommand(String aName, ICommand aCommand)
+    public void addCommand(String aName, Command aCommand)
     throws ExtensionException {
         getReplEngine().addCommand(aName, aCommand);
     }
 
-    public void addMacro(String aName, ICommand aMacro)
+    public void addMacro(String aName, Command aMacro)
     throws ExtensionException {
         getReplEngine().addMacro(aName, aMacro);
     }

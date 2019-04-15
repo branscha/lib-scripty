@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -25,14 +25,14 @@
 package branscha.scripty.parser;
 
 public interface IEval {
-    IContext getContext();
+    Context getContext();
 
-    void setContext(IContext context);
+    void setContext(Context context);
 
     Object eval(Object aExpr)
     throws CommandException;
 
-    Object eval(Object aExpr, IContext aContext)
+    Object eval(Object aExpr, Context aContext)
     throws CommandException;
 
     public void setCommandRepo(CommandRepository aRepo);

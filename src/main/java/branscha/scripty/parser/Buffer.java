@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -25,7 +25,7 @@
 package branscha.scripty.parser;
 
 public class Buffer
-        implements IParserInput {
+        implements ParserInput {
     // Essential data.
     private String sentence;
     private int pos;

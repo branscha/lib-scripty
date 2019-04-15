@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.annot;
 
-import branscha.scripty.parser.ICommand;
+import branscha.scripty.parser.Command;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -33,11 +33,11 @@ import java.lang.annotation.Target;
 
 /**
  * Mark a method as a command. You can register the commands individually using
- * {@link branscha.scripty.ScriptyCapable#addCommand(String, ICommand)} or group the commands in a
+ * {@link branscha.scripty.ScriptyCapable#addCommand(String, Command)} or group the commands in a
  * {@link ScriptyLibrary} to manage them together.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyCommand {
-    public String name() default "";
+    String name() default "";
 }

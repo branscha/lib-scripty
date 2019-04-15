@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,28 +24,28 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class OrType
         implements ITypeSpec {
     private ITypeSpec[] types;
     private String name;
 
-    public OrType(ITypeSpec[] aTypes) {
-        types = aTypes;
-        StringBuilder lBuf = new StringBuilder();
-        for (int i = 0; i < types.length; i++) {
-            lBuf.append(types[i].getSpecName());
-            if (i < types.length - 1) lBuf.append(" or ");
+    public OrType(ITypeSpec[] types) {
+        this.types = types;
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < this.types.length; i++) {
+            buf.append(this.types[i].getSpecName());
+            if (i < this.types.length - 1) buf.append(" or ");
         }
-        name = lBuf.toString();
+        name = buf.toString();
     }
 
     public String getSpecName() {
         return name;
     }
 
-    public Object guard(Object aArg, IContext aCtx)
+    public Object guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         for (int i = 0; i < types.length; i++) {
             try {

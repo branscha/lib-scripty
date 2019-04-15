@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -32,7 +32,13 @@ import branscha.scripty.parser.CommandException;
 
 import java.awt.*;
 
-public class ScriptyAutoRepl extends ScriptyCapable {
+/**
+ * A wrapper REPL that has two faces. If the environment is GUI capable, it will start a {@link ScriptyGuiRepl} but
+ * if the runtime environment does not have graphical capabilities, it  starts a {@link ScriptyTextRepl}.
+ */
+public class ScriptyAutoRepl
+extends ScriptyCapable {
+
     private ScriptyGuiRepl guiRepl;
     private ScriptyTextRepl textRepl;
     private boolean forceTextMode = false;

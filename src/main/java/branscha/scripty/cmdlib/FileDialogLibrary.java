@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -59,6 +59,10 @@ public class FileDialogLibrary {
 
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(aTitle);
+        // Set the previous directory.
+        if(currentDir != null) {
+            chooser.setCurrentDirectory(currentDir);
+        }
 
         if ("dir".equals(aType)) chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         else chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

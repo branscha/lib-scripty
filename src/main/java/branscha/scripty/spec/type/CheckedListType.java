@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 public class CheckedListType
         implements ITypeSpec {
@@ -57,7 +57,7 @@ public class CheckedListType
     }
 
     @SuppressWarnings("unchecked")
-    public Object guard(Object aArg, IContext aCtx)
+    public Object guard(Object aArg, Context aCtx)
     throws TypeSpecException {
         if (!(aArg instanceof List))
             throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));

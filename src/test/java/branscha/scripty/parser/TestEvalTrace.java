@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -39,9 +39,9 @@ import static org.junit.Assert.*;
 
 public class TestEvalTrace {
 
-    public static final String FUN_FAC = "(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))";
+    private static final String FUN_FAC = "(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))";
 
-    public static final String FAC_STACK_8 = "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]\n" +
+    private static final String FAC_STACK_8 = "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]\n" +
             "[fac, [-, $n, 1]]:2! ~ [fac, 8]\n" +
             "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 9, null]\n" +
             "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
@@ -50,17 +50,16 @@ public class TestEvalTrace {
             "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
             "[fac, 10]:2! ~ [fac, 10]";
 
-    Parser parser;
-    Eval2 eval;
-    ExtensionRepositoryBuilder extBldr;
+    private Parser parser;
+    private Eval2 eval;
 
     @Before
     public void setup()
-    throws ExtensionException, CommandException {
+    throws ExtensionException {
         parser = new Parser();
         eval = new Eval2();
 
-        extBldr = new ExtensionRepositoryBuilder();
+        ExtensionRepositoryBuilder extBldr = new ExtensionRepositoryBuilder();
         extBldr.addLibraryClasses(MathLibrary.class);
         eval.setMacroRepo(extBldr.getMacroRepository());
         eval.setCommandRepo(extBldr.getCommandRepository());
@@ -68,7 +67,7 @@ public class TestEvalTrace {
 
     @Test
     public void testTrace()
-    throws CommandException, InterruptedException {
+    throws CommandException {
 
         eval.eval(parser.parseExpression(FUN_FAC));
         Object expr = parser.parseExpression("(fac 3)");
@@ -80,7 +79,7 @@ public class TestEvalTrace {
             trace.step();
         }
 
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
         assertTrue(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals(147, stepCounter);
@@ -131,13 +130,13 @@ public class TestEvalTrace {
             trace.step();
             assertEquals(stacks[step], trace.getStack().toString().trim());
 
-            assertEquals(false, trace.isTerminated());
+            assertFalse(trace.isTerminated());
             assertFalse(trace.hasResult());
             assertFalse(trace.isExcepted());
         }
         trace.step();
 
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
         assertTrue(trace.hasResult());
         assertFalse(trace.isExcepted());
         Object lResult = trace.getResult();
@@ -154,7 +153,7 @@ public class TestEvalTrace {
         trace.reset();
         assertEquals("[+, 1, 2]:0 ~ [null, null, null]", trace.getStack().toString().trim());
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
     }
@@ -172,7 +171,7 @@ public class TestEvalTrace {
         trace.step(); trace.step();
         assertEquals( "1 ==> 1\n[+, 1, 2]:1 ~ [+, null, null]", trace.getStack().toString().trim());
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
     }
@@ -195,13 +194,13 @@ public class TestEvalTrace {
         trace.runToReady();
 
         // Now step backwards to the beginning.
-        for(int step = 0; step < stacks.length; step++) {
+        for (String stack : stacks) {
 
-            assertEquals(stacks[step], trace.getStack().toString().trim());
+            assertEquals(stack, trace.getStack().toString().trim());
 
             trace.backStep();
 
-            assertEquals(false, trace.isTerminated());
+            assertFalse(trace.isTerminated());
             assertFalse(trace.hasResult());
             assertFalse(trace.isExcepted());
         }
@@ -225,13 +224,13 @@ public class TestEvalTrace {
             trace.stepOver();
             assertEquals(stacks[step], trace.getStack().toString().trim());
 
-            assertEquals(false, trace.isTerminated());
+            assertFalse(trace.isTerminated());
             assertFalse(trace.hasResult());
             assertFalse(trace.isExcepted());
         }
         trace.stepOver();
 
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
         assertTrue(trace.hasResult());
         assertFalse(trace.isExcepted());
         Object lResult = trace.getResult();
@@ -262,7 +261,7 @@ public class TestEvalTrace {
         EvalTrace trace = new EvalTrace(eval, expr);
         trace.runToResult();
 
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
         assertTrue(trace.hasResult());
         assertFalse(trace.isExcepted());
         Object lResult = trace.getResult();
@@ -275,7 +274,7 @@ public class TestEvalTrace {
         EvalTrace trace = new EvalTrace(eval, expr);
         trace.run();
 
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
         assertTrue(trace.hasResult());
         assertFalse(trace.isExcepted());
         Object lResult = trace.getResult();
@@ -295,7 +294,7 @@ public class TestEvalTrace {
 
         trace.run();
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals(">\n" +
@@ -310,7 +309,7 @@ public class TestEvalTrace {
                 "[fac, 100000000]:2! ~ [fac, 100000000]", trace.getStack().toString().trim());
 
         trace.terminate();
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
     }
 
     @Test
@@ -326,7 +325,7 @@ public class TestEvalTrace {
 
         trace.run();
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
@@ -335,7 +334,7 @@ public class TestEvalTrace {
 
         trace.run();
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
@@ -347,7 +346,7 @@ public class TestEvalTrace {
 
         trace.run();
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
@@ -361,7 +360,7 @@ public class TestEvalTrace {
                 "[fac, 100]:2! ~ [fac, 100]", trace.getStack().toString().trim());
 
         trace.terminate();
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
     }
 
     @Test
@@ -377,18 +376,17 @@ public class TestEvalTrace {
 
         trace.run();
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals(FAC_STACK_8, trace.getStack().toString().trim());
 
         trace.terminate();
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
     }
 
     @Test
-    public void testAndBpt()
-    throws CommandException {
+    public void testAndBpt() {
 
         EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
         EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $size large)"), eval);
@@ -451,18 +449,17 @@ public class TestEvalTrace {
 
         trace.run();
 
-        assertEquals(false, trace.isTerminated());
+        assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals(FAC_STACK_8, trace.getStack().toString().trim());
 
         trace.terminate();
-        assertEquals(true, trace.isTerminated());
+        assertTrue(trace.isTerminated());
     }
 
     @Test
-    public void testBptOr()
-    throws CommandException {
+    public void testBptOr() {
 
         EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
         EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color blue)"), eval);

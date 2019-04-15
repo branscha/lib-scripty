@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -32,7 +32,14 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-public class ScriptyGuiRepl extends ScriptyCapable {
+/**
+ * A minimalistic GUI to demonstrate how Scripty could be embedded in a more elaborate GUI. The scripty library wants
+ * to be independent of a GUI framework that is why the example is kept simple on purpose. A more elaborate GUI
+ * will first have to make a decision on which GUI library to use.
+ */
+public class ScriptyGuiRepl
+extends ScriptyCapable {
+
     private JFrame frame;
     private String title = "Scripty";
     private ScriptyPanel scriptyPanel;

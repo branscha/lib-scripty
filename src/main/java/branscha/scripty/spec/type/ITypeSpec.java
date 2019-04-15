@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
 /**
  * Type checking per argument. Does not have the context of the complete
@@ -33,7 +33,7 @@ import branscha.scripty.parser.IContext;
  * @param <T>
  */
 public interface ITypeSpec<T> {
-    T guard(Object aArg, IContext aCtx)
+    T guard(Object aArg, Context aCtx)
     throws TypeSpecException;
 
     String getSpecName();

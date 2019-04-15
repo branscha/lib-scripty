@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -27,9 +27,10 @@ package branscha.scripty.cmdlib;
 import branscha.scripty.ExtensionException;
 import branscha.scripty.ProcessorException;
 import branscha.scripty.ScriptyStreamProcessor;
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestTeaLibrary {
     private ScriptyStreamProcessor scripty;
@@ -45,27 +46,27 @@ public class TestTeaLibrary {
     public void encryptStandard()
     throws ProcessorException {
         Object lResult = scripty.process("tea-encrypt \"Bruno Ranschaert is my name\"");
-        Assert.assertEquals("58eac04cbf4629f6b576c80570e0e1898e96a6105f0d3b2780b570873f21580e601f30ab6d365853601f30ab6d365853601f30ab6d365853", lResult);
+        assertEquals("58eac04cbf4629f6b576c80570e0e1898e96a6105f0d3b2780b570873f21580e601f30ab6d365853601f30ab6d365853601f30ab6d365853", lResult);
     }
 
     @Test
     public void decryptStandard()
     throws ProcessorException {
         Object lResult = scripty.process("tea-decrypt 58eac04cbf4629f6b576c80570e0e1898e96a6105f0d3b2780b570873f21580e601f30ab6d365853601f30ab6d365853601f30ab6d365853");
-        Assert.assertEquals("Bruno Ranschaert is my name", lResult);
+        assertEquals("Bruno Ranschaert is my name", lResult);
     }
 
     @Test
     public void encryptPwd()
     throws ProcessorException {
         Object lResult = scripty.process("tea-encrypt \"Bruno Ranschaert is my name\" password=\"Lang leve de koning!\"");
-        Assert.assertEquals("ebe7d6aff359a43aaf6bb157504eb980633005aa56fa84b5642b928a2d72d193d60c1af1435c043bd60c1af1435c043bd60c1af1435c043b", lResult);
+        assertEquals("ebe7d6aff359a43aaf6bb157504eb980633005aa56fa84b5642b928a2d72d193d60c1af1435c043bd60c1af1435c043bd60c1af1435c043b", lResult);
     }
 
     @Test
     public void decryptPwd()
     throws ProcessorException {
         Object lResult = scripty.process("tea-decrypt ebe7d6aff359a43aaf6bb157504eb980633005aa56fa84b5642b928a2d72d193d60c1af1435c043bd60c1af1435c043bd60c1af1435c043b password=\"Lang leve de koning!\"");
-        Assert.assertEquals("Bruno Ranschaert is my name", lResult);
+        assertEquals("Bruno Ranschaert is my name", lResult);
     }
 }

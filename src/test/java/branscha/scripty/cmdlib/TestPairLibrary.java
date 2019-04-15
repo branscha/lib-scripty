@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -28,9 +28,12 @@ import branscha.scripty.ExtensionException;
 import branscha.scripty.ProcessorException;
 import branscha.scripty.ScriptyStreamProcessor;
 import branscha.scripty.parser.Pair;
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class TestPairLibrary {
     private ScriptyStreamProcessor scripty;
@@ -46,47 +49,47 @@ public class TestPairLibrary {
     public void testPairCreation()
     throws ProcessorException {
         Object lResult = scripty.process("let (p1=a=uno p2=b=duo p3=c=ter) $p1");
-        Assert.assertTrue(lResult instanceof Pair);
+        assertTrue(lResult instanceof Pair);
         Pair lPair = (Pair) lResult;
-        Assert.assertEquals("a", lPair.getLeft());
-        Assert.assertEquals("uno", lPair.getRight());
+        assertEquals("a", lPair.getLeft());
+        assertEquals("uno", lPair.getRight());
     }
 
     @Test
     public void isPair1()
     throws ProcessorException {
         Object lResult = scripty.process("let (p1=a=uno p2=b=duo p3=c=ter) (pair? $p1)");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertTrue((Boolean) lResult);
+        assertTrue(lResult instanceof Boolean);
+        assertTrue((Boolean) lResult);
     }
 
     @Test
     public void isPair2()
     throws ProcessorException {
         Object lResult = scripty.process("pair? abc");
-        Assert.assertFalse((Boolean) lResult);
+        assertFalse((Boolean) lResult);
     }
 
     @Test
     public void isPair3()
     throws ProcessorException {
         Object lResult = scripty.process("pair? $null");
-        Assert.assertFalse((Boolean) lResult);
+        assertFalse((Boolean) lResult);
     }
 
     @Test
     public void pairLeft1()
     throws ProcessorException {
         Object lResult = scripty.process("let (p1=a=uno p2=b=duo p3=c=ter) (pair-left $p1)");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("a", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("a", lResult);
     }
 
     @Test
     public void pairRight1()
     throws ProcessorException {
         Object lResult = scripty.process("let (p1=a=uno p2=b=duo p3=c=ter) (pair-right $p1)");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("uno", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("uno", lResult);
     }
 }

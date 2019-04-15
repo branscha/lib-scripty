@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -28,17 +28,17 @@ import java.util.Collection;
 
 public abstract class AbstractEval implements IEval {
 
-    private IContext context;
+    private Context context;
 
-    public AbstractEval(IContext aContext) {
+    public AbstractEval(Context aContext) {
         context = aContext;
     }
 
-    public IContext getContext() {
+    public Context getContext() {
         return context;
     }
 
-    public void setContext(IContext context) {
+    public void setContext(Context context) {
         this.context = context;
     }
 

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -32,10 +32,9 @@ import branscha.scripty.annot.ScriptyCommand;
 import branscha.scripty.annot.ScriptyParam;
 import branscha.scripty.annot.ScriptyStdArgList;
 import branscha.scripty.cmdlib.TeaLibrary;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.spec.type.ITypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,8 +46,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.*;
+
 @SuppressWarnings("ALL")
 public class TestArgListBuilderUtil {
+    
     private ScriptyStreamProcessor scripty;
 
     @Before
@@ -77,7 +79,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(AnyTypeLibrary.class);
         Object lResult = scripty.process("go teststring");
-        Assert.assertTrue("teststring".equals(lResult));
+        assertTrue("teststring".equals(lResult));
     }
 
     @Test(expected = ProcessorException.class)
@@ -87,7 +89,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(AnyTypeLibrary.class);
         scripty.process("go $null");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -97,7 +99,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(AnyTypeLibrary.class);
         Object lResult = scripty.process("go2 $null");
-        Assert.assertTrue(null == lResult);
+        assertTrue(null == lResult);
     }
 
     public static class StandardTypes {
@@ -173,8 +175,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-bigdecimal 123.456");
-        Assert.assertTrue(lResult instanceof BigDecimal);
-        Assert.assertEquals(new BigDecimal("123.456"), lResult);
+        assertTrue(lResult instanceof BigDecimal);
+        assertEquals(new BigDecimal("123.456"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -182,7 +184,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-bigdecimal abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -190,8 +192,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-integer 123456");
-        Assert.assertTrue(lResult instanceof Integer);
-        Assert.assertEquals(new Integer("123456"), lResult);
+        assertTrue(lResult instanceof Integer);
+        assertEquals(new Integer("123456"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -199,7 +201,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-integer abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -207,8 +209,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-integer-range 11");
-        Assert.assertTrue(lResult instanceof Integer);
-        Assert.assertEquals(new Integer("11"), lResult);
+        assertTrue(lResult instanceof Integer);
+        assertEquals(new Integer("11"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -216,7 +218,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-integer-range 2");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
@@ -224,7 +226,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-integer-range 14");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -232,8 +234,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-biginteger 123456");
-        Assert.assertTrue(lResult instanceof BigInteger);
-        Assert.assertEquals(new BigInteger("123456"), lResult);
+        assertTrue(lResult instanceof BigInteger);
+        assertEquals(new BigInteger("123456"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -241,7 +243,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-biginteger abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -249,8 +251,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-boolean true");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertEquals(Boolean.TRUE, lResult);
+        assertTrue(lResult instanceof Boolean);
+        assertEquals(Boolean.TRUE, lResult);
     }
 
     @Test
@@ -258,8 +260,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-boolean false");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertEquals(Boolean.FALSE, lResult);
+        assertTrue(lResult instanceof Boolean);
+        assertEquals(Boolean.FALSE, lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -267,7 +269,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-boolean abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -275,8 +277,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-byte -128");
-        Assert.assertTrue(lResult instanceof Byte);
-        Assert.assertEquals(new Byte("-128"), lResult);
+        assertTrue(lResult instanceof Byte);
+        assertEquals(new Byte("-128"), lResult);
     }
 
     @Test
@@ -284,8 +286,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-byte 127");
-        Assert.assertTrue(lResult instanceof Byte);
-        Assert.assertEquals(new Byte("127"), lResult);
+        assertTrue(lResult instanceof Byte);
+        assertEquals(new Byte("127"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -293,7 +295,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-byte abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -301,8 +303,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-double 1234.567");
-        Assert.assertTrue(lResult instanceof Double);
-        Assert.assertEquals(new Double("1234.567"), lResult);
+        assertTrue(lResult instanceof Double);
+        assertEquals(new Double("1234.567"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -310,7 +312,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-double abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -318,8 +320,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-float 1234.567");
-        Assert.assertTrue(lResult instanceof Float);
-        Assert.assertEquals(new Float("1234.567"), lResult);
+        assertTrue(lResult instanceof Float);
+        assertEquals(new Float("1234.567"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -327,7 +329,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-float abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -335,8 +337,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-long 1234567");
-        Assert.assertTrue(lResult instanceof Long);
-        Assert.assertEquals(new Long("1234567"), lResult);
+        assertTrue(lResult instanceof Long);
+        assertEquals(new Long("1234567"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -344,7 +346,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-long abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -352,8 +354,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-short 1234");
-        Assert.assertTrue(lResult instanceof Short);
-        Assert.assertEquals(new Short("1234"), lResult);
+        assertTrue(lResult instanceof Short);
+        assertEquals(new Short("1234"), lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -361,7 +363,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-short abc");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -369,8 +371,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         Object lResult = scripty.process("do-string Hallo");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("Hallo", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("Hallo", lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -378,7 +380,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(StandardTypes.class);
         scripty.process("do-string $null");
-        Assert.fail();
+        fail();
     }
 
     public static class ListTypes {
@@ -400,7 +402,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(ListTypes.class);
         scripty.process("do-intlist-unbounded $null");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -408,8 +410,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(ListTypes.class);
         Object lResult = scripty.process("do-intlist-unbounded ()");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() <= 0);
+        assertTrue(lResult instanceof List);
+        assertTrue(((List) lResult).size() <= 0);
     }
 
     @Test
@@ -417,8 +419,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(ListTypes.class);
         Object lResult = scripty.process("do-intlist-unbounded '(1 2 3 4 5 6 7 8 9 10)");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 10);
+        assertTrue(lResult instanceof List);
+        assertTrue(((List) lResult).size() == 10);
     }
 
     @Test
@@ -427,8 +429,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(ListTypes.class);
         Object lResult = scripty.process("do-intlist-bounded '(1 2 3 4 5 6 7 8 9 10)");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 10);
+        assertTrue(lResult instanceof List);
+        assertTrue(((List) lResult).size() == 10);
     }
 
     @Test(expected = ProcessorException.class)
@@ -437,7 +439,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(ListTypes.class);
         scripty.process("do-intlist-bounded '(1 2 3 4 )");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
@@ -446,7 +448,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(ListTypes.class);
         scripty.process("do-intlist-bounded '(1 2 3 4 5 6 7 8 9 10 11)");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -462,8 +464,8 @@ public class TestArgListBuilderUtil {
         scripty.getContext().defBinding("lst", lOrig);
 
         Object lResult = scripty.process("do-intlist-unbounded $lst");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(lOrig == lResult);
+        assertTrue(lResult instanceof List);
+        assertTrue(lOrig == lResult);
     }
 
     @Test
@@ -477,8 +479,8 @@ public class TestArgListBuilderUtil {
         scripty.getContext().defBinding("lst", lOrig);
 
         Object lResult = scripty.process("do-intlist-unbounded $lst");
-        Assert.assertTrue(lResult instanceof List);
-        Assert.assertTrue(((List) lResult).size() == 3);
+        assertTrue(lResult instanceof List);
+        assertTrue(((List) lResult).size() == 3);
     }
 
     @Test(expected = ProcessorException.class)
@@ -487,7 +489,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(ListTypes.class);
         scripty.process("do-intlist-unbounded '(1 2 3 4 notinteger 6 7 8 9 10 11)");
-        Assert.fail();
+        fail();
     }
 
     public static class InstanceTypes {
@@ -517,8 +519,8 @@ public class TestArgListBuilderUtil {
         scripty.getContext().defBinding("nr", 13);
 
         Object lResult = scripty.process("do-binding nr");
-        Assert.assertTrue(lResult instanceof Integer);
-        Assert.assertEquals(13, lResult);
+        assertTrue(lResult instanceof Integer);
+        assertEquals(13, lResult);
     }
 
     @Test
@@ -526,8 +528,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(InstanceTypes.class);
         Object lResult = scripty.process("do-binding 17");
-        Assert.assertTrue(lResult instanceof Integer);
-        Assert.assertEquals(17, lResult);
+        assertTrue(lResult instanceof Integer);
+        assertEquals(17, lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -535,7 +537,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(InstanceTypes.class);
         scripty.process("do-binding abc");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
@@ -543,7 +545,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(InstanceTypes.class);
         scripty.process("do-binding '(1 2 3)");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -551,7 +553,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(InstanceTypes.class);
         Object lResult = scripty.process("do-instance '(1 2 3)");
-        Assert.assertTrue(lResult instanceof List);
+        assertTrue(lResult instanceof List);
     }
 
     @Test(expected = ProcessorException.class)
@@ -559,7 +561,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(InstanceTypes.class);
         scripty.process("do-instance abc");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
@@ -567,7 +569,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(InstanceTypes.class);
         scripty.process("do-instance $null");
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -575,7 +577,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(InstanceTypes.class);
         Object lResult = scripty.process("do-instance-null $null");
-        Assert.assertNull(lResult);
+        assertNull(lResult);
     }
 
     public static class UnionTypes {
@@ -591,7 +593,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(UnionTypes.class);
         Object lResult = scripty.process("do-union '(1 2 3)");
-        Assert.assertTrue(lResult instanceof List);
+        assertTrue(lResult instanceof List);
     }
 
     @Test
@@ -599,8 +601,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(UnionTypes.class);
         Object lResult = scripty.process("do-union true");
-        Assert.assertTrue(lResult instanceof Boolean);
-        Assert.assertEquals(Boolean.TRUE, lResult);
+        assertTrue(lResult instanceof Boolean);
+        assertEquals(Boolean.TRUE, lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -608,7 +610,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(UnionTypes.class);
         scripty.process("do-union abc");
-        Assert.fail();
+        fail();
     }
 
     @Test(expected = ProcessorException.class)
@@ -616,7 +618,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(UnionTypes.class);
         scripty.process("do-union '(1 2 xyz)");
-        Assert.fail();
+        fail();
     }
 
     public static class CustomTypes {
@@ -631,7 +633,7 @@ public class TestArgListBuilderUtil {
             implements ITypeSpec {
         private Pattern pattern = Pattern.compile("a+b*");
 
-        public Object guard(Object aArg, IContext aCtx)
+        public Object guard(Object aArg, Context aCtx)
         throws TypeSpecException {
             if (aArg instanceof String) {
                 Matcher lMatcher = pattern.matcher(((String) aArg));
@@ -650,8 +652,8 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(CustomTypes.class);
         Object lResult = scripty.process("do-custom aaaabbbbbbbbbb");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("aaaabbbbbbbbbb", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("aaaabbbbbbbbbb", lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -659,7 +661,7 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(CustomTypes.class);
         scripty.process("do-custom bbb");
-        Assert.fail();
+        fail();
     }
 
     public static class EnumTypes {
@@ -676,16 +678,16 @@ public class TestArgListBuilderUtil {
         scripty.addLibraryClasses(EnumTypes.class);
 
         Object lResult = scripty.process("do-enum uno");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("uno", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("uno", lResult);
 
         lResult = scripty.process("do-enum duo");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("duo", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("duo", lResult);
 
         lResult = scripty.process("do-enum tres");
-        Assert.assertTrue(lResult instanceof String);
-        Assert.assertEquals("tres", lResult);
+        assertTrue(lResult instanceof String);
+        assertEquals("tres", lResult);
     }
 
     @Test(expected = ProcessorException.class)
@@ -693,6 +695,6 @@ public class TestArgListBuilderUtil {
     throws ExtensionException, ProcessorException {
         scripty.addLibraryClasses(EnumTypes.class);
         scripty.process("do-enum quattuor");
-        Assert.fail();
+        fail();
     }
 }

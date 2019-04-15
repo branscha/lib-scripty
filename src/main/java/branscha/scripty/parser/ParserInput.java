@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,25 +24,14 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
-import java.util.Map;
+public interface ParserInput {
+    public abstract char consumeChar();
 
-public interface IContext {
-    // Changes an existing binding.
-    // The change can occur at a nested level.
-    public void setBinding(String aKey, Object aValue)
-    throws CommandException;
+    public abstract char peekChar();
 
-    // Define a  binding in the current context. The value can be null.
-    // The new binding will always be at the top level.
-    public void defBinding(String aKey, Object aValue);
+    public abstract boolean eof();
 
-    public Object getBinding(String aKey);
+    public abstract int getColNr();
 
-    public boolean isBound(String aKey);
-
-    public void removeBinding(String aKey);
-
-    public IContext getRootContext();
-
-    public Map<String, Object> dumpBindings();
+    public abstract int getLineNr();
 }

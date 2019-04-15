@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -64,7 +64,7 @@ public class Parser {
      * @param aBuffer
      * @return
      */
-    private Token getNextToken(IParserInput aBuffer) {
+    private Token getNextToken(ParserInput aBuffer) {
         if (pushback != null) {
             Token lToken = pushback;
             pushback = null;
@@ -212,7 +212,7 @@ public class Parser {
             .filter((c)->c!=PAIR_CHAR)
             .collect(Collectors.toCollection(HashSet::new));
 
-    private String consumeIdentifier(char firstChar, IParserInput inputBuffer) {
+    private String consumeIdentifier(char firstChar, ParserInput inputBuffer) {
         final StringBuilder identifier = new StringBuilder();
         //
         identifier.append(firstChar);
@@ -244,7 +244,7 @@ public class Parser {
         return identifier.toString();
     }
 
-    private String consumeWhitespace(char firstChar, IParserInput aBuffer) {
+    private String consumeWhitespace(char firstChar, ParserInput aBuffer) {
         final StringBuilder whitespace = new StringBuilder();
         whitespace.append(firstChar);
         while (!aBuffer.eof() && Character.isWhitespace(aBuffer.peekChar()))
@@ -257,7 +257,7 @@ public class Parser {
         pushback = token;
     }
 
-    private Token getNextNonWhitespaceToken(IParserInput inputBuffer) {
+    private Token getNextNonWhitespaceToken(ParserInput inputBuffer) {
         Token token = getNextToken(inputBuffer);
         while (token.isWhitespace()) token = getNextToken(inputBuffer);
         previous = token;
@@ -272,7 +272,7 @@ public class Parser {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private Object parseList(IParserInput aBuffer) {
+    private Object parseList(ParserInput aBuffer) {
         Token lToken = getNextNonWhitespaceToken(aBuffer);
         if (lToken.isErroneous()) return lToken;
         else if (lToken.isBeginList()) {
@@ -328,7 +328,7 @@ public class Parser {
      * @param aBuffer
      * @return
      */
-    public Object parseExpression(IParserInput aBuffer) {
+    public Object parseExpression(ParserInput aBuffer) {
         final Token lToken = getNextNonWhitespaceToken(aBuffer);
         if (lToken.isErroneous()) {
             return lToken;

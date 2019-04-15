@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -26,7 +26,7 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.IEval;
 import branscha.scripty.parser.Lambda;
 
@@ -123,7 +123,7 @@ public class FileLibrary {
             @ScriptyParam("recursive") boolean aRecursive,
             @ScriptyParam("file") Object aFileRepr,
             @ScriptyBindingParam("*output") PrintWriter aWriter,
-            IContext aCtx,
+            Context aCtx,
             IEval aEval)
     throws CommandException {
         try {

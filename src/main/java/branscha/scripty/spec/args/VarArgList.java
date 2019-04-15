@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -24,7 +24,7 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 
 /**
@@ -41,7 +41,7 @@ import branscha.scripty.parser.Pair;
  * Finally, the variable part.
  */
 public class VarArgList
-        implements IArgList {
+        implements ArgList {
     private FixedArg req[];
     private VarArg var;
     private NamedArg[] named;
@@ -62,7 +62,7 @@ public class VarArgList
      * - Then !!! the named.
      * - Lastly the varargs.
      */
-    public Object[] guard(Object[] aArgs, IContext aCtx)
+    public Object[] guard(Object[] aArgs, Context aCtx)
     throws ArgSpecException {
         // We look for all pairs at the end of the argument list. We will only
         // consider these trailing pairs.
@@ -97,7 +97,7 @@ public class VarArgList
         // consider these trailing pairs.
         while (lStartNamed > 0 && (aArgs[lStartNamed] instanceof Pair)) lStartNamed--;
         // Now we can resolve the named arguments within this range.
-        for (IArgSpec lSpec : named) {
+        for (ArgSpec lSpec : named) {
             lNewArgs[lArgIdx++] = lSpec.guard(aArgs, lStartNamed, aCtx);
         }
         // Finally we go looking for spurious named parameters that were not specified ...

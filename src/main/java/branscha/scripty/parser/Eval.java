@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
@@ -103,6 +103,7 @@ import java.util.List;
  * </ul>
  */
 public class Eval extends AbstractEval {
+
     private CommandRepository commands;
     private CommandRepository macros;
 
@@ -110,7 +111,7 @@ public class Eval extends AbstractEval {
         this(new BasicContext());
     }
 
-    public Eval(IContext aContext) {
+    public Eval(Context aContext) {
         super(aContext);
         commands = new CommandRepository();
         macros = new CommandRepository();
@@ -161,7 +162,7 @@ public class Eval extends AbstractEval {
      * @throws CommandException
      */
     @SuppressWarnings("unchecked")
-    public Object eval(Object aExpr, IContext aContext)
+    public Object eval(Object aExpr, Context aContext)
     throws CommandException {
         try {
             // Stop evaluation if the current evaluation thread got a signal to
@@ -334,7 +335,7 @@ public class Eval extends AbstractEval {
                     final List<Pair> lBindingPrep = new ArrayList<Pair>();
                     // The let or let* context.
                     // For let* we will incrementally use the new context.
-                    final IContext lLetCtx = new CompositeContext(new BasicContext(), aContext);
+                    final Context lLetCtx = new CompositeContext(new BasicContext(), aContext);
 
                     for (Object lBinding : lBindingsList) {
                         if (lBinding instanceof String) {
@@ -400,24 +401,24 @@ public class Eval extends AbstractEval {
                     if (lListSize != 3)
                         throw new CommandException("The 'lambda' form should have the format (lambda (<params>) <expr>).");
                     // Parameters are *not* evaluated ...
-                    final Object lParams = lList.get(1);
-                    final Object lBody = lList.get(2);
+                    final Object params = lList.get(1);
+                    final Object body = lList.get(2);
 
                     // Do some checking.
-                    if (lParams == null || !(lParams instanceof List))
+                    if (params == null || !(params instanceof List))
                         throw new CommandException("The first argument in the 'lambda' form should evaluate to a list of parameters.");
-                    List lParamList = (List) lParams;
+                    List lParamList = (List) params;
                     for (Object lParam : lParamList)
                         if (!(lParam instanceof String))
                             throw new CommandException("The first argument in the 'lambda' form, the parameter list,  should evaluate to a list of strings.");
-                    if (lBody == null)
+                    if (body == null)
                         throw new CommandException("The second argument in the 'lambda' form should be an expression.");
 
                     // Construct the lambda.
                     final String[] lStrArgs = new String[lParamList.size()];
                     for (int i = 0; i < lParamList.size(); i++) lStrArgs[i] = (String) lParamList.get(i);
 
-                    return new Lambda(lStrArgs, lBody, aContext);
+                    return new Lambda(lStrArgs, body, aContext);
                 }
                 else if ("defun".equals(lCmdCandidate)) {
                     // It is a special form because the parameter list nor the function body
@@ -466,7 +467,7 @@ public class Eval extends AbstractEval {
                 }
                 else if (lCmdCandidate instanceof String && macros.hasCommand((String) lCmdCandidate)) {
                     // Built-in macro call.
-                    final ICommand lMacro = macros.getCommand((String) lCmdCandidate);
+                    final Command lMacro = macros.getCommand((String) lCmdCandidate);
                     final List lArgs = new ArrayList(lList.size());
                     lArgs.addAll(lList);
 
@@ -588,7 +589,7 @@ public class Eval extends AbstractEval {
                                 // Context that binds the parameters to the arguments in addition to the lexical context.
                                 // Note that we skip the 'funcall' constant and the function name/lambda when constructing
                                 // the argument list.
-                                final IContext lFunCtx = lFun.createContext(lEvalList.subList(2, lEvalList.size()).toArray(), 0, lEvalList.size() - 2);
+                                final Context lFunCtx = lFun.createContext(lEvalList.subList(2, lEvalList.size()).toArray(), 0, lEvalList.size() - 2);
                                 return eval(lFun.getExpr(), lFunCtx);
                             }
                             catch (CommandException e) {
@@ -603,7 +604,7 @@ public class Eval extends AbstractEval {
                         }
                         else if (commands.hasCommand(lCmdName)) {
                             try {
-                                final ICommand lCmd = commands.getCommand(lCmdName);
+                                final Command lCmd = commands.getCommand(lCmdName);
                                 return lCmd.execute(this, aContext, lEvalList.toArray());
                             }
                             catch (CommandException e) {
