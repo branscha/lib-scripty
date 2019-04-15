@@ -27,15 +27,15 @@ package branscha.scripty;
 import branscha.scripty.parser.Command;
 
 public interface ExtensionManager {
-    void addCommand(String aName, Command aCommand)
+    void addCommand(String aName, Command command)
     throws ExtensionException;
 
-    void addMacro(String aName, Command aMacro)
+    void addMacro(String aName, Command macro)
     throws ExtensionException;
 
-    void addLibraryClasses(Class... aLibraryClasses)
+    void addLibraryClasses(Class... libraryClasses)
     throws ExtensionException;
 
-    void addLibraryInstances(Object... aLibraryInstances)
+    void addLibraryInstances(Object... libraryInstances)
     throws ExtensionException;
 }

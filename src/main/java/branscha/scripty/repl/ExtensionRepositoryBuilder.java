@@ -50,19 +50,19 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         macroRepo = new CommandRepository();
     }
 
-    public void addCommand(String aName, Command aCommand)
+    public void addCommand(String aName, Command command)
     throws ExtensionException {
-        commandRepo.registerCommand(aName, aCommand);
+        commandRepo.registerCommand(aName, command);
     }
 
-    public void addMacro(String aName, Command aMacro)
+    public void addMacro(String aName, Command macro)
     throws ExtensionException {
-        macroRepo.registerCommand(aName, aMacro);
+        macroRepo.registerCommand(aName, macro);
     }
 
-    public void addLibraryClasses(Class... aLibraryClasses)
+    public void addLibraryClasses(Class... libraryClasses)
     throws ExtensionException {
-        for (Class lClass : aLibraryClasses) {
+        for (Class lClass : libraryClasses) {
             String lLibraryName = lClass.getSimpleName();
             ScriptyLibraryType lLibraryType = ScriptyLibraryType.AUTO;
             ScriptyLibrary lScriptyLibrary = (ScriptyLibrary) lClass.getAnnotation(ScriptyLibrary.class);
@@ -308,9 +308,9 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         }
     }
 
-    public void addLibraryInstances(Object... aLibraryInstances)
+    public void addLibraryInstances(Object... libraryInstances)
     throws ExtensionException {
-        for (Object lLib : aLibraryInstances) {
+        for (Object lLib : libraryInstances) {
             String lLibraryName = lLib.getClass().getSimpleName();
             ScriptyLibraryType lLibraryType = ScriptyLibraryType.AUTO;
 

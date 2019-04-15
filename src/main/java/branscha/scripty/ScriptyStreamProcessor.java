@@ -31,7 +31,8 @@ import java.io.Reader;
 
 /**
  * A non-interactive version of Scripty that can execute scripts from strings, files or resources. It can be used to
- * make an application scriptable, or to read the applications configuration files.
+ * make an application scriptable, or to read the applications configuration files. It can also be used to create the
+ * unit tests of the command libraries.
  */
 public class ScriptyStreamProcessor
 extends ScriptyCapable {

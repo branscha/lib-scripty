@@ -61,23 +61,23 @@ implements ExtensionManager, ContextHolder {
         getReplEngine().setContext(aContext);
     }
 
-    public void addCommand(String aName, Command aCommand)
+    public void addCommand(String aName, Command command)
     throws ExtensionException {
-        getReplEngine().addCommand(aName, aCommand);
+        getReplEngine().addCommand(aName, command);
     }
 
-    public void addMacro(String aName, Command aMacro)
+    public void addMacro(String aName, Command macro)
     throws ExtensionException {
-        getReplEngine().addMacro(aName, aMacro);
+        getReplEngine().addMacro(aName, macro);
     }
 
-    public void addLibraryClasses(Class... aLibraryClasses)
+    public void addLibraryClasses(Class... libraryClasses)
     throws ExtensionException {
-        getReplEngine().addLibraryClasses(aLibraryClasses);
+        getReplEngine().addLibraryClasses(libraryClasses);
     }
 
-    public void addLibraryInstances(Object... aLibraryInstances)
+    public void addLibraryInstances(Object... libraryInstances)
     throws ExtensionException {
-        getReplEngine().addLibraryInstances(aLibraryInstances);
+        getReplEngine().addLibraryInstances(libraryInstances);
     }
 }

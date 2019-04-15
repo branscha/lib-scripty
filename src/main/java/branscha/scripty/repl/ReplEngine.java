@@ -48,7 +48,8 @@ import java.util.List;
  * nice formatting.</li>
  * </ul>
  */
-public class ReplEngine implements ExtensionManager {
+public class ReplEngine
+implements ExtensionManager {
 
     private ExtensionRepositoryBuilder extensions = new ExtensionRepositoryBuilder();
 
@@ -385,24 +386,24 @@ public class ReplEngine implements ExtensionManager {
         eval.setContext(context);
     }
 
-    public void addCommand(String aName, Command aCommand)
+    public void addCommand(String aName, Command command)
     throws ExtensionException {
-        extensions.addCommand(aName, aCommand);
+        extensions.addCommand(aName, command);
     }
 
-    public void addMacro(String aName, Command aMacro)
+    public void addMacro(String aName, Command macro)
     throws ExtensionException {
-        extensions.addMacro(aName, aMacro);
+        extensions.addMacro(aName, macro);
     }
 
-    public void addLibraryClasses(Class... aLibraryClasses)
+    public void addLibraryClasses(Class... libraryClasses)
     throws ExtensionException {
-        extensions.addLibraryClasses(aLibraryClasses);
+        extensions.addLibraryClasses(libraryClasses);
     }
 
-    public void addLibraryInstances(Object... aLibraryInstances)
+    public void addLibraryInstances(Object... libraryInstances)
     throws ExtensionException {
-        extensions.addLibraryInstances(aLibraryInstances);
+        extensions.addLibraryInstances(libraryInstances);
     }
 
     public CommandRepository getCommandRepository() {
