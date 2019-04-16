@@ -24,8 +24,8 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
-public class Buffer
-        implements ParserInput {
+public class Buffer implements ParserInput {
+
     // Essential data.
     private String sentence;
     private int pos;

@@ -27,6 +27,7 @@ package branscha.scripty.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
 
@@ -63,7 +64,7 @@ public class EvalTrace {
     /**
      * Represents a breakpoint during expression evaluation.
      */
-    public interface IBreakpoint {
+    public interface Breakpoint {
         String getName();
 
         void setEnabled(boolean aEnabled);
@@ -76,14 +77,14 @@ public class EvalTrace {
      */
     public static class BreakpointSet {
 
-        private List<IBreakpoint> breakpoints = new ArrayList<>();
+        private List<Breakpoint> breakpoints = new ArrayList<>();
 
-        public void addBreakpoint(IBreakpoint aBpt) {
+        public void addBreakpoint(Breakpoint aBpt) {
             breakpoints.add(aBpt);
         }
 
         public void removeBreakpoint(String aName) {
-            for (IBreakpoint lBpt : breakpoints) {
+            for (Breakpoint lBpt : breakpoints) {
                 if (lBpt.getName() != null && lBpt.getName().equals(aName)) {
                     breakpoints.remove(lBpt);
                     return;
@@ -92,7 +93,7 @@ public class EvalTrace {
         }
 
         public void enableBreakpoint(String aName, boolean aEnable) {
-            for (IBreakpoint lBpt : breakpoints) {
+            for (Breakpoint lBpt : breakpoints) {
                 if (lBpt.getName() != null && lBpt.getName().equals(aName)) {
                     lBpt.setEnabled(aEnable);
                 }
@@ -103,17 +104,17 @@ public class EvalTrace {
             breakpoints.clear();
         }
 
-        public List<IBreakpoint> findAllMatchingBreakpoints(Eval2.EvalStack aStack) {
-            List<IBreakpoint> lResult = new ArrayList<>();
+        public List<Breakpoint> findAllMatchingBreakpoints(Eval2.EvalStack aStack) {
+            List<Breakpoint> breakers = new ArrayList<>();
             if (aStack != null) {
-                for (IBreakpoint lBpt : breakpoints)
-                    if (lBpt.breakHere(aStack)) lResult.add(lBpt);
+                for (Breakpoint lBpt : breakpoints)
+                    if (lBpt.breakHere(aStack)) breakers.add(lBpt);
             }
-            return lResult;
+            return breakers;
         }
 
-        public IBreakpoint findFirstMatchingBreakpoint(Eval2.EvalStack aStack) {
-            for (IBreakpoint lBpt : breakpoints)
+        public Breakpoint findFirstMatchingBreakpoint(Eval2.EvalStack aStack) {
+            for (Breakpoint lBpt : breakpoints)
                 if (lBpt.breakHere(aStack)) return lBpt;
             return null;
         }
@@ -124,26 +125,24 @@ public class EvalTrace {
 
         @Override
         public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            for (IBreakpoint lBpt : breakpoints) {
-                builder.append(lBpt.toString()).append("\n");
-            }
-            return builder.toString();
+            return "BreakpointSet{" +
+                    "breakpoints=[\n\t" + breakpoints.stream().map(Object::toString).collect(Collectors.joining(",\n\t")) + "]" +
+                    '}';
         }
     }
 
     /**
      * A breakpoint on a function name.
      */
-    public static class BreakpointFunc implements EvalTrace.IBreakpoint {
+    public static class BreakpointFunc implements Breakpoint {
 
         private String name;
-        private String func;
+        private String funcName;
         private boolean enabled = true;
 
         public BreakpointFunc(String aName, String aFunc) {
             name = aName;
-            func = aFunc;
+            funcName = aFunc;
         }
 
         public void setEnabled(boolean enabled) {
@@ -161,7 +160,7 @@ public class EvalTrace {
                 // and also that the frame slot pointer is at the beginning of the frame,
                 // we only want to break the first time an expression is pushed on the stack,
                 // not each time it is on top of the stack.
-                return (lExprLst.size() > 0) && func.equals(lExprLst.get(0)) && (lFrame.getDataptr() == 0);
+                return (lExprLst.size() > 0) && funcName.equals(lExprLst.get(0)) && (lFrame.getDataptr() == 0);
             }
             return false;
         }
@@ -172,17 +171,21 @@ public class EvalTrace {
 
         @Override
         public String toString() {
-            return this.name + ", " + "name break: '" + this.func + "'" + (enabled ? ", enabled" : ", paused");
+            return "BreakpointFunc{" +
+                    "name='" + name + '\'' +
+                    ", funcName='" + funcName + '\'' +
+                    ", enabled=" + enabled +
+                    '}';
         }
     }
 
     /**
      * A breakpoint on an expression.
      */
-    public static class BreakpointWhen implements IBreakpoint {
+    public static class BreakpointWhen implements Breakpoint {
 
         private String name;
-        private Object lWhenExpr;
+        private Object breakExpression;
         private IEval bptEval = new Eval();
         private boolean enabled = true;
 
@@ -193,7 +196,7 @@ public class EvalTrace {
                 Token token = (Token) aExpr;
                 throw new IllegalArgumentException("Expression was not parsed correctly: " + token.getValue());
             }
-            this.lWhenExpr = aExpr;
+            this.breakExpression = aExpr;
 
             // Copy the eval environment in our breakpoint eval.
             bptEval.setMacroRepo(srcEval.getMacroRepo());
@@ -211,7 +214,7 @@ public class EvalTrace {
 
         public boolean breakHere(Eval2.EvalStack stack) {
             try {
-                return enabled && AbstractEval.boolEval(bptEval.eval(lWhenExpr, stack.top().getCtx()));
+                return enabled && AbstractEval.boolEval(bptEval.eval(breakExpression, stack.top().getCtx()));
             }
             catch (CommandException e) {
                 throw new IllegalArgumentException("Breakpoint expression failure.", e);
@@ -220,14 +223,18 @@ public class EvalTrace {
 
         @Override
         public String toString() {
-            return this.name + ", " + "expression break: '" + lWhenExpr.toString() + "'" + (enabled ? ", enabled" : ", paused");
+            return "BreakpointWhen{" +
+                    "name='" + name + '\'' +
+                    ", breakExpression='" + Printer.print(breakExpression, false)  + '\'' +
+                    ", enabled=" + enabled +
+                    '}';
         }
     }
 
     /**
      * A breakpoint on a stack depth.
      */
-    public static class BreakpointStackdepth implements IBreakpoint {
+    public static class BreakpointStackdepth implements Breakpoint {
 
         private String name;
         private boolean enabled = true;
@@ -252,22 +259,26 @@ public class EvalTrace {
 
         @Override
         public String toString() {
-            return this.name + ", " + "stack depth break: '" + depth + "'" + (enabled ? ", enabled" : ", paused");
+            return "BreakpointStackdepth{" +
+                    "name='" + name + '\'' +
+                    ", depth=" + depth +
+                    ", enabled=" + enabled +
+                    '}';
         }
     }
 
     /**
      * Breakpoint expression. It inverts an existing breakpoint condition.
      */
-    public static class BreakpointNot implements IBreakpoint {
+    public static class BreakpointNot implements Breakpoint {
 
         private String name;
         private boolean enabled = true;
-        private IBreakpoint bp;
+        private Breakpoint breakpoint;
 
-        public BreakpointNot(String aName, IBreakpoint aBp) {
+        public BreakpointNot(String aName, Breakpoint aBp) {
             this.name = aName;
-            this.bp = aBp;
+            this.breakpoint = aBp;
         }
 
         public String getName() {
@@ -279,28 +290,31 @@ public class EvalTrace {
         }
 
         public boolean breakHere(Eval2.EvalStack aStack) {
-            return enabled && !(bp.breakHere(aStack));
+            return enabled && !(breakpoint.breakHere(aStack));
         }
 
         @Override
         public String toString() {
-            return this.name + ", " + "not-composite" + (enabled ? ", enabled" : ", paused") +
-                    "\n\t" + bp.toString().replace("\n\t", "\n\t\t");
+            return "BreakpointNot{" +
+                    "name='" + name + '\'' +
+                    ", enabled=" + enabled +
+                    ", breakpoint=" + breakpoint +
+                    '}';
         }
     }
 
     /**
      * Breakpoint expression. It combines a number of breakpoint conditions with and logic.
      */
-    public static class BreakpointAnd implements IBreakpoint {
+    public static class BreakpointAnd implements Breakpoint {
 
         private String name;
         private boolean enabled = true;
-        private List<IBreakpoint> bps;
+        private List<Breakpoint> breakpoints;
 
-        public BreakpointAnd(String aName, List<IBreakpoint> aBps) {
+        public BreakpointAnd(String aName, List<Breakpoint> aBps) {
             this.name = aName;
-            this.bps = aBps;
+            this.breakpoints = aBps;
         }
 
         public String getName() {
@@ -313,7 +327,7 @@ public class EvalTrace {
 
         public boolean breakHere(Eval2.EvalStack aStack) {
             boolean lBreak = enabled;
-            for (IBreakpoint lBp : bps) {
+            for (Breakpoint lBp : breakpoints) {
                 lBreak = lBreak && lBp.breakHere(aStack);
                 if (!lBreak) return lBreak;
             }
@@ -322,24 +336,24 @@ public class EvalTrace {
 
         @Override
         public String toString() {
-            StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("and-composite").append(enabled ? ", enabled" : ", paused");
-            for (IBreakpoint lBp : bps)
-                lBuilder.append("\n\t * ").append(lBp.toString().replace("\n\t", "\n\t\t"));
-            return lBuilder.toString();
+            return "BreakpointAnd{" +
+                    "name='" + name + '\'' +
+                    ", enabled=" + enabled +
+                    ", breakpoints=[\n\t" + breakpoints.stream().map(Object::toString).collect(Collectors.joining(",\n\t")) + "]" +
+                    '}';
         }
     }
 
     /**
      * Breakpoint expression. It combines a number of breakpoint conditions with or logic.
      */
-    public static class BreakpointOr implements IBreakpoint {
+    public static class BreakpointOr implements Breakpoint {
 
         private String name;
         private boolean enabled = true;
-        private List<IBreakpoint> bps;
+        private List<Breakpoint> bps;
 
-        public BreakpointOr(String aName, List<IBreakpoint> aBps) {
+        public BreakpointOr(String aName, List<Breakpoint> aBps) {
             this.name = aName;
             this.bps = aBps;
         }
@@ -359,11 +373,11 @@ public class EvalTrace {
 
         @Override
         public String toString() {
-            StringBuilder lBuilder = new StringBuilder();
-            lBuilder.append(this.name).append(", ").append("or-composite").append(enabled ? ", enabled" : ", paused");
-            for (IBreakpoint lBp : bps)
-                lBuilder.append("\n\t * ").append(lBp.toString().replace("\n\t", "\n\t\t"));
-            return lBuilder.toString();
+            return "BreakpointOr{" +
+                    "name='" + name + '\'' +
+                    ", enabled=" + enabled +
+                    ", breakpoints=[\n\t" + bps.stream().map(Object::toString).collect(Collectors.joining(",\n\t")) + "]" +
+                    '}';
         }
     }
 

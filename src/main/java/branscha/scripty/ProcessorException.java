@@ -26,18 +26,18 @@ package branscha.scripty;
 
 public class ProcessorException extends Exception {
     public ProcessorException() {
-        super();    //To change body of overridden methods use File | Settings | File Templates.
+        super();
     }
 
     public ProcessorException(String message) {
-        super(message);    //To change body of overridden methods use File | Settings | File Templates.
+        super(message);
     }
 
     public ProcessorException(String message, Throwable cause) {
-        super(message, cause);    //To change body of overridden methods use File | Settings | File Templates.
+        super(message, cause);
     }
 
     public ProcessorException(Throwable cause) {
-        super(cause);    //To change body of overridden methods use File | Settings | File Templates.
+        super(cause);
     }
 }

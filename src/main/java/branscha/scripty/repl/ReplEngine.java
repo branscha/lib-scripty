@@ -199,7 +199,6 @@ implements ExtensionManager {
                 // Time for evaluation.
                 try {
                     lastResult = eval.eval(lAst);
-                    if(interactiveMode && (lastResult !=  null)) writeLine(lastResult.toString());
                 }
                 catch (CommandException e) {
                     // Normal command error.

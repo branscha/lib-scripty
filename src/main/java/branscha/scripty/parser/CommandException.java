@@ -25,6 +25,7 @@
 package branscha.scripty.parser;
 
 public class CommandException extends Exception {
+
     private static final long serialVersionUID = -4301173601968482098L;
 
     // The stack will be filled in by the Eval2 implementation.

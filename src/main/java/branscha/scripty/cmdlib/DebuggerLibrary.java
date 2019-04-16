@@ -38,17 +38,17 @@ import java.util.List;
                 @ScriptyStdArgList(name = "one argument", fixed = {@ScriptyArg(name = "arg", type = "Any")}),
                 @ScriptyStdArgList(name = "no arguments"),
                 @ScriptyStdArgList(name = "no arguments + quiet option", named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")}),
-                @ScriptyStdArgList(name = "breakpoint", fixed = {@ScriptyArg(name = "arg", type = "Instance branscha.scripty.parser.EvalTrace$IBreakpoint")}),
+                @ScriptyStdArgList(name = "breakpoint", fixed = {@ScriptyArg(name = "arg", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint")}),
                 @ScriptyStdArgList(name = "name", fixed = {@ScriptyArg(name = "name", type = "String")}),
                 @ScriptyStdArgList(name = "name + bool", fixed = {@ScriptyArg(name = "name", type = "String"), @ScriptyArg(name = "bool", type = "Boolean")}),
                 @ScriptyStdArgList(name = "string + name", fixed = {@ScriptyArg(name = "str", type = "String")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
                 @ScriptyStdArgList(name = "posint + name", fixed = {@ScriptyArg(name = "posint", type = "IntegerRange min=0")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
                 @ScriptyStdArgList(name = "obj + name", fixed = {@ScriptyArg(name = "obj", type = "Any")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "breakpoint + name", fixed = {@ScriptyArg(name = "bpt", type = "Instance branscha.scripty.parser.EvalTrace$IBreakpoint")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
+                @ScriptyStdArgList(name = "breakpoint + name", fixed = {@ScriptyArg(name = "bpt", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
         },
         var = {
                 @ScriptyVarArgList(name = "at least one argument", vararg = @ScriptyArg(name = "arg", type = "Any"), minLength = 1),
-                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance branscha.scripty.parser.EvalTrace$IBreakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
+                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
         }
 )
 public class DebuggerLibrary {
@@ -308,9 +308,9 @@ public class DebuggerLibrary {
                 // Find all the breakpoints that match the current situation (stack).
                 // We will compose a message mentioning the labels of all the
                 // breakpoints that were triggered.
-                final List<EvalTrace.IBreakpoint> lBpts = trace.getBreakpoints().findAllMatchingBreakpoints(trace.getStack());
+                final List<EvalTrace.Breakpoint> lBpts = trace.getBreakpoints().findAllMatchingBreakpoints(trace.getStack());
                 StringBuilder lBuilder = new StringBuilder();
-                for (EvalTrace.IBreakpoint lBpt : lBpts) lBuilder.append(lBpt.getName());
+                for (EvalTrace.Breakpoint lBpt : lBpts) lBuilder.append(lBpt.getName());
                 writer.println("Breakpoint(s) reached: " + lBuilder.toString() + ".");
             }
         }
@@ -496,7 +496,7 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-addbreakpoint")
     @ScriptyRefArgList(ref = "breakpoint")
-    public EvalTrace.BreakpointSet addBreakpoint(@ScriptyParam("arg") EvalTrace.IBreakpoint aBpt) {
+    public EvalTrace.BreakpointSet addBreakpoint(@ScriptyParam("arg") EvalTrace.Breakpoint aBpt) {
         // If none was found, we create a new empty one.
         if (breakpoints == null) breakpoints = new EvalTrace.BreakpointSet();
         // At this point, we are sure there is a breakpoint set.
@@ -565,7 +565,7 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "bpt-func")
     @ScriptyRefArgList(ref = "string + name")
-    public EvalTrace.IBreakpoint bptFunc(@ScriptyParam("str") String aFuncName, @ScriptyParam("name") String aBtpName) {
+    public EvalTrace.Breakpoint bptFunc(@ScriptyParam("str") String aFuncName, @ScriptyParam("name") String aBtpName) {
         if (aBtpName.length() <= 0) aBtpName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointFunc(aBtpName, aFuncName);
     }
@@ -581,7 +581,7 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "bpt-stack")
     @ScriptyRefArgList(ref = "posint + name")
-    public EvalTrace.IBreakpoint bptStackDepth(@ScriptyParam("posint") Integer aDepth, @ScriptyParam("name") String aBptName) {
+    public EvalTrace.Breakpoint bptStackDepth(@ScriptyParam("posint") Integer aDepth, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointStackdepth(aBptName, aDepth);
     }
@@ -590,14 +590,14 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "bpt-when-x")
     @ScriptyRefArgList(ref = "obj + name")
-    public EvalTrace.IBreakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName, IEval srcEval) {
+    public EvalTrace.Breakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName, IEval srcEval) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointWhen(aBptName, aExpr, srcEval);
     }
 
     @ScriptyCommand(name = "bpt-not")
     @ScriptyRefArgList(ref = "breakpoint + name")
-    public EvalTrace.IBreakpoint bptNot(@ScriptyParam("bpt") EvalTrace.IBreakpoint aBtp, @ScriptyParam("name") String aBptName) {
+    public EvalTrace.Breakpoint bptNot(@ScriptyParam("bpt") EvalTrace.Breakpoint aBtp, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointNot(aBptName, aBtp);
     }
@@ -605,19 +605,19 @@ public class DebuggerLibrary {
 
     @ScriptyCommand(name = "bpt-and")
     @ScriptyRefArgList(ref = "breakpoint* + name")
-    public EvalTrace.IBreakpoint bptAnd(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
+    public EvalTrace.Breakpoint bptAnd(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
-        List<EvalTrace.IBreakpoint> lBpts = new LinkedList<EvalTrace.IBreakpoint>();
-        for (final Object aBpt : aBpts) lBpts.add((EvalTrace.IBreakpoint) aBpt);
+        List<EvalTrace.Breakpoint> lBpts = new LinkedList<EvalTrace.Breakpoint>();
+        for (final Object aBpt : aBpts) lBpts.add((EvalTrace.Breakpoint) aBpt);
         return new EvalTrace.BreakpointAnd(aBptName, lBpts);
     }
 
     @ScriptyCommand(name = "bpt-or")
     @ScriptyRefArgList(ref = "breakpoint* + name")
-    public EvalTrace.IBreakpoint bptOr(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
+    public EvalTrace.Breakpoint bptOr(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
-        List<EvalTrace.IBreakpoint> lBpts = new LinkedList<EvalTrace.IBreakpoint>();
-        for (final Object aBpt : aBpts) lBpts.add((EvalTrace.IBreakpoint) aBpt);
+        List<EvalTrace.Breakpoint> lBpts = new LinkedList<EvalTrace.Breakpoint>();
+        for (final Object aBpt : aBpts) lBpts.add((EvalTrace.Breakpoint) aBpt);
         return new EvalTrace.BreakpointOr(aBptName, lBpts);
     }
 

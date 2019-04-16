@@ -41,14 +41,14 @@ public class TestEvalTrace {
 
     private static final String FUN_FAC = "(defun fac (n) (if (> $n 0) (* $n (fac (- $n 1))) 1))";
 
-    private static final String FAC_STACK_8 = "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]\n" +
-            "[fac, [-, $n, 1]]:2! ~ [fac, 8]\n" +
-            "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 9, null]\n" +
-            "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-            "[fac, [-, $n, 1]]:2! ~ [fac, 9]\n" +
-            "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 10, null]\n" +
-            "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-            "[fac, 10]:2! ~ [fac, 10]";
+    private static final String FAC_STACK_8 = "(if (> $n 0) (* $n (fac (- $n 1))) 1)\n" +
+            "(fac (- $n 1)):2! ~ [fac, 8]\n" +
+            "(* $n (fac (- $n 1))):2 ~ [*, 9, null]\n" +
+            "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+            "(fac (- $n 1)):2! ~ [fac, 9]\n" +
+            "(* $n (fac (- $n 1))):2 ~ [*, 10, null]\n" +
+            "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+            "(fac 10):2! ~ [fac, 10]";
 
     private Parser parser;
     private Eval2 eval;
@@ -110,16 +110,16 @@ public class TestEvalTrace {
     @Test
     public void testStack() {
         String[] stacks = {
-                "[+, 1, 2]",
-                "+\n[+, 1, 2]:0 ~ [null, null, null]",
-                "+ ==> +\n[+, 1, 2]:0 ~ [null, null, null]",
-                "[+, 1, 2]:1 ~ [+, null, null]",
-                "1\n[+, 1, 2]:1 ~ [+, null, null]",
-                "1 ==> 1\n[+, 1, 2]:1 ~ [+, null, null]",
-                "[+, 1, 2]:2 ~ [+, 1, null]",
-                "2\n[+, 1, 2]:2 ~ [+, 1, null]",
-                "2 ==> 2\n[+, 1, 2]:2 ~ [+, 1, null]",
-                "[+, 1, 2]:3! ~ [+, 1, 2]"
+                "(+ 1 2)",
+                "+\n(+ 1 2):0 ~ [null, null, null]",
+                "+ ==> +\n(+ 1 2):0 ~ [null, null, null]",
+                "(+ 1 2):1 ~ [+, null, null]",
+                "1\n(+ 1 2):1 ~ [+, null, null]",
+                "1 ==> 1\n(+ 1 2):1 ~ [+, null, null]",
+                "(+ 1 2):2 ~ [+, 1, null]",
+                "2\n(+ 1 2):2 ~ [+, 1, null]",
+                "2 ==> 2\n(+ 1 2):2 ~ [+, 1, null]",
+                "(+ 1 2):3! ~ [+, 1, 2]"
         };
 
         Object expr = parser.parseExpression("(+ 1 2)");
@@ -148,10 +148,10 @@ public class TestEvalTrace {
         Object expr = parser.parseExpression("(+ 1 2)");
         EvalTrace trace = new EvalTrace(eval, expr);
         for (int i = 0; i < 3; i++) trace.step();
-        assertEquals("[+, 1, 2]:1 ~ [+, null, null]", trace.getStack().toString().trim());
+        assertEquals("(+ 1 2):1 ~ [+, null, null]", trace.getStack().toString().trim());
 
         trace.reset();
-        assertEquals("[+, 1, 2]:0 ~ [null, null, null]", trace.getStack().toString().trim());
+        assertEquals("(+ 1 2):0 ~ [null, null, null]", trace.getStack().toString().trim());
 
         assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
@@ -163,13 +163,13 @@ public class TestEvalTrace {
         Object expr = parser.parseExpression("(+ 1 2)");
         EvalTrace trace = new EvalTrace(eval, expr);
         for (int i = 0; i < 5; i++) trace.step();
-        assertEquals( "1 ==> 1\n[+, 1, 2]:1 ~ [+, null, null]", trace.getStack().toString().trim());
+        assertEquals( "1 ==> 1\n(+ 1 2):1 ~ [+, null, null]", trace.getStack().toString().trim());
 
         trace.dropFrame();
-        assertEquals( "[+, 1, 2]:1 ~ [+, null, null]", trace.getStack().toString().trim());
+        assertEquals( "(+ 1 2):1 ~ [+, null, null]", trace.getStack().toString().trim());
 
         trace.step(); trace.step();
-        assertEquals( "1 ==> 1\n[+, 1, 2]:1 ~ [+, null, null]", trace.getStack().toString().trim());
+        assertEquals( "1 ==> 1\n(+ 1 2):1 ~ [+, null, null]", trace.getStack().toString().trim());
 
         assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
@@ -180,10 +180,10 @@ public class TestEvalTrace {
     public void testBack() {
 
         String[] stacks = {
-                "[+, 1, 2]:3! ~ [+, 1, 2]",
-                "[+, 1, 2]:2 ~ [+, 1, null]",
-                "[+, 1, 2]:1 ~ [+, null, null]",
-                "[+, 1, 2]:0 ~ [null, null, null]"
+                "(+ 1 2):3! ~ [+, 1, 2]",
+                "(+ 1 2):2 ~ [+, 1, null]",
+                "(+ 1 2):1 ~ [+, null, null]",
+                "(+ 1 2):0 ~ [null, null, null]"
         };
 
         Object expr = parser.parseExpression("(+ 1 2)");
@@ -210,10 +210,10 @@ public class TestEvalTrace {
     public void testStepOver() {
 
         String[] stacks = {
-                "[+, 1, 2]",
-                "[+, 1, 2]:1 ~ [+, null, null]",
-                "[+, 1, 2]:2 ~ [+, 1, null]",
-                "[+, 1, 2]:3! ~ [+, 1, 2]",
+                "(+ 1 2)",
+                "(+ 1 2):1 ~ [+, null, null]",
+                "(+ 1 2):2 ~ [+, 1, null]",
+                "(+ 1 2):3! ~ [+, 1, 2]",
         };
 
         Object expr = parser.parseExpression("(+ 1 2)");
@@ -242,17 +242,17 @@ public class TestEvalTrace {
         Object expr = parser.parseExpression("(+ (* 2 3) 7)");
         EvalTrace trace = new EvalTrace(eval, expr);
 
-        assertEquals("[+, [*, 2, 3], 7]", trace.getStack().toString().trim());
+        assertEquals("(+ (* 2 3) 7)", trace.getStack().toString().trim());
 
         // Evaluate until subexpression (* 2 3) is on top.
         trace.stepOver();
         trace.step();
-        assertEquals("[*, 2, 3]\n[+, [*, 2, 3], 7]:1 ~ [+, null, null]", trace.getStack().toString().trim());
+        assertEquals("(* 2 3)\n(+ (* 2 3) 7):1 ~ [+, null, null]", trace.getStack().toString().trim());
 
         // Evaluate the top and substitute in the main expression.
         // => (+ 6 ? )
         trace.stepOut();
-        assertEquals("[+, [*, 2, 3], 7]:2 ~ [+, 6, null]", trace.getStack().toString().trim());
+        assertEquals("(+ (* 2 3) 7):2 ~ [+, 6, null]", trace.getStack().toString().trim());
     }
 
     @Test
@@ -289,7 +289,7 @@ public class TestEvalTrace {
 
         Object expr = parser.parseExpression("(fac 100000000)");
         EvalTrace trace = new EvalTrace(eval, expr);
-        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointStackdepth("sdepth", 10);
+        EvalTrace.Breakpoint bpt = new EvalTrace.BreakpointStackdepth("sdepth", 10);
         trace.getBreakpoints().addBreakpoint(bpt);
 
         trace.run();
@@ -298,15 +298,15 @@ public class TestEvalTrace {
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
         assertEquals(">\n" +
-                "[>, $n, 0]:0 ~ [null, null, null]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:0 ~ [null, null]\n" +
-                "[fac, [-, $n, 1]]:2! ~ [fac, 99999998]\n" +
-                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 99999999, null]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, [-, $n, 1]]:2! ~ [fac, 99999999]\n" +
-                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 100000000, null]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, 100000000]:2! ~ [fac, 100000000]", trace.getStack().toString().trim());
+                "(> $n 0):0 ~ [null, null, null]\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):0 ~ [null, null]\n" +
+                "(fac (- $n 1)):2! ~ [fac, 99999998]\n" +
+                "(* $n (fac (- $n 1))):2 ~ [*, 99999999, null]\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac (- $n 1)):2! ~ [fac, 99999999]\n" +
+                "(* $n (fac (- $n 1))):2 ~ [*, 100000000, null]\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac 100000000):2! ~ [fac, 100000000]", trace.getStack().toString().trim());
 
         trace.terminate();
         assertTrue(trace.isTerminated());
@@ -320,7 +320,7 @@ public class TestEvalTrace {
 
         Object expr = parser.parseExpression("(fac 100)");
         EvalTrace trace = new EvalTrace(eval, expr);
-        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointFunc("func", "*");
+        EvalTrace.Breakpoint bpt = new EvalTrace.BreakpointFunc("func", "*");
         trace.getBreakpoints().addBreakpoint(bpt);
 
         trace.run();
@@ -328,36 +328,36 @@ public class TestEvalTrace {
         assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
-        assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, 100]:2! ~ [fac, 100]", trace.getStack().toString().trim());
+        assertEquals("(* $n (fac (- $n 1)))\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac 100):2! ~ [fac, 100]", trace.getStack().toString().trim());
 
         trace.run();
 
         assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
-        assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, [-, $n, 1]]:2! ~ [fac, 99]\n" +
-                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 100, null]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, 100]:2! ~ [fac, 100]", trace.getStack().toString().trim());
+        assertEquals("(* $n (fac (- $n 1)))\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac (- $n 1)):2! ~ [fac, 99]\n" +
+                "(* $n (fac (- $n 1))):2 ~ [*, 100, null]\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac 100):2! ~ [fac, 100]", trace.getStack().toString().trim());
 
         trace.run();
 
         assertFalse(trace.isTerminated());
         assertFalse(trace.hasResult());
         assertFalse(trace.isExcepted());
-        assertEquals("[*, $n, [fac, [-, $n, 1]]]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, [-, $n, 1]]:2! ~ [fac, 98]\n" +
-                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 99, null]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, [-, $n, 1]]:2! ~ [fac, 99]\n" +
-                "[*, $n, [fac, [-, $n, 1]]]:2 ~ [*, 100, null]\n" +
-                "[if, [>, $n, 0], [*, $n, [fac, [-, $n, 1]]], 1]:1 ~ [true, null]\n" +
-                "[fac, 100]:2! ~ [fac, 100]", trace.getStack().toString().trim());
+        assertEquals("(* $n (fac (- $n 1)))\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac (- $n 1)):2! ~ [fac, 98]\n" +
+                "(* $n (fac (- $n 1))):2 ~ [*, 99, null]\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac (- $n 1)):2! ~ [fac, 99]\n" +
+                "(* $n (fac (- $n 1))):2 ~ [*, 100, null]\n" +
+                "(if (> $n 0) (* $n (fac (- $n 1))) 1):1 ~ [true, null]\n" +
+                "(fac 100):2! ~ [fac, 100]", trace.getStack().toString().trim());
 
         trace.terminate();
         assertTrue(trace.isTerminated());
@@ -371,7 +371,7 @@ public class TestEvalTrace {
 
         Object expr = parser.parseExpression("(fac 10)");
         EvalTrace trace = new EvalTrace(eval, expr);
-        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (< $n 9) false)"), eval);
+        EvalTrace.Breakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (< $n 9) false)"), eval);
         trace.getBreakpoints().addBreakpoint(bpt);
 
         trace.run();
@@ -388,9 +388,9 @@ public class TestEvalTrace {
     @Test
     public void testAndBpt() {
 
-        EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
-        EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $size large)"), eval);
-        EvalTrace.IBreakpoint bptAnd = new EvalTrace.BreakpointAnd("and", Arrays.asList(bpt1, bpt2));
+        EvalTrace.Breakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
+        EvalTrace.Breakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $size large)"), eval);
+        EvalTrace.Breakpoint bptAnd = new EvalTrace.BreakpointAnd("and", Arrays.asList(bpt1, bpt2));
 
         // No red nor large -> run to end.
         Object expr = parser.parseExpression("(progn (defvar color=black) (defvar size=small))");
@@ -443,8 +443,8 @@ public class TestEvalTrace {
 
         Object expr = parser.parseExpression("(fac 10)");
         EvalTrace trace = new EvalTrace(eval, expr);
-        EvalTrace.IBreakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (>= $n 9) true)"), eval);
-        EvalTrace.IBreakpoint bptNot = new EvalTrace.BreakpointNot("not", bpt);
+        EvalTrace.Breakpoint bpt = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(if $n (>= $n 9) true)"), eval);
+        EvalTrace.Breakpoint bptNot = new EvalTrace.BreakpointNot("not", bpt);
         trace.getBreakpoints().addBreakpoint(bptNot);
 
         trace.run();
@@ -461,9 +461,9 @@ public class TestEvalTrace {
     @Test
     public void testBptOr() {
 
-        EvalTrace.IBreakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
-        EvalTrace.IBreakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color blue)"), eval);
-        EvalTrace.IBreakpoint bptOr = new EvalTrace.BreakpointOr("or", Arrays.asList(bpt1, bpt2));
+        EvalTrace.Breakpoint bpt1 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color red)"), eval);
+        EvalTrace.Breakpoint bpt2 = new EvalTrace.BreakpointWhen("when", parser.parseExpression("(eq $color blue)"), eval);
+        EvalTrace.Breakpoint bptOr = new EvalTrace.BreakpointOr("or", Arrays.asList(bpt1, bpt2));
 
         // No red nor blue -> run to end.
         Object expr = parser.parseExpression("(progn (defvar color=none) (set color=black) (set color=green) (set color=cyan ) (set color=yellow))");
@@ -482,8 +482,8 @@ public class TestEvalTrace {
         trace.run();
         assertFalse(trace.isTerminated());
         assertFalse((trace.isExcepted()));
-        assertEquals("[set, pair(color,red)]:2! ~ [color, red] ==> red\n" +
-                "[progn, [defvar, pair(color,none)], [set, pair(color,black)], [set, pair(color,green)], [set, pair(color,red)], [set, pair(color,yellow)]]:4 ~ [progn, none, black, green, null, null]", trace.getStack().toString().trim());
+        assertEquals("(set color=red):2! ~ [color, red] ==> red\n" +
+                "(progn (defvar color=none) (set color=black) (set color=green) (set color=red) (set color=yellow)):4 ~ [progn, none, black, green, null, null]", trace.getStack().toString().trim());
         trace.terminate();
 
         // blue is there -> breakpoint hit.
@@ -495,7 +495,60 @@ public class TestEvalTrace {
         assertFalse(trace.isTerminated());
         assertFalse((trace.isExcepted()));
         assertEquals("progn\n" +
-                "[progn, [defvar, pair(color,none)], [set, pair(color,black)], [set, pair(color,green)], [set, pair(color,blue)], [set, pair(color,yellow)]]:0 ~ [null, null, null, null, null, null]", trace.getStack().toString().trim());
+                "(progn (defvar color=none) (set color=black) (set color=green) (set color=blue) (set color=yellow)):0 ~ [null, null, null, null, null, null]", trace.getStack().toString().trim());
         trace.terminate();
     }
+
+    @Test
+    public void testBtpToString() {
+        EvalTrace.Breakpoint bpt1 = new EvalTrace.BreakpointWhen("when-red", parser.parseExpression("(eq $color red)"), eval);
+        assertEquals("BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true}", bpt1.toString());
+
+        EvalTrace.Breakpoint bpt2 = new EvalTrace.BreakpointWhen("when-blue", parser.parseExpression("(eq $color blue)"), eval);
+        assertEquals("BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}", bpt2.toString());
+
+        EvalTrace.Breakpoint bptOr = new EvalTrace.BreakpointOr("or", Arrays.asList(bpt1, bpt2));
+        assertEquals("BreakpointOr{name='or', enabled=true, breakpoints=[\n" +
+                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]}", bptOr.toString());
+
+        EvalTrace.Breakpoint bptAnd = new EvalTrace.BreakpointAnd("and", Arrays.asList(bpt1, bpt2));
+        assertEquals("BreakpointAnd{name='and', enabled=true, breakpoints=[\n" +
+                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]}", bptAnd.toString());
+
+        EvalTrace.Breakpoint bptFunc = new EvalTrace.BreakpointFunc("func", "*");
+        assertEquals("BreakpointFunc{name='func', funcName='*', enabled=true}", bptFunc.toString());
+
+        EvalTrace.Breakpoint bptDepth = new EvalTrace.BreakpointStackdepth("sdepth", 10);
+        assertEquals("BreakpointStackdepth{name='sdepth', depth=10, enabled=true}", bptDepth.toString());
+
+        EvalTrace.Breakpoint bptNot = new EvalTrace.BreakpointNot("not", bptFunc);
+        assertEquals("BreakpointNot{name='not', enabled=true, breakpoint=BreakpointFunc{name='func', funcName='*', enabled=true}}", bptNot.toString());
+
+        EvalTrace.BreakpointSet bptSet = new EvalTrace.BreakpointSet();
+        bptSet.addBreakpoint(bpt1);
+        bptSet.addBreakpoint(bpt2);
+        bptSet.addBreakpoint(bptOr);
+        bptSet.addBreakpoint(bptAnd);
+        bptSet.addBreakpoint(bptFunc);
+        bptSet.addBreakpoint(bptDepth);
+        bptSet.addBreakpoint(bptNot);
+
+        assertEquals("BreakpointSet{breakpoints=[\n" +
+                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true},\n" +
+                "\tBreakpointOr{name='or', enabled=true, breakpoints=[\n" +
+                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
+                "\tBreakpointAnd{name='and', enabled=true, breakpoints=[\n" +
+                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
+                "\tBreakpointFunc{name='func', funcName='*', enabled=true},\n" +
+                "\tBreakpointStackdepth{name='sdepth', depth=10, enabled=true},\n" +
+                "\tBreakpointNot{name='not', enabled=true, breakpoint=BreakpointFunc{name='func', funcName='*', enabled=true}}]}", bptSet.toString());
+
+    }
 }
+
+

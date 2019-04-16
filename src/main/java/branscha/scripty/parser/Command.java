@@ -24,6 +24,9 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
+/**
+ * An extension that can be used in a Scripty script and executed by an {@link Eval}.
+ */
 public interface Command {
     public Object execute(IEval aEval, Context aCtx, Object[] aArgs)
     throws CommandException;
