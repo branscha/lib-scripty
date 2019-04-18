@@ -602,7 +602,6 @@ public class DebuggerLibrary {
         return new EvalTrace.BreakpointNot(aBptName, aBtp);
     }
 
-
     @ScriptyCommand(name = "bpt-and")
     @ScriptyRefArgList(ref = "breakpoint* + name")
     public EvalTrace.Breakpoint bptAnd(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
@@ -620,5 +619,4 @@ public class DebuggerLibrary {
         for (final Object aBpt : aBpts) lBpts.add((EvalTrace.Breakpoint) aBpt);
         return new EvalTrace.BreakpointOr(aBptName, lBpts);
     }
-
 }

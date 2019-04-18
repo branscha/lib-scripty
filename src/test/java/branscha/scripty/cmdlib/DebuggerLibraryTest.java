@@ -92,4 +92,49 @@ public class DebuggerLibraryTest {
         lResult = scripty.process("dbg-result");
         assertEquals(new BigDecimal(13), lResult);
     }
+
+    @Test
+    public void dbgBpts()
+    throws ProcessorException {
+        scripty.process("dbg-addbreakpoint (bpt-func fie)");
+        scripty.process("dbg-addbreakpoint (bpt-stack 10)");
+        scripty.process("dbg-addbreakpoint (bpt-when (= $counter 10))");
+        scripty.process("dbg-addbreakpoint (bpt-or (bpt-func a) (bpt-func b) (bpt-func c))");
+        scripty.process("dbg-addbreakpoint (bpt-and (bpt-func 1) (bpt-func 2) (bpt-func 3))");
+        scripty.process("dbg-addbreakpoint (bpt-not (bpt-func x))");
+
+        Object lResult = scripty.process("dbg-breakpoints");
+        assertEquals("BreakpointSet{breakpoints=[\n" +
+                "    BreakpointFunc{name='bp0', funcName='fie', enabled=true},\n" +
+                "    BreakpointStackdepth{name='bp1', depth=10, enabled=true},\n" +
+                "    BreakpointWhen{name='bp2', breakExpression='(= $counter 10)', enabled=true},\n" +
+                "    BreakpointOr{name='bp6', enabled=true, breakpoints=[\n" +
+                "        BreakpointFunc{name='bp3', funcName='a', enabled=true},\n" +
+                "        BreakpointFunc{name='bp4', funcName='b', enabled=true},\n" +
+                "        BreakpointFunc{name='bp5', funcName='c', enabled=true}]},\n" +
+                "    BreakpointAnd{name='bp10', enabled=true, breakpoints=[\n" +
+                "        BreakpointFunc{name='bp7', funcName='1', enabled=true},\n" +
+                "        BreakpointFunc{name='bp8', funcName='2', enabled=true},\n" +
+                "        BreakpointFunc{name='bp9', funcName='3', enabled=true}]},\n" +
+                "    BreakpointNot{name='bp12', enabled=true, breakpoint=BreakpointFunc{name='bp11', funcName='x', enabled=true}}]}", lResult.toString().trim());
+
+
+        scripty.process("dbg-removebreakpoint bp6");
+        scripty.process("dbg-removebreakpoint bp10");
+        scripty.process("dbg-enablebreakpoint bp2 false");
+
+        lResult = scripty.process("dbg-breakpoints");
+        assertEquals("BreakpointSet{breakpoints=[\n" +
+                "    BreakpointFunc{name='bp0', funcName='fie', enabled=true},\n" +
+                "    BreakpointStackdepth{name='bp1', depth=10, enabled=true},\n" +
+                "    BreakpointWhen{name='bp2', breakExpression='(= $counter 10)', enabled=false},\n" +
+                "    BreakpointNot{name='bp12', enabled=true, breakpoint=BreakpointFunc{name='bp11', funcName='x', enabled=true}}]}", lResult.toString().trim());
+
+        scripty.process("dbg-clearbreakpoints");
+
+        lResult = scripty.process("dbg-breakpoints");
+        assertEquals("BreakpointSet{breakpoints=[\n" +
+                "]}", lResult.toString().trim());
+
+    }
 }
