@@ -13,7 +13,6 @@ import java.util.List;
 public class Printer {
 
     private static final String INDENT = "  ";
-    private static final String ERR010 = "Printer/010: Only lists and strings are allowed in S-expressionS, encountered element of type '%s'.";
 
     public static String print(Object sExpr, boolean pretty) {
         StringBuilder builder = new StringBuilder();
@@ -46,7 +45,7 @@ public class Printer {
                 builder.append(str);
             }
             else {
-                throw new IllegalArgumentException(String.format(ERR010, sExpr.getClass()));
+                builder.append(sExpr);
             }
         }
     }

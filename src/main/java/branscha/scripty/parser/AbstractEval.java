@@ -24,6 +24,8 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 
 public abstract class AbstractEval implements IEval {
@@ -50,6 +52,8 @@ public abstract class AbstractEval implements IEval {
         else if (aObj instanceof Short) return ((Short) aObj).intValue() != 0;
         else if (aObj instanceof Integer) return (Integer) aObj != 0;
         else if (aObj instanceof Long) return (Long) aObj != 0l;
+        else if (aObj instanceof BigDecimal) return ((BigDecimal) aObj).compareTo(BigDecimal.ONE) >= 0;
+        else if (aObj instanceof BigInteger) return ((BigInteger) aObj).compareTo(BigInteger.ONE) >= 0;
         else if (aObj instanceof String) {
             String lNor = ((String) aObj).toLowerCase();
             return ("true".equals(lNor) || "yes".equals(lNor) || "t".equals(lNor) || "y".equals(lNor) || "on".equals(lNor));

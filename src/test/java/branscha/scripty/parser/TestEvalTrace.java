@@ -509,13 +509,13 @@ public class TestEvalTrace {
 
         EvalTrace.Breakpoint bptOr = new EvalTrace.BreakpointOr("or", Arrays.asList(bpt1, bpt2));
         assertEquals("BreakpointOr{name='or', enabled=true, breakpoints=[\n" +
-                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
-                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]}", bptOr.toString());
+                "    BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "    BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]}", bptOr.toString());
 
         EvalTrace.Breakpoint bptAnd = new EvalTrace.BreakpointAnd("and", Arrays.asList(bpt1, bpt2));
         assertEquals("BreakpointAnd{name='and', enabled=true, breakpoints=[\n" +
-                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
-                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]}", bptAnd.toString());
+                "    BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "    BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]}", bptAnd.toString());
 
         EvalTrace.Breakpoint bptFunc = new EvalTrace.BreakpointFunc("func", "*");
         assertEquals("BreakpointFunc{name='func', funcName='*', enabled=true}", bptFunc.toString());
@@ -536,18 +536,75 @@ public class TestEvalTrace {
         bptSet.addBreakpoint(bptNot);
 
         assertEquals("BreakpointSet{breakpoints=[\n" +
-                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
-                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true},\n" +
-                "\tBreakpointOr{name='or', enabled=true, breakpoints=[\n" +
-                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
-                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
-                "\tBreakpointAnd{name='and', enabled=true, breakpoints=[\n" +
-                "\tBreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
-                "\tBreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
-                "\tBreakpointFunc{name='func', funcName='*', enabled=true},\n" +
-                "\tBreakpointStackdepth{name='sdepth', depth=10, enabled=true},\n" +
-                "\tBreakpointNot{name='not', enabled=true, breakpoint=BreakpointFunc{name='func', funcName='*', enabled=true}}]}", bptSet.toString());
+                "    BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "    BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true},\n" +
+                "    BreakpointOr{name='or', enabled=true, breakpoints=[\n" +
+                "        BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "        BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
+                "    BreakpointAnd{name='and', enabled=true, breakpoints=[\n" +
+                "        BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "        BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
+                "    BreakpointFunc{name='func', funcName='*', enabled=true},\n" +
+                "    BreakpointStackdepth{name='sdepth', depth=10, enabled=true},\n" +
+                "    BreakpointNot{name='not', enabled=true, breakpoint=BreakpointFunc{name='func', funcName='*', enabled=true}}]}", bptSet.toString());
 
+        bptSet.removeBreakpoint("func");
+        bptSet.removeBreakpoint("sdepth");
+        bptSet.removeBreakpoint("when-blue");
+
+        assertEquals("BreakpointSet{breakpoints=[\n" +
+                "    BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "    BreakpointOr{name='or', enabled=true, breakpoints=[\n" +
+                "        BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "        BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
+                "    BreakpointAnd{name='and', enabled=true, breakpoints=[\n" +
+                "        BreakpointWhen{name='when-red', breakExpression='(eq $color red)', enabled=true},\n" +
+                "        BreakpointWhen{name='when-blue', breakExpression='(eq $color blue)', enabled=true}]},\n" +
+                "    BreakpointNot{name='not', enabled=true, breakpoint=BreakpointFunc{name='func', funcName='*', enabled=true}}]}", bptSet.toString());
+    }
+
+    @Test
+    public void testPauseBpt()
+    throws CommandException {
+
+        eval.eval(parser.parseExpression("(defun countit ()  (progn  (defvar counter=0) (while (< $counter 100) (set counter=(+ $counter 1)))))"));
+        Object expr = parser.parseExpression("(countit)");
+        EvalTrace trace = new EvalTrace(eval, expr);
+
+        EvalTrace.Breakpoint bptEven = new EvalTrace.BreakpointWhen("when-even", parser.parseExpression("(and $counter (not (rem $counter 2)))"), eval);
+        EvalTrace.Breakpoint bptOld = new EvalTrace.BreakpointWhen("when-50", parser.parseExpression("(and $counter (>= $counter 50))"), eval);
+
+        trace.getBreakpoints().addBreakpoint(bptEven);
+        trace.getBreakpoints().addBreakpoint(bptOld);
+
+        trace.run();
+        assertFalse(trace.isTerminated());
+        assertTrue(trace.isBreakpointEncountered());
+        assertEquals(new BigDecimal(2), eval.getContext().getBinding("counter"));
+
+        bptEven.setEnabled(false);
+
+        trace.run();
+        assertFalse(trace.isTerminated());
+        assertTrue(trace.isBreakpointEncountered());
+        assertEquals(new BigDecimal(50), eval.getContext().getBinding("counter"));
+        eval.getContext().setBinding("counter", new BigDecimal(51));
+
+        bptOld.setEnabled(false);
+        bptEven.setEnabled(true);
+
+        trace.runToResult();
+        assertFalse(trace.isTerminated());
+        assertTrue(trace.isBreakpointEncountered());
+        assertEquals(new BigDecimal(52), eval.getContext().getBinding("counter"));
+
+        bptEven.setEnabled(false);
+
+        trace.run();
+        assertTrue(trace.hasResult());
+        assertFalse(trace.isExcepted());
+        Object lResult = trace.getResult();
+        assertEquals(new BigDecimal("100"), lResult);
     }
 }
 

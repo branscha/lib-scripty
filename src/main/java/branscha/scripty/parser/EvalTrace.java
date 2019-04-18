@@ -65,11 +65,15 @@ public class EvalTrace {
      * Represents a breakpoint during expression evaluation.
      */
     public interface Breakpoint {
+        String INDENT = "    ";
+
         String getName();
 
         void setEnabled(boolean aEnabled);
 
         boolean breakHere(Eval2.EvalStack stack);
+
+        String toString(String indent);
     }
 
     /**
@@ -126,7 +130,7 @@ public class EvalTrace {
         @Override
         public String toString() {
             return "BreakpointSet{" +
-                    "breakpoints=[\n\t" + breakpoints.stream().map(Object::toString).collect(Collectors.joining(",\n\t")) + "]" +
+                    "breakpoints=[\n" + breakpoints.stream().map((bpt)->bpt.toString(Breakpoint.INDENT)).collect(Collectors.joining(",\n")) + "]" +
                     '}';
         }
     }
@@ -170,12 +174,17 @@ public class EvalTrace {
         }
 
         @Override
-        public String toString() {
-            return "BreakpointFunc{" +
+        public String toString(String indent) {
+            return indent + "BreakpointFunc{" +
                     "name='" + name + '\'' +
                     ", funcName='" + funcName + '\'' +
                     ", enabled=" + enabled +
                     '}';
+        }
+
+        @Override
+        public String toString() {
+            return this.toString("");
         }
     }
 
@@ -222,12 +231,17 @@ public class EvalTrace {
         }
 
         @Override
-        public String toString() {
-            return "BreakpointWhen{" +
+        public String toString(String indent) {
+            return indent + "BreakpointWhen{" +
                     "name='" + name + '\'' +
                     ", breakExpression='" + Printer.print(breakExpression, false)  + '\'' +
                     ", enabled=" + enabled +
                     '}';
+        }
+
+        @Override
+        public String toString() {
+            return this.toString("");
         }
     }
 
@@ -258,12 +272,17 @@ public class EvalTrace {
         }
 
         @Override
-        public String toString() {
-            return "BreakpointStackdepth{" +
+        public String toString(String indent) {
+            return indent + "BreakpointStackdepth{" +
                     "name='" + name + '\'' +
                     ", depth=" + depth +
                     ", enabled=" + enabled +
                     '}';
+        }
+
+        @Override
+        public String toString() {
+            return this.toString("");
         }
     }
 
@@ -294,12 +313,17 @@ public class EvalTrace {
         }
 
         @Override
-        public String toString() {
-            return "BreakpointNot{" +
+        public String toString(String indent) {
+            return indent + "BreakpointNot{" +
                     "name='" + name + '\'' +
                     ", enabled=" + enabled +
                     ", breakpoint=" + breakpoint +
                     '}';
+        }
+
+        @Override
+        public String toString() {
+            return this.toString("");
         }
     }
 
@@ -335,12 +359,17 @@ public class EvalTrace {
         }
 
         @Override
-        public String toString() {
-            return "BreakpointAnd{" +
+        public String toString(String indent) {
+            return indent + "BreakpointAnd{" +
                     "name='" + name + '\'' +
                     ", enabled=" + enabled +
-                    ", breakpoints=[\n\t" + breakpoints.stream().map(Object::toString).collect(Collectors.joining(",\n\t")) + "]" +
+                    ", breakpoints=[\n" + breakpoints.stream().map((bpt)->bpt.toString(indent + INDENT)).collect(Collectors.joining(",\n")) + "]" +
                     '}';
+        }
+
+        @Override
+        public String toString() {
+            return this.toString("");
         }
     }
 
@@ -372,12 +401,17 @@ public class EvalTrace {
         }
 
         @Override
-        public String toString() {
-            return "BreakpointOr{" +
+        public String toString(String indent) {
+            return indent + "BreakpointOr{" +
                     "name='" + name + '\'' +
                     ", enabled=" + enabled +
-                    ", breakpoints=[\n\t" + bps.stream().map(Object::toString).collect(Collectors.joining(",\n\t")) + "]" +
+                    ", breakpoints=[\n" + bps.stream().map((bpt)->bpt.toString(indent + INDENT)).collect(Collectors.joining(",\n")) + "]" +
                     '}';
+        }
+
+        @Override
+        public String toString() {
+            return this.toString("");
         }
     }
 
@@ -696,7 +730,7 @@ public class EvalTrace {
     }
 
     /**
-     * Keep on stepping as long as there are more expressions to evaluate.
+     * Keep on stepping as long as there are more expressions to evaluate and no breakpoint is encountered.
      * This will walk over the results, this can happen when an intermediate command
      * keeps on evaluating expressions in sequence.
      */
@@ -715,7 +749,7 @@ public class EvalTrace {
     }
 
     /**
-     * Keep on stepping as long as the expression has not been completely evaluated.
+     * Keep on stepping as long as the expression has not been completely evaluated and no breakpoint is encountered.
      * Note that after the result has been reached, new expressions might be evaluated, so this is
      * not necessarily the end of evaluation. This can happen with intermediary commands.
      */
@@ -735,7 +769,7 @@ public class EvalTrace {
 
     /**
      * Evaluates the current frame and substitute the result of the evaluation
-     * in the parent expression.
+     * in the parent expression. Stop if a breakpoint is encountered.
      */
     public synchronized void stepOut() {
         // First we run until the current frame has been evaluated.
@@ -760,7 +794,7 @@ public class EvalTrace {
 
     /**
      * Run until all the arguments in the current frame have been evaluated and the complete
-     * frame can be evaluated.
+     * frame can be evaluated and  no breakpoint is encountered in the process.
      */
     public synchronized void runToReady() {
         // We run until the current frame has been evaluated.

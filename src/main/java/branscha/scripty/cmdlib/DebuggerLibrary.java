@@ -316,10 +316,10 @@ public class DebuggerLibrary {
         }
         else {
             writer.println(MSG_NOSTEPS);
-            if (trace.hasResult()) writer.println(MSG_RESULT);
-            if (trace.isExcepted()) writer.println(MSG_EXCEPTION);
             return Boolean.FALSE;
         }
+        if (trace.hasResult()) writer.println(MSG_RESULT);
+        if (trace.isExcepted()) writer.println(MSG_EXCEPTION);
         return Boolean.TRUE;
     }
 

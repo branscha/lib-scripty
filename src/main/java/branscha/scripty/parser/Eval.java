@@ -672,7 +672,7 @@ public class Eval extends AbstractEval {
                     lMsg = lMsg + "\n-> ...";
             }
             // We augment the exception with information so that the user can pinpoint the error.
-            else lMsg = String.format("%s%n-> %s", e.getMessage(), limitMsg(aExpr, lEntryMsgLim));
+            else lMsg = String.format("%s%n-> %s", e.getMessage(), limitMsg(Printer.print(aExpr, false), lEntryMsgLim));
             throw new CommandException(lMsg);
         }
         catch (Exception e) {

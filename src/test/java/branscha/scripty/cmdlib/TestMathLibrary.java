@@ -37,6 +37,7 @@ import static junit.framework.TestCase.*;
 import static org.junit.Assert.assertFalse;
 
 public class TestMathLibrary {
+
     private ScriptyStreamProcessor scripty;
 
     @Before
