@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 /**
@@ -36,6 +37,12 @@ public class DebuggerLibraryTest {
         assertFalse((Boolean) scripty.process("dbg-result?"));
         assertFalse((Boolean) scripty.process("dbg-exception?"));
         assertTrue((Boolean) scripty.process("dbg-moresteps?"));
+
+        lResult = scripty.process("dbg-eval (+ 1 2)");
+        assertEquals(BigDecimal.valueOf(3), lResult);
+
+        lResult = scripty.process("dbg-ctx");
+        assertNotNull(lResult);
 
         scripty.process("dbg-step");
         lResult = scripty.process("dbg-stack");
@@ -91,6 +98,8 @@ public class DebuggerLibraryTest {
 
         lResult = scripty.process("dbg-result");
         assertEquals(new BigDecimal(13), lResult);
+
+        scripty.process("dbg-terminate");
     }
 
     @Test
@@ -136,5 +145,17 @@ public class DebuggerLibraryTest {
         assertEquals("BreakpointSet{breakpoints=[\n" +
                 "]}", lResult.toString().trim());
 
+    }
+
+    @Test
+    public void dbgExeption()
+    throws ProcessorException {
+        scripty.process("dbg-expr (dbg-raise aiai)");
+        scripty.process("dbg-runresult");
+
+        assertTrue((Boolean) scripty.process("dbg-exception?"));
+        assertFalse((Boolean) scripty.process("dbg-moresteps?"));
+        Object lResult  = scripty.process("dbg-exception");
+        assertThat(lResult.toString(), containsString("aiai"));
     }
 }

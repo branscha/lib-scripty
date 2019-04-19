@@ -38,7 +38,7 @@ import java.util.List;
 import static junit.framework.TestCase.*;
 import static org.junit.Assert.assertFalse;
 
-public class TestListLibrary {
+public class ListLibraryTest {
 
     private ScriptyStreamProcessor scripty;
 
