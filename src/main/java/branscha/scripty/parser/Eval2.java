@@ -244,7 +244,6 @@ public class Eval2 extends AbstractEval {
                 final StackFrame lFrame = stack.get(i);
                 // Show the expression itself.
                 if (lFrame.getExpr() != null)
-//                    lBuilder.append(lFrame.getExpr().toString());
                     lBuilder.append(Printer.print(lFrame.getExpr(), false));
                 // Show the frame slots if there are any.
                 if (lFrame.getData() != StackFrame.EMPTY) {

@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -41,7 +42,11 @@ import java.util.regex.Pattern;
 
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(
-        std = {@ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name = "path", type = "String", value = ".")})}
+        std = {
+                @ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name = "path", type = "String", value = ".")}),
+                @ScriptyStdArgList(name = "path + quiet option",
+                        named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")},
+                        optional = {@ScriptyArg(name = "path", type = "String", value = ".")  })}
 )
 public class BeanLibrary {
 
@@ -58,20 +63,20 @@ public class BeanLibrary {
     public Object beanCd(@ScriptyParam("path") String aPath, Context aCtx)
     throws CommandException {
         // Follow the path to see if it leads somewhere.
-        final Resolution lRes = resolve(aPath, aCtx);
+        final Resolution resolution = resolve(aPath, aCtx);
         // We succeeded following the path, so it exists.
-        if (!filter(lRes)) throw new CommandException("ERROR - cannot go there.");
+        if (!filter(resolution)) throw new CommandException("ERROR - cannot go there.");
         // We remember the current directory.
-        currentDirectory = lRes.getPath();
-        return lRes.getVal();
+        currentDirectory = resolution.getPath();
+        return resolution.getVal();
     }
 
     // Print the current path to the repl.
     //
     @ScriptyCommand(name = "bean-pwd")
     @ScriptyStdArgList
-    public Object beanPwd(@ScriptyBindingParam("*output") PrintWriter aWriter) {
-        aWriter.println(currentDirectory);
+    public Object beanPwd(@ScriptyBindingParam("*output") PrintWriter writer) {
+        writer.println(currentDirectory);
         return currentDirectory;
     }
 
@@ -79,16 +84,20 @@ public class BeanLibrary {
     // The action depends on the type of the object, properties, array elements are listed.
     //
     @ScriptyCommand(name = "bean-ls")
-    @ScriptyRefArgList(ref = "path")
-    public Object beanLs(@ScriptyParam("path") String aPath, Context aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
+    @ScriptyRefArgList(ref = "path + quiet option")
+    public Object beanLs(@ScriptyParam("path") String aPath, Context aCtx, @ScriptyBindingParam("*output") PrintWriter writer, @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         // Resolve the path.
-        final Resolution lRes = resolve(aPath, aCtx);
-        if (!filter(lRes)) throw new CommandException("Cannot show filtered.");
-        // Render the target object.
-        final Object lVal = lRes.getVal();
-        render(lVal, aWriter);
-        return lVal;
+        final Resolution resolution = resolve(aPath, aCtx);
+        if (!filter(resolution)) throw new CommandException("Cannot show filtered.");
+
+        final Object value = resolution.getVal();
+        String typeDescr = value == null ? "null" : value.getClass().getSimpleName();
+        Directory dir = list(typeDescr, value);
+        if (!isQuiet && writer != null) {
+            writer.println(dir.toString());
+        }
+        return dir;
     }
 
     // Convert the denoted object to a string and print it on the repl.
@@ -96,15 +105,17 @@ public class BeanLibrary {
     // cat calls the toString() method.
     //
     @ScriptyCommand(name = "bean-cat")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
-    public Object beanCat(@ScriptyParam("path") String aPath, Context aCtx, @ScriptyBindingParam("*output") PrintWriter aWriter)
+    @ScriptyRefArgList(ref = "path + quiet option")
+    public Object beanCat(@ScriptyParam("path") String path, Context ctx, @ScriptyBindingParam("*output") PrintWriter writer, @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         // Resolve the path.
-        final Resolution lRes = resolve(aPath, aCtx);
-        if (!filter(lRes)) throw new CommandException("Cannot cat filtered.");
-        final Object lVal = lRes.getVal();
-        aWriter.println(lVal == null ? "null" : lVal.toString());
-        return lVal;
+        final Resolution resolution = resolve(path, ctx);
+        if (!filter(resolution)) throw new CommandException("Cannot cat filtered.");
+        final Object value = resolution.getVal();
+        if(!isQuiet) {
+            writer.println(value == null ? "null" : value.toString());
+        }
+        return value;
     }
 
     // Convert a pathname to the object itself.
@@ -124,7 +135,7 @@ public class BeanLibrary {
 
     // Call java methods on an object denoted by a path.
     // The target object should be denoted by a pathname.
-    // The method can be specied by a method instance or by a name (and a lookup will occur).
+    // The method can be specified by a method instance or by a name (and a lookup will occur).
     // The arguments are not resolved, they are passed directly to the method. You can use the
     // rslv method above to accomplish argument resolution as well.
     //
@@ -195,6 +206,9 @@ public class BeanLibrary {
 
     private static Pattern PAT_FIELDNAME_BIS = Pattern.compile("^\\s*([^\\s\\[\\]]+)?\\s*(\\[\\s*([^\\s\\[\\]]+)\\s*\\])*\\s*$");
 
+    /**
+     * A resolution represents a path and the value found at that path.
+     */
     private static class Resolution {
         private Object val;
         private String path;
@@ -215,36 +229,51 @@ public class BeanLibrary {
 
     public Resolution resolve(String path, Context ctx)
     throws CommandException {
+        String absolutePath;
         if (path.startsWith("/")) {
-            final String relPath = path.substring(1);
-            List<String> pieces = canonize(relPath);
-
-            Object value;
-            if ("".equals(relPath)) value = ctx;
-            else value = resolveCanonical(pieces, 0, ctx);
-
-            final StringBuilder stringBuilder = new StringBuilder("/");
-            for (int i = 0; i < pieces.size(); i++) {
-                String part = pieces.get(i);
-                stringBuilder.append(part);
-                if (i < (pieces.size() - 1)) {
-                    stringBuilder.append("/");
-                }
-            }
-            return new Resolution(stringBuilder.toString(), value);
+            absolutePath = path;
         }
         else {
-            String lAbsPath;
-            if ("/".equals(currentDirectory)) lAbsPath = currentDirectory + path;
-            else lAbsPath = currentDirectory + "/" + path;
-            return resolve(lAbsPath, ctx);
+            // We have a relative path, lets try to convert it to an absolute path first.
+            if ("/".equals(currentDirectory)) {
+                absolutePath = "/" + path;
+            }
+            else {
+                absolutePath = currentDirectory + "/" + path;
+            }
         }
+
+        // Remove the first slash (that represents root).
+        final String relativePath = absolutePath.substring(1);
+        final List<String> pathParts = canonize(relativePath);
+
+        Object value;
+        if ("".equals(relativePath)) {
+            // No path to follow, we are already there: the ctx itself.
+            value = ctx;
+        }
+        else {
+            // Follow the path from root (the ctx).
+            value = resolveCanonical(pathParts, 0, ctx);
+        }
+
+        final StringBuilder stringBuilder = new StringBuilder("/");
+        for (int i = 0; i < pathParts.size(); i++) {
+            String part = pathParts.get(i);
+            stringBuilder.append(part);
+            if (i < (pathParts.size() - 1)) {
+                stringBuilder.append("/");
+            }
+        }
+        return new Resolution(stringBuilder.toString(), value);
     }
 
-    private static Object resolveCanonical(List<String> aPieces, int aCurrPiece, Object aBase)
+    private static Object resolveCanonical(List<String> pathPieces, int currPiece, Object base)
     throws CommandException {
-        if (aPieces.size() <= aCurrPiece) return aBase;
-        final String lPiece = aPieces.get(aCurrPiece);
+        if (pathPieces.size() <= currPiece) return base;
+        final String lPiece = pathPieces.get(currPiece);
+
+        // We check if the piece is a number.
         int lIdx = -1;
         try {
             lIdx = Integer.parseInt(lPiece);
@@ -253,40 +282,40 @@ public class BeanLibrary {
             // Ignore this exception!
         }
 
-        if (aBase instanceof Context && lIdx < 0) {
-            final Context lCtx = (Context) aBase;
+        if (base instanceof Context && lIdx < 0) {
+            final Context lCtx = (Context) base;
             if (lCtx.isBound(lPiece))
-                return resolveCanonical(aPieces, aCurrPiece + 1, lCtx.getBinding(lPiece));
+                return resolveCanonical(pathPieces, currPiece + 1, lCtx.getBinding(lPiece));
             else
                 throw new CommandException(String.format("Cannot find '%s' in context.", lPiece));
         }
-        else if (aBase instanceof Map && lIdx < 0) {
-            final Map lMap = (Map) aBase;
+        else if (base instanceof Map && lIdx < 0) {
+            final Map lMap = (Map) base;
             if (lMap.containsKey(lPiece))
-                return resolveCanonical(aPieces, aCurrPiece + 1, lMap.get(lPiece));
+                return resolveCanonical(pathPieces, currPiece + 1, lMap.get(lPiece));
             else
                 throw new CommandException("ERROR - map.");
         }
-        else if (aBase instanceof List) {
-            final List lList = (List) aBase;
+        else if (base instanceof List) {
+            final List lList = (List) base;
             if (lIdx < 0) throw new CommandException("List expects an index.");
             if (lIdx >= lList.size()) throw new CommandException("List index out of range.");
-            else return resolveCanonical(aPieces, aCurrPiece + 1, lList.get(lIdx));
+            else return resolveCanonical(pathPieces, currPiece + 1, lList.get(lIdx));
         }
-        else if (aBase != null) {
-            if (aBase.getClass().isArray()) {
+        else if (base != null) {
+            if (base.getClass().isArray()) {
                 // Array rendering.
                 ///////////////////
 
-                if (lIdx >= 0 && lIdx < Array.getLength(aBase))
-                    return resolveCanonical(aPieces, aCurrPiece + 1, Array.get(aBase, lIdx));
+                if (lIdx >= 0 && lIdx < Array.getLength(base))
+                    return resolveCanonical(pathPieces, currPiece + 1, Array.get(base, lIdx));
                 else throw new CommandException("ERROR - index out of range/wrong index type/no index.");
             }
             else {
                 try {
                     // Try bean.
                     //
-                    final BeanInfo lInfo = Introspector.getBeanInfo(aBase.getClass());
+                    final BeanInfo lInfo = Introspector.getBeanInfo(base.getClass());
                     final PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
                     for (PropertyDescriptor lProp : lProps) {
                         if (lProp.getName().equals(lPiece)) {
@@ -296,8 +325,8 @@ public class BeanLibrary {
                             if (lIdx >= 0) lArgs = new Object[]{lIdx};
                             else lArgs = new Object[]{};
 
-                            Object lVal = lGetter.invoke(aBase, lArgs);
-                            return resolveCanonical(aPieces, aCurrPiece + 1, lVal);
+                            Object lVal = lGetter.invoke(base, lArgs);
+                            return resolveCanonical(pathPieces, currPiece + 1, lVal);
                         }
                     }
                 }
@@ -321,9 +350,17 @@ public class BeanLibrary {
         }
     }
 
-    private static List<String> canonize(String aPath)
+    /**
+     * Convert a relative path description containing . and .. into a path without these.
+     * We calculate the effect of . and ..
+     *
+     * @param beanPath
+     * @return
+     * @throws CommandException
+     */
+    private static List<String> canonize(String beanPath)
     throws CommandException {
-        final String[] lPieces = aPath.split("/");
+        final String[] lPieces = beanPath.split("/");
         final List<String> lResult = new ArrayList<String>(lPieces.length);
         for (String lPiece : lPieces) {
             if (".".equals(lPiece))
@@ -423,51 +460,52 @@ public class BeanLibrary {
         }
     }
 
-    private void render(Object aObj, PrintWriter aWriter)
+    private Directory list(String description, Object obj)
     throws CommandException {
-        if (aWriter == null) return;
-
-        if (aObj instanceof Context) {
-            Context lCtx = (Context) aObj;
-            Map<String, Object> lDump = lCtx.dumpBindings();
-            for (Map.Entry<String, Object> entry : lDump.entrySet()) {
-                aWriter.print(entry.getKey());
-                aWriter.print("=");
-                aWriter.println(entry.getValue() == null ? "null" : entry.getValue().toString());
+        Directory dir = new Directory(description);
+        if (obj instanceof Context) {
+            dir.setSorted(true);
+            Context ctx = (Context) obj;
+            Map<String, Object> dump = ctx.dumpBindings();
+            for (Map.Entry<String, Object> entry : dump.entrySet()) {
+                String typeDescr = entry.getValue() == null ? "null" : entry.getValue().getClass().getSimpleName();
+                DirectoryEntry dirEntry = new DirectoryEntry(entry.getKey(), typeDescr, true, true);
+                dir.addEntry(dirEntry);
             }
         }
-        else if (aObj instanceof List) {
-            // Show indexed ...
-            aWriter.println(aObj.toString());
+        else if (obj instanceof List) {
+            List lst = (List) obj;
+            for (int i = 0; i < lst.size(); i++) {
+                Object item = lst.get(i);
+                String typeDescr = item == null ? "null" : item.getClass().getSimpleName();
+                DirectoryEntry dirEntry = new DirectoryEntry(String.format("[%d]", i), typeDescr, true, true);
+                dir.addEntry(dirEntry);
+            }
         }
-        else if (aObj instanceof Map) {
-            // Show map ....
-            aWriter.println(aObj.toString());
-        }
-        else if (aObj != null) {
-            if (aObj.getClass().isArray()) {
+        else if (obj != null) {
+            if (obj.getClass().isArray()) {
                 // Array rendering.
                 ///////////////////
-
-                aWriter.println(String.format("=== Type '%s' length %d ===", aObj.getClass().getSimpleName(), Array.getLength(aObj)));
-                for (int i = 0; i < Array.getLength(aObj); i++) {
-                    Object lObj = Array.get(aObj, i);
-                    aWriter.println(String.format("%6s %s", "[" + i + "]", lObj == null ? "null" : lObj.toString()));
+                for (int i = 0; i < Array.getLength(obj); i++) {
+                    Object item = Array.get(obj, i);
+                    String typeDescr = item == null ? "null" : item.getClass().getSimpleName();
+                    DirectoryEntry dirEntry = new DirectoryEntry(String.format("[%d]", i), typeDescr, true, true);
+                    dir.addEntry(dirEntry);
                 }
             }
             else {
                 try {
                     // Try JavaBean...
                     ///////////////////
-
-                    aWriter.println(String.format("=== Type '%s' ===", aObj.getClass().getSimpleName()));
-                    BeanInfo lInfo = Introspector.getBeanInfo(aObj.getClass());
+                    dir.setSorted(true);
+                    BeanInfo lInfo = Introspector.getBeanInfo(obj.getClass());
                     PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
                     for (PropertyDescriptor lProp : lProps) {
                         Method lRead = lProp.getReadMethod();
                         Method lWrite = lProp.getWriteMethod();
                         String lRw = "" + ((lRead != null) ? "r" : "-") + ((lWrite != null) ? "w" : "-");
-                        aWriter.println(String.format("%s (%s, %s)", lProp.getDisplayName(), lProp.getPropertyType().getSimpleName(), lRw));
+                        DirectoryEntry dirEntry = new DirectoryEntry(lProp.getDisplayName(), lProp.getPropertyType().getSimpleName(), lRead != null, lWrite != null);
+                        dir.addEntry(dirEntry);
                     }
                 }
                 catch (IntrospectionException e) {
@@ -475,8 +513,8 @@ public class BeanLibrary {
                 }
             }
         }
-        else
-            throw new CommandException("ERROR - null encountered.");
+        else throw new CommandException("ERROR - null encountered.");
+        return dir;
     }
 
     private boolean filter(Resolution aRes) {
@@ -487,5 +525,89 @@ public class BeanLibrary {
             if (!lFilt.filter(lPath, lVal)) return false;
         }
         return true;
+    }
+
+    public static class Directory {
+        private boolean isSorted = false;
+        private String description;
+        private List<DirectoryEntry> dir = new ArrayList<>();
+
+        public Directory(String description) {
+            this.description = description;
+        }
+
+        public void addEntry(DirectoryEntry entry) {
+            dir.add(entry);
+        }
+
+        public void setSorted(boolean sorted) {
+            isSorted = sorted;
+        }
+
+        @Override
+        public String toString() {
+            if(isSorted) {
+                dir.sort(Comparator.comparing(DirectoryEntry::getName));
+            }
+            StringBuilder builder = new StringBuilder();
+            builder.append("Directory{").append("\n").append("type=").append(description).append("\n");
+            builder.append("dir=").append("\n");
+            for(DirectoryEntry entry: dir) {
+                builder.append("    ").append(entry.toString()).append("\n");
+            }
+            builder.append('}');
+            return builder.toString();
+        }
+    }
+
+    public static class DirectoryEntry {
+        private String name;
+        private String description;
+        private boolean isReadable;
+        private boolean isWritable;
+
+        public DirectoryEntry(String name, String description, boolean isReadable, boolean isWritable) {
+            this.name = name;
+            this.description = description;
+            this.isReadable = isReadable;
+            this.isWritable = isWritable;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public boolean isReadable() {
+            return isReadable;
+        }
+
+        public void setReadable(boolean readable) {
+            isReadable = readable;
+        }
+
+        public boolean isWritable() {
+            return isWritable;
+        }
+
+        public void setWritable(boolean writable) {
+            isWritable = writable;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%-20s %-20s%8s%s", name, description, isReadable?"R":"-", isWritable?"W":"-");
+        }
     }
 }

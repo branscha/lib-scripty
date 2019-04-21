@@ -155,7 +155,7 @@ public class DebuggerLibraryTest {
 
         assertTrue((Boolean) scripty.process("dbg-exception?"));
         assertFalse((Boolean) scripty.process("dbg-moresteps?"));
-        Object lResult  = scripty.process("dbg-exception");
+        Object lResult = scripty.process("dbg-exception");
         assertThat(lResult.toString(), containsString("aiai"));
     }
 }

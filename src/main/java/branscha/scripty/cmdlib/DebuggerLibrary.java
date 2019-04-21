@@ -333,16 +333,16 @@ public class DebuggerLibrary {
                                     @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
-        final Eval2.EvalStack lStack = trace.getStack();
+        final Eval2.EvalStack stack = trace.getStack();
         if (!isQuiet) {
-            if (lStack != null) writer.print(lStack.toString());
+            if (stack != null) writer.print(stack.toString());
             else {
                 writer.println(MSG_EMPTYSTACK);
                 if (trace.hasResult()) writer.println(MSG_RESULT);
                 if (trace.isExcepted()) writer.println(MSG_EXCEPTION);
             }
         }
-        return lStack;
+        return stack;
     }
 
     // Print the context of the top of the stack. You can examine all the bindings
