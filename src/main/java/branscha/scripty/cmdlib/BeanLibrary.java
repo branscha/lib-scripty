@@ -482,6 +482,16 @@ public class BeanLibrary {
                 dir.addEntry(dirEntry);
             }
         }
+        else if (obj instanceof Map) {
+            Map map = (Map) obj;
+
+            for (Object key : map.keySet()) {
+                Object item = map.get(key);
+                String typeDescr = item == null ? "null" : item.getClass().getSimpleName();
+                DirectoryEntry dirEntry = new DirectoryEntry(String.format("[%s]", key), typeDescr, true, true);
+                dir.addEntry(dirEntry);
+            }
+        }
         else if (obj != null) {
             if (obj.getClass().isArray()) {
                 // Array rendering.

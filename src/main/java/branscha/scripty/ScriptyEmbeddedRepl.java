@@ -30,6 +30,11 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * A text based scripty REPL that can be embedded in an application and then accessed over the network layer.
+ * In this way an application can provide console access for debugging, monitoring or configuration.
+ * It is a proof-of-concept for the REPL, a production implementation will need a security layer.
+ */
 @SuppressWarnings("UnusedDeclaration")
 public class ScriptyEmbeddedRepl
 extends ScriptyCapable {

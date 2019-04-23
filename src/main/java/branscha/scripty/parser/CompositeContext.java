@@ -27,61 +27,91 @@ package branscha.scripty.parser;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CompositeContext
-        implements Context {
-    Context main, backing;
+/**
+ * Represents a {@link Context} hierarchy. A new binding is always created in the top hierarchy,
+ * when a binding is changed the binding is performed in the nearest context that contains
+ * the binding.
+ */
+public class CompositeContext implements Context {
 
+    private  static final String ERR010 = "CompositeContext/010: There is no binding for '%s' in the context.";
+
+    private Context main, backing;
+
+    /**
+     * Construct a composite context.
+     *
+     * @param aChildCtx  The new topmost context.
+     * @param aParentCtx Its parent.
+     */
     public CompositeContext(Context aChildCtx, Context aParentCtx) {
         main = aChildCtx;
         backing = aParentCtx;
     }
 
-    public Object getBinding(String aKey) {
-        if (main.isBound(aKey)) return main.getBinding(aKey);
-        else return backing.getBinding(aKey);
+    /**
+     * A binding lookup starts from top (newest) to bottom (ancestors).
+     */
+    public Object getBinding(String key) {
+        if (main.isBound(key)) return main.getBinding(key);
+        else return backing.getBinding(key);
     }
 
-    public void removeBinding(String aKey) {
-        if (main.isBound(aKey)) main.removeBinding(aKey);
-        else backing.removeBinding(aKey);
+    /**
+     * Remove the most recent binding with that key.
+     */
+    public void removeBinding(String key) {
+        if (main.isBound(key)) main.removeBinding(key);
+        else backing.removeBinding(key);
     }
 
-    public void setBinding(String aKey, Object aValue)
+    /**
+     * Change the nearest binding with  that key.
+     */
+    public void setBinding(String key, Object value)
     throws CommandException {
-        if (main.isBound(aKey)) main.setBinding(aKey, aValue);
-        else if (backing.isBound(aKey)) backing.setBinding(aKey, aValue);
-        else
-            throw new CommandException(String.format("There is no binding for '%s' in the context.", aKey == null ? "null" : aKey));
+        if (main.isBound(key)) main.setBinding(key, value);
+        else if (backing.isBound(key)) backing.setBinding(key, value);
+        else{
+            throw new CommandException(String.format(ERR010, key == null ? "null" : key));
+        }
     }
 
-    public boolean isBound(String aKey) {
-        return main.isBound(aKey) || backing.isBound(aKey);
+    /**
+     * Verify if there is a binding in the hierarchy.
+     */
+    public boolean isBound(String key) {
+        return main.isBound(key) || backing.isBound(key);
     }
 
+    /**
+     * Find the root of the context tree, this is the oldest context.
+     */
     public Context getRootContext() {
         if (backing != null) return backing.getRootContext();
         else if (main != null) return main.getRootContext();
         else return null;
     }
 
-    public void defBinding(String aKey, Object aValue) {
-        main.defBinding(aKey, aValue);
+    /**
+     * Create a new binding, this is always performed on the most recent context.
+     */
+    public void defBinding(String key, Object value) {
+        main.defBinding(key, value);
     }
 
     public Map<String, Object> dumpBindings() {
         Map<String, Object> lBackingDump = backing.dumpBindings();
         Map<String, Object> lMainDump = main.dumpBindings();
-        Map<String, Object> lDump = new HashMap<String, Object>(lBackingDump);
+        Map<String, Object> lDump = new HashMap<>(lBackingDump);
         lDump.putAll(lMainDump);
         return lDump;
     }
 
     @Override
     public String toString() {
-        final StringBuilder lBuilder = new StringBuilder();
-        lBuilder.append(main.toString());
-        lBuilder.append("----------\n");
-        lBuilder.append(backing.toString());
-        return lBuilder.toString();
+        return main.toString() +
+                "----------\n" +
+                backing.toString();
     }
 }

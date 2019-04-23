@@ -26,23 +26,58 @@ package branscha.scripty.parser;
 
 import java.util.Map;
 
+/**
+ * Scripty data context.
+ */
 public interface Context {
-    // Changes an existing binding.
-    // The change can occur at a nested level.
-    public void setBinding(String aKey, Object aValue)
+
+    /**
+     * Define a new binding. A binding must be defined before it can be changed.
+     * Defining a binding more than once has the same effect sas setting the value multiple times.
+     *
+     * @param key Binding key.
+     * @param value value.
+     */
+    public void defBinding(String key, Object value);
+
+    /**
+     * Change the binding, the binding must be defined.
+     * @param key The binding key.
+     * @param value The new value.
+     * @throws CommandException The binding does not exist.
+     */
+    public void setBinding(String key, Object value)
     throws CommandException;
 
-    // Define a  binding in the current context. The value can be null.
-    // The new binding will always be at the top level.
-    public void defBinding(String aKey, Object aValue);
+    /**
+     * Retrieve a binding.
+     * @param key Binding key.
+     * @return The bound value or null if the key was not bound.
+     */
+    public Object getBinding(String key);
 
-    public Object getBinding(String aKey);
+    /**
+     * Verify if the binding exists.
+     * @param key The binding key.
+     * @return Flag that indicates if the binding exists.
+     */
+    public boolean isBound(String key);
 
-    public boolean isBound(String aKey);
+    /**
+     * Delete a binding.
+     * @param key The binding key.
+     */
+    public void removeBinding(String key);
 
-    public void removeBinding(String aKey);
-
+    /**
+     * Get the oldest linked context.
+     * @return
+     */
     public Context getRootContext();
 
+    /**
+     * Create a map with a copy of all the bindings.
+     * @return A map with all the bindings.
+     */
     public Map<String, Object> dumpBindings();
 }

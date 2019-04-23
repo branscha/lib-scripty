@@ -7,7 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -32,6 +34,12 @@ public class BeanLibraryTest {
             private String data = "Bruno";
             private int[] intList = new int[]{1, 2, 5, 7, 9, 11, 13};
             private List<String> strList = Arrays.asList("uno", "duo", "tres");
+            private Map<String, String> map = new HashMap<>();
+
+            public MyBean() {
+                map.put("abc", "def");
+                map.put("123", "456");
+            }
 
             public String getData() {
                 return data;
@@ -59,6 +67,14 @@ public class BeanLibraryTest {
 
             public String callMe() {
                 return "Hi there.";
+            }
+
+            public Map<String, String> getMap() {
+                return map;
+            }
+
+            public void setMap(Map<String, String> map) {
+                this.map = map;
             }
         }
 
@@ -96,6 +112,7 @@ public class BeanLibraryTest {
                 "    class                Class                      R-\n" +
                 "    data                 String                     RW\n" +
                 "    intList              int[]                      RW\n" +
+                "    map                  Map                        RW\n" +
                 "    strList              List                       RW\n" +
                 "}", result.toString());
 
@@ -139,15 +156,28 @@ public class BeanLibraryTest {
         assertEquals("Alexander", result);
 
         result = scripty.process("bean-rslv /test/intList/5");
+
         assertEquals(11, result);
         scripty.process("bean-upd /test/intList 5=(bean-rslv /test/intList/6)");
         result = scripty.process("bean-rslv /test/intList/5");
+        Object result2 = scripty.process("bean-rslv /test/intList[5]");
         assertEquals(13, result);
+        assertEquals(result, result2);
 
         result = scripty.process("bean-rslv /test/strList/1");
         assertEquals("duo", result);
         scripty.process("bean-upd /test/strList 1=Ok");
         result = scripty.process("bean-rslv /test/strList/1");
         assertEquals("Ok", result);
+
+        scripty.process("bean-cd /test/map");
+        result = scripty.process("bean-ls");
+        assertEquals("Directory{\n" +
+                "type=HashMap\n" +
+                "dir=\n" +
+                "    [123]                String                     RW\n" +
+                "    [abc]                String                     RW\n" +
+                "}", result.toString());
+
     }
 }

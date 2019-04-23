@@ -29,35 +29,38 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class BasicContext
-        implements Context {
+public class BasicContext implements Context {
+
+    public static final String ERR010 = "BasicContext/010: There is no binding for '%s' in the context.";
+
     private Map<String, Object> context = new HashMap<String, Object>();
 
-    public Object getBinding(String aKey) {
-        return context.get(aKey);
+    public Object getBinding(String key) {
+        return context.get(key);
     }
 
-    public void setBinding(String aKey, Object aValue)
+    public void setBinding(String key, Object value)
     throws CommandException {
-        if (isBound(aKey)) context.put(aKey, aValue);
-        else
-            throw new CommandException(String.format("There is no binding for '%s' in the context.", aKey == null ? "null" : aKey));
+        if (isBound(key)) context.put(key, value);
+        else {
+            throw new CommandException(String.format(ERR010, key == null ? "null" : key));
+        }
     }
 
-    public boolean isBound(String aKey) {
-        return context.containsKey(aKey);
+    public boolean isBound(String key) {
+        return context.containsKey(key);
     }
 
-    public void removeBinding(String aKey) {
-        context.remove(aKey);
+    public void removeBinding(String key) {
+        context.remove(key);
     }
 
     public Context getRootContext() {
         return this;
     }
 
-    public void defBinding(String aKey, Object aValue) {
-        context.put(aKey, aValue);
+    public void defBinding(String key, Object value) {
+        context.put(key, value);
     }
 
     public Map<String, Object> dumpBindings() {

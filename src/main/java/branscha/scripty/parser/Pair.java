@@ -32,6 +32,7 @@ import java.util.Objects;
  * be copied during evaluation.
  */
 public class Pair {
+
     private Object left;
     private Object right;
 
