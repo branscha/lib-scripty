@@ -94,7 +94,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         }
     }
 
-    private void registerClassArgList(Class aClass, ScriptyStdArgList aStdLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>> aNamedLists)
+    private void registerClassArgList(Class aClass, ScriptyStdArgList aStdLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>> aNamedLists)
     throws ExtensionException {
         final String lName = aStdLst.name();
         if (lName.length() == 0) {
@@ -104,7 +104,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
 
         try {
             // Build it.
-            final ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aStdLst);
+            final ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aStdLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
         }
@@ -114,7 +114,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         }
     }
 
-    private void registerClassArgList(Class aClass, ScriptyVarArgList aVarLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>> aNamedLists)
+    private void registerClassArgList(Class aClass, ScriptyVarArgList aVarLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>> aNamedLists)
     throws ExtensionException {
         final String lName = aVarLst.name();
         if (lName.length() == 0) {
@@ -124,7 +124,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
 
         try {
             // Build it.
-            final ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aVarLst);
+            final ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aVarLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
         }
@@ -137,7 +137,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
     private void addLibrary(String aLibName, Object aLibInstance, Class aClass)
     throws ExtensionException {
         // We keep track of the named arglists in this datastructure. 
-        Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>> lNamedArgLists = new HashMap<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>>>();
+        Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>> lNamedArgLists = new HashMap<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>>();
 
         // Library (Class) annotations.
         ///////////////////////////////
@@ -183,7 +183,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             // Result binding
             /////////////////
 
-            IResultMapping lResultMapping = null;
+            ResultMapping lResultMapping = null;
             ScriptySetBinding lSetBinding = lMethod.getAnnotation(ScriptySetBinding.class);
             ScriptyDefBinding lDefBinding = lMethod.getAnnotation(ScriptyDefBinding.class);
             if (lSetBinding != null && lDefBinding != null) {
@@ -203,7 +203,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             ////////////////////////////////
 
             ArgList lArgList = null;
-            Map<String, IArgMapping> lMappings = null;
+            Map<String, ArgMapping> lMappings = null;
 
             ScriptyStdArgList lStdArgListAnnot = lMethod.getAnnotation(ScriptyStdArgList.class);
             ScriptyVarArgList lVarArgListAnnot = lMethod.getAnnotation(ScriptyVarArgList.class);
@@ -221,7 +221,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             if (lRefArgListAnnot != null) {
                 final String lRef = lRefArgListAnnot.ref();
                 if (lNamedArgLists.containsKey(lRef)) {
-                    ArgListBuilderUtil.Tuple<ArgList, Map<String, IArgMapping>> lTuple = lNamedArgLists.get(lRef);
+                    ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>> lTuple = lNamedArgLists.get(lRef);
                     lArgList = lTuple.getX();
                     lMappings = lTuple.getY();
                 }

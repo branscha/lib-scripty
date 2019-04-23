@@ -25,11 +25,8 @@
 package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
 
-public interface IArgMapping {
-    public Object map(IEval aEval, Context aContext, Object aArgs)
-    throws ArgMappingException;
-
-    public void setOffset(int aOffset);
+public interface ResultMapping {
+    public void map(Object aResult, Context aContext)
+    throws ResultMappingException;
 }

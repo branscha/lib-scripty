@@ -27,7 +27,7 @@ package branscha.scripty.cmdlib;
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 import branscha.scripty.parser.Lambda;
 
 import java.io.File;
@@ -124,7 +124,7 @@ public class FileLibrary {
             @ScriptyParam("file") Object aFileRepr,
             @ScriptyBindingParam("*output") PrintWriter aWriter,
             Context aCtx,
-            IEval aEval)
+            Eval aEval)
     throws CommandException {
         try {
             File lFile;

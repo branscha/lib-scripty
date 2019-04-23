@@ -29,18 +29,18 @@ import branscha.scripty.spec.args.ArgSpecException;
 import branscha.scripty.spec.args.ArgList;
 import branscha.scripty.spec.map.ArgListMapping;
 import branscha.scripty.spec.map.ArgMappingException;
-import branscha.scripty.spec.map.IResultMapping;
+import branscha.scripty.spec.map.ResultMapping;
 import branscha.scripty.spec.map.ResultMappingException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class MethodCommand
-        implements Command {
+public class MethodCommand implements Command {
+
     private ArgList argList;
     private Object instance;
     private ArgListMapping argMapping;
-    private IResultMapping resultMapping;
+    private ResultMapping resultMapping;
     private Method method;
 
     public MethodCommand(Method aMethod) {
@@ -51,7 +51,7 @@ public class MethodCommand
         resultMapping = null;
     }
 
-    public MethodCommand(Object aInstance, Method aMethod, ArgList aArgList, ArgListMapping aArgListMapping, IResultMapping aResultMapping) {
+    public MethodCommand(Object aInstance, Method aMethod, ArgList aArgList, ArgListMapping aArgListMapping, ResultMapping aResultMapping) {
         argList = aArgList;
         method = aMethod;
         instance = aInstance;
@@ -59,7 +59,7 @@ public class MethodCommand
         resultMapping = aResultMapping;
     }
 
-    public Object execute(IEval aEval, Context aCtx, Object[] aArgs)
+    public Object execute(Eval aEval, Context aCtx, Object[] aArgs)
     throws CommandException {
         try {
             Object[] lArgs = aArgs;

@@ -58,7 +58,7 @@ implements ExtensionManager {
     public static final String ERROR = "*error";
 
     private Context context;
-    private IEval eval;
+    private Eval eval;
     private StringBuilder currCmd = new StringBuilder();
     private Parser parser = new Parser();
     private static final String PROMPT_NORMAL = "> ";
@@ -137,7 +137,7 @@ implements ExtensionManager {
 
     public ReplEngine() {
         context = new BasicContext();
-        eval = new Eval(context);
+        eval = new ClassicEval(context);
         eval.setCommandRepo(extensions.getCommandRepository());
         eval.setMacroRepo(extensions.getMacroRepository());
     }

@@ -27,7 +27,7 @@ package branscha.scripty.spec.map;
 import branscha.scripty.annot.ScriptyBindingParam;
 import branscha.scripty.annot.ScriptyParam;
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -35,7 +35,7 @@ import java.util.Map;
 
 public class ArgMappingBuilderUtil {
 
-    public static ArgListMapping buildArgMapping(Method aMethod, Map<String, IArgMapping> aMappings)
+    public static ArgListMapping buildArgMapping(Method aMethod, Map<String, ArgMapping> aMappings)
     throws ArgMappingException {
         Class<?>[] lParamTypes = aMethod.getParameterTypes();
         Annotation[][] lParamAnnotations = aMethod.getParameterAnnotations();
@@ -43,19 +43,19 @@ public class ArgMappingBuilderUtil {
         ArgListMapping lArgListMapping = new ArgListMapping();
 
         for (int i = 0; i < lParamTypes.length; i++) {
-            IArgMapping lMapping = buildMapping(lParamTypes[i], lParamAnnotations[i], aMappings);
+            ArgMapping lMapping = buildMapping(lParamTypes[i], lParamAnnotations[i], aMappings);
             lArgListMapping.addArgMapping(lMapping);
         }
         return lArgListMapping;
     }
 
-    private static IArgMapping buildMapping(Class<?> aParamClass, Annotation[] aParamAnnotations, Map<String, IArgMapping> aMappings)
+    private static ArgMapping buildMapping(Class<?> aParamClass, Annotation[] aParamAnnotations, Map<String, ArgMapping> aMappings)
     throws ArgMappingException {
         if (aParamAnnotations.length <= 0) {
             // If there are not parameter annotations, we check if
             // the parameter types is one of the well known types.
 
-            if (aParamClass.isAssignableFrom(IEval.class)) {
+            if (aParamClass.isAssignableFrom(Eval.class)) {
                 return new EvalMapping();
             }
             else if (aParamClass.isAssignableFrom(Context.class)) {

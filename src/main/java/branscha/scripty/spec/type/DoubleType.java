@@ -26,7 +26,7 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class DoubleType implements ITypeSpec {
+public class DoubleType implements TypeSpec {
 
     public String getSpecName() {
         return "Double";

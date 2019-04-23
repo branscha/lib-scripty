@@ -28,14 +28,14 @@ public class CommandException extends Exception {
 
     private static final long serialVersionUID = -4301173601968482098L;
 
-    // The stack will be filled in by the Eval2 implementation.
-    // The Eval implementation does not manage a stack of its own, it will only
+    // The stack will be filled in by the HooksEval implementation.
+    // The ClassicEval implementation does not manage a stack of its own, it will only
     // produce a message without actual stack.
 
-    private Eval2.EvalStack stack;
+    private HooksEval.EvalStack stack;
 
     // Normal constructors without stack.
-    // Used by the Eval implementation.
+    // Used by the ClassicEval implementation.
 
     public CommandException() {
         super();
@@ -54,41 +54,41 @@ public class CommandException extends Exception {
     }
 
     // Stack constructors.
-    // These are used by the Eval2 implementation.
+    // These are used by the HooksEval implementation.
 
-    public CommandException(Eval2.EvalStack aStack) {
+    public CommandException(HooksEval.EvalStack aStack) {
         super();
         this.stack = aStack;
     }
 
-    public CommandException(String message, Throwable cause, Eval2.EvalStack aStack) {
+    public CommandException(String message, Throwable cause, HooksEval.EvalStack aStack) {
         super(message, cause);
         this.stack = aStack;
     }
 
-    public CommandException(String message, Eval2.EvalStack aStack) {
+    public CommandException(String message, HooksEval.EvalStack aStack) {
         super(message);
         this.stack = aStack;
     }
 
-    public CommandException(Throwable cause, Eval2.EvalStack aStack) {
+    public CommandException(Throwable cause, HooksEval.EvalStack aStack) {
         super(cause);
         this.stack = aStack;
     }
 
-    public Eval2.EvalStack getStack() {
+    public HooksEval.EvalStack getStack() {
         return stack;
     }
 
-    public void setStack(Eval2.EvalStack stack) {
+    public void setStack(HooksEval.EvalStack stack) {
         this.stack = stack;
     }
 
     @Override
     public String getMessage() {
-        // This method accomodates both Eval and Eval2 implementations.
-        // If it is an exception from Eval, normally only the message will be available.
-        // If it is a message from Eval2, we will include our own stacktrace.
+        // This method accomodates both ClassicEval and HooksEval implementations.
+        // If it is an exception from ClassicEval, normally only the message will be available.
+        // If it is a message from HooksEval, we will include our own stacktrace.
 
         final String lMsg = super.getMessage();
         if (stack != null) return lMsg + "\n" + stack.toString();

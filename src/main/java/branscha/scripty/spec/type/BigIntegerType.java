@@ -29,7 +29,7 @@ import java.math.BigInteger;
 import branscha.scripty.parser.Context;
 
 public class BigIntegerType
-        implements ITypeSpec<BigInteger> {
+        implements TypeSpec<BigInteger> {
     public String getSpecName() {
         return "BigInteger";
     }

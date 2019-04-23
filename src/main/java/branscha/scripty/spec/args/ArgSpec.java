@@ -27,12 +27,14 @@ package branscha.scripty.spec.args;
 import branscha.scripty.parser.Context;
 
 /**
- * Argument list check. Can consider all arguments.
+ * Single argument specification. It can use all arguments to make a decision.
  * Is aware of the location within the arguments list.
+ * The argument specs will be provisioned by the annotations.
  *
  * @param <T>
  */
 public interface ArgSpec<T> {
+
     T guard(Object[] aArgs, int aPos, Context aCtx)
     throws ArgSpecException;
 

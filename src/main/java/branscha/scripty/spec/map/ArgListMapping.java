@@ -25,23 +25,24 @@
 package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ArgListMapping {
-    private List<IArgMapping> mappings = new ArrayList<IArgMapping>();
 
-    public void addArgMapping(IArgMapping aArgMapping) {
+    private List<ArgMapping> mappings = new ArrayList<ArgMapping>();
+
+    public void addArgMapping(ArgMapping aArgMapping) {
         mappings.add(aArgMapping);
     }
 
-    public Object[] map(IEval aEval, Context aContext, Object[] aArgs)
+    public Object[] map(Eval aEval, Context aContext, Object[] aArgs)
     throws ArgMappingException {
         Object[] lMapped = new Object[mappings.size()];
         int i = 0;
-        for (IArgMapping lMapping : mappings) {
+        for (ArgMapping lMapping : mappings) {
             lMapped[i++] = lMapping.map(aEval, aContext, aArgs);
         }
         return lMapped;

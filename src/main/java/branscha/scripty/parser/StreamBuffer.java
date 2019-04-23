@@ -29,8 +29,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-public class StreamBuffer
-        implements ParserInput {
+public class StreamBuffer implements ParserInput {
+
     private Reader reader;
     private char buff[] = new char[1024];
     private int buffPos = 0;

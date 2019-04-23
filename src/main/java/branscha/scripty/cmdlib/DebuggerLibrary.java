@@ -167,13 +167,13 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-expr-x")
     @ScriptyRefArgList(ref = "one argument")
-    public void dbgExprInternal(IEval currentEval, Context context, @ScriptyParam("arg") Object expr) {
+    public void dbgExprInternal(Eval currentEval, Context context, @ScriptyParam("arg") Object expr) {
         // Halt the previous debug session in order not
         // to clutter up our debugger.
         if (trace != null) trace.terminate();
 
         // Now create a new one.
-        final Eval2 dbgEval = new Eval2();
+        final HooksEval dbgEval = new HooksEval();
         dbgEval.setCommandRepo(currentEval.getCommandRepo());
         dbgEval.setMacroRepo(currentEval.getMacroRepo());
         dbgEval.setContext(context);
@@ -329,11 +329,11 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-stack")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
-    public Eval2.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
-                                    @ScriptyParam("quiet") boolean isQuiet)
+    public HooksEval.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
+                                        @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
-        final Eval2.EvalStack stack = trace.getStack();
+        final HooksEval.EvalStack stack = trace.getStack();
         if (!isQuiet) {
             if (stack != null) writer.print(stack.toString());
             else {
@@ -357,7 +357,7 @@ public class DebuggerLibrary {
                           @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
-        final Eval2.EvalStack lStack = trace.getStack();
+        final HooksEval.EvalStack lStack = trace.getStack();
         if (lStack == null) throw new CommandException(ERR040);
         final Context lCtx = lStack.top().getCtx();
         if (!isQuiet) writer.print(lCtx.toString());
@@ -423,12 +423,12 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-eval-x")
     @ScriptyRefArgList(ref = "one argument")
-    public Object dbgEval(@ScriptyParam("arg") Object aArg, IEval aEval)
+    public Object dbgEval(@ScriptyParam("arg") Object aArg, Eval aEval)
     throws CommandException {
         checkTrace();
-        Eval2.EvalStack lStack = trace.getStack();
+        HooksEval.EvalStack lStack = trace.getStack();
         if (lStack == null) throw new CommandException(ERR040);
-        Eval2.StackFrame lFrame = lStack.top();
+        HooksEval.StackFrame lFrame = lStack.top();
         if (lFrame == null) throw new CommandException(ERR050);
         final Context lCtx = lFrame.getCtx();
         return aEval.eval(aArg, lCtx);
@@ -590,7 +590,7 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "bpt-when-x")
     @ScriptyRefArgList(ref = "obj + name")
-    public EvalTrace.Breakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName, IEval srcEval) {
+    public EvalTrace.Breakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName, Eval srcEval) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointWhen(aBptName, aExpr, srcEval);
     }

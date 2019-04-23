@@ -27,7 +27,7 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class StringType
-        implements ITypeSpec {
+        implements TypeSpec {
     public static final StringType STRING_TYPE = new StringType();
 
     public String getSpecName() {

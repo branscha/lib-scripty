@@ -24,14 +24,45 @@
  ******************************************************************************/
 package branscha.scripty.parser;
 
+/**
+ * Food for the parser.
+ */
 public interface ParserInput {
-    public abstract char consumeChar();
 
-    public abstract char peekChar();
+    /**
+     * Read and remove the character from the input.
+     *
+     * @return The next character that is read.
+     */
+    char consumeChar();
 
-    public abstract boolean eof();
+    /**
+     * Inspect the next character that could be read, but do not
+     * remove it from the stream. Just look at it to make a decision.
+     *
+     * @return The next character that will be read.
+     */
+    char peekChar();
 
-    public abstract int getColNr();
+    /**
+     * Test if there still are characters on the stream.
+     *
+     * @return
+     */
+    boolean eof();
 
-    public abstract int getLineNr();
+    /**
+     * Currrent column, the number of characters since the last newline was encountered.
+     * Counting starts at 1 (user oriented).
+     *
+     * @return
+     */
+    int getColNr();
+
+    /**
+     * Get the number of lines (separated by newlines). Counting starts at 1 (user friendliness).
+     *
+     * @return
+     */
+    int getLineNr();
 }

@@ -26,15 +26,15 @@ package branscha.scripty.spec.args;
 
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
-public class VarArg
-        implements ArgSpec {
-    private ITypeSpec spec;
+public class VarArg implements ArgSpec {
+
+    private TypeSpec spec;
     private String specName;
 
-    public VarArg(ITypeSpec aSpec) {
+    public VarArg(TypeSpec aSpec) {
         spec = aSpec;
         specName = "var: " + spec.getSpecName();
     }

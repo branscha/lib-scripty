@@ -27,8 +27,8 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class BooleanType
-        implements ITypeSpec<Boolean> {
-    public static final ITypeSpec<Boolean> BOOLEAN_TYPE = new BooleanType();
+        implements TypeSpec<Boolean> {
+    public static final TypeSpec<Boolean> BOOLEAN_TYPE = new BooleanType();
 
     public String getSpecName() {
         return "Boolean";

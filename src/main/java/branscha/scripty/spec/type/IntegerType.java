@@ -26,7 +26,7 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class IntegerType implements ITypeSpec {
+public class IntegerType implements TypeSpec {
     @Deprecated
     public static final IntegerType INTEGER_TYPE = new IntegerType();
 

@@ -27,11 +27,11 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class OrType
-        implements ITypeSpec {
-    private ITypeSpec[] types;
+        implements TypeSpec {
+    private TypeSpec[] types;
     private String name;
 
-    public OrType(ITypeSpec[] types) {
+    public OrType(TypeSpec[] types) {
         this.types = types;
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < this.types.length; i++) {

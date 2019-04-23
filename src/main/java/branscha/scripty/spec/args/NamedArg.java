@@ -26,18 +26,18 @@ package branscha.scripty.spec.args;
 
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
-public class NamedArg
-        implements ArgSpec {
+public class NamedArg implements ArgSpec {
+
     private String paramName;
     private Object value;
-    private ITypeSpec valueSpec;
+    private TypeSpec valueSpec;
     private boolean optional = true;
     private String specName;
 
-    public NamedArg(String aName, ITypeSpec aValSpec, Object aValue, boolean aOptional) {
+    public NamedArg(String aName, TypeSpec aValSpec, Object aValue, boolean aOptional) {
         paramName = aName;
         value = aValue;
         valueSpec = aValSpec;

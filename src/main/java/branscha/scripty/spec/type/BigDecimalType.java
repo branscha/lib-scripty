@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import branscha.scripty.parser.Context;
 
 public class BigDecimalType
-        implements ITypeSpec<BigDecimal> {
+        implements TypeSpec<BigDecimal> {
     public String getSpecName() {
         return "BigDecimal";
     }

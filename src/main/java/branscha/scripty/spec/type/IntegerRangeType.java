@@ -26,7 +26,7 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class IntegerRangeType implements ITypeSpec {
+public class IntegerRangeType implements TypeSpec {
     private int from;
     private int to;
     private IntegerType intSpec = new IntegerType();

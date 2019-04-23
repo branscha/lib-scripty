@@ -40,8 +40,8 @@ import branscha.scripty.parser.Pair;
  * After that, the (!) named args will be put in the list.
  * Finally, the variable part.
  */
-public class VarArgList
-        implements ArgList {
+public class VarArgList implements ArgList {
+
     private FixedArg req[];
     private VarArg var;
     private NamedArg[] named;

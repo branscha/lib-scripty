@@ -27,10 +27,10 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class InstanceOrBinding
-        implements ITypeSpec {
-    private ITypeSpec innerSpec;
+        implements TypeSpec {
+    private TypeSpec innerSpec;
 
-    public InstanceOrBinding(ITypeSpec aSpec) {
+    public InstanceOrBinding(TypeSpec aSpec) {
         innerSpec = aSpec;
     }
 

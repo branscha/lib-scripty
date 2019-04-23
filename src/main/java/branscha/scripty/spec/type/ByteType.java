@@ -26,7 +26,7 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class ByteType implements ITypeSpec<Byte> {
+public class ByteType implements TypeSpec<Byte> {
 
     public String getSpecName() {
         return "Byte";

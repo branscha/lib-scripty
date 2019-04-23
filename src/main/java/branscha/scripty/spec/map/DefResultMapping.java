@@ -27,7 +27,7 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.Context;
 
 public class DefResultMapping
-        implements IResultMapping {
+        implements ResultMapping {
     private String binding;
 
     public DefResultMapping(String aBinding) {

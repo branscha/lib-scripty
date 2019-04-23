@@ -37,8 +37,8 @@ import static java.lang.Thread.sleep;
  */
 public class EvalTrace {
 
-    private Eval2 eval;
-    private Eval2.EvalStack stack;
+    private HooksEval eval;
+    private HooksEval.EvalStack stack;
 
     private Thread worker;
 
@@ -71,7 +71,7 @@ public class EvalTrace {
 
         void setEnabled(boolean aEnabled);
 
-        boolean breakHere(Eval2.EvalStack stack);
+        boolean breakHere(HooksEval.EvalStack stack);
 
         String toString(String indent);
     }
@@ -108,7 +108,7 @@ public class EvalTrace {
             breakpoints.clear();
         }
 
-        public List<Breakpoint> findAllMatchingBreakpoints(Eval2.EvalStack aStack) {
+        public List<Breakpoint> findAllMatchingBreakpoints(HooksEval.EvalStack aStack) {
             List<Breakpoint> breakers = new ArrayList<>();
             if (aStack != null) {
                 for (Breakpoint lBpt : breakpoints)
@@ -117,13 +117,13 @@ public class EvalTrace {
             return breakers;
         }
 
-        public Breakpoint findFirstMatchingBreakpoint(Eval2.EvalStack aStack) {
+        public Breakpoint findFirstMatchingBreakpoint(HooksEval.EvalStack aStack) {
             for (Breakpoint lBpt : breakpoints)
                 if (lBpt.breakHere(aStack)) return lBpt;
             return null;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack) {
+        public boolean breakHere(HooksEval.EvalStack aStack) {
             return findFirstMatchingBreakpoint(aStack) != null;
         }
 
@@ -153,8 +153,8 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack) {
-            final Eval2.StackFrame lFrame = aStack.top();
+        public boolean breakHere(HooksEval.EvalStack aStack) {
+            final HooksEval.StackFrame lFrame = aStack.top();
             final Object lExpr = lFrame.getExpr();
 
             if (enabled && name != null && lExpr instanceof List) {
@@ -195,10 +195,10 @@ public class EvalTrace {
 
         private String name;
         private Object breakExpression;
-        private IEval bptEval = new Eval();
+        private Eval bptEval = new ClassicEval();
         private boolean enabled = true;
 
-        public BreakpointWhen(String aName, Object aExpr, IEval srcEval) {
+        public BreakpointWhen(String aName, Object aExpr, Eval srcEval) {
             this.name = aName;
 
             if (aExpr instanceof Token && ((Token) aExpr).isErroneous()) {
@@ -221,7 +221,7 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack stack) {
+        public boolean breakHere(HooksEval.EvalStack stack) {
             try {
                 return enabled && AbstractEval.boolEval(bptEval.eval(breakExpression, stack.top().getCtx()));
             }
@@ -267,7 +267,7 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack) {
+        public boolean breakHere(HooksEval.EvalStack aStack) {
             return enabled && aStack.size() >= depth;
         }
 
@@ -308,7 +308,7 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack) {
+        public boolean breakHere(HooksEval.EvalStack aStack) {
             return enabled && !(breakpoint.breakHere(aStack));
         }
 
@@ -349,7 +349,7 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack aStack) {
+        public boolean breakHere(HooksEval.EvalStack aStack) {
             boolean lBreak = enabled;
             for (Breakpoint lBp : breakpoints) {
                 lBreak = lBreak && lBp.breakHere(aStack);
@@ -395,7 +395,7 @@ public class EvalTrace {
             this.enabled = enabled;
         }
 
-        public boolean breakHere(Eval2.EvalStack stack) {
+        public boolean breakHere(HooksEval.EvalStack stack) {
             if (!enabled) return false;
             return bps.stream().anyMatch((bp)->bp.breakHere(stack));
         }
@@ -484,7 +484,7 @@ public class EvalTrace {
         else if(excepted) throw new IllegalStateException(String.format(ERR030, instruction));
     }
 
-    public EvalTrace(final Eval2 aEval, final Object aExpr) {
+    public EvalTrace(final HooksEval aEval, final Object aExpr) {
         // Keep track of the eval under scrutiny.
         // Add an event listener to it.
         eval = aEval;
@@ -492,9 +492,9 @@ public class EvalTrace {
         // We currently do not allow other listeners.
         eval.removeAllEventListeners();
         // Attach our own listener.
-        eval.addEvalListener(new Eval2.EvalListener() {
+        eval.addEvalListener(new HooksEval.EvalListener() {
 
-            public void finishedEval(Eval2.EvalEvent aEvent) {
+            public void finishedEval(HooksEval.EvalEvent aEvent) {
                 synchronized (EvalTrace.this) {
                     hasResult = true;
                     excepted = false;
@@ -509,7 +509,7 @@ public class EvalTrace {
                 }
             }
 
-            public void startEval(Eval2.EvalEvent aEvent) throws CommandException{
+            public void startEval(HooksEval.EvalEvent aEvent) throws CommandException{
                 synchronized (EvalTrace.this) {
                     result = null;
                     hasResult = false;
@@ -522,7 +522,7 @@ public class EvalTrace {
                 }
             }
 
-            public void stepEvent(Eval2.EvalEvent aEvent) throws CommandException{
+            public void stepEvent(HooksEval.EvalEvent aEvent) throws CommandException{
                 synchronized (EvalTrace.this) {
                     // Provide the stack for the debugger to examine.
                     stack = aEvent.getStack();
@@ -536,7 +536,7 @@ public class EvalTrace {
                 }
             }
 
-            public void receivedException(Eval2.EvalEvent aEvent) {
+            public void receivedException(HooksEval.EvalEvent aEvent) {
                 synchronized (EvalTrace.this) {
                     stack = aEvent.getStack();
                     exception = aEvent.getException();
@@ -612,7 +612,7 @@ public class EvalTrace {
     /**
      * Get the current evaluation stack.
      */
-    public synchronized Eval2.EvalStack getStack() {
+    public synchronized HooksEval.EvalStack getStack() {
         waitForEval();
         return stack;
     }
@@ -720,7 +720,7 @@ public class EvalTrace {
     public synchronized void backStep() {
         verifyEvalState("backStep");
         waitForEval();
-        final Eval2.StackFrame lFrame = stack.top();
+        final HooksEval.StackFrame lFrame = stack.top();
         if (lFrame.getDataptr() > 0) {
             lFrame.backStep();
         }
@@ -775,7 +775,7 @@ public class EvalTrace {
         // First we run until the current frame has been evaluated.
         // Note that we keep holding on to the same frame for testing,
         // the one that was on the top when this method was called.
-        final Eval2.StackFrame lFrame = getStack().top();
+        final HooksEval.StackFrame lFrame = getStack().top();
         stepcount = 0;
         breakpoint = false;
 
@@ -800,7 +800,7 @@ public class EvalTrace {
         // We run until the current frame has been evaluated.
         // Note that we keep holding on to the same frame for testing,
         // the one that was on the top when this method was called.
-        final Eval2.StackFrame lFrame = getStack().top();
+        final HooksEval.StackFrame lFrame = getStack().top();
         stepcount = 0;
         breakpoint = false;
 
@@ -825,7 +825,7 @@ public class EvalTrace {
     public synchronized void stepOver() {
         if (excepted) return;
 
-        final Eval2.StackFrame lFrame = getStack().top();
+        final HooksEval.StackFrame lFrame = getStack().top();
         final int lStartSlot = lFrame.getDataptr();
 
         // Initialize run statistics.

@@ -24,22 +24,27 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
+import branscha.scripty.annot.ScriptyBindingParam;
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 
-public class BindingMapping implements IArgMapping {
+/**
+ * This mapping fetches data from the {@link Context} of the {@link Eval} and provides it as an argument
+ * of the {@link ScriptyBindingParam} annotated command parameter.
+ */
+public class BindingMapping implements ArgMapping {
 
     private String binding;
     private boolean excIfNull;
 
-    public BindingMapping(String aBinding, boolean aExcIfNull) {
-        binding = aBinding;
-        excIfNull = aExcIfNull;
+    public BindingMapping(String binding, boolean excIfNull) {
+        this.binding = binding;
+        this.excIfNull = excIfNull;
     }
 
-    public Object map(IEval aEval, Context aContext, Object aArgs)
+    public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
-        if (aContext.isBound(binding)) return aContext.getBinding(binding);
+        if (ctx.isBound(binding)) return ctx.getBinding(binding);
         else if (excIfNull) throw new ArgMappingException("... no such binding ...");
         else return null;
     }

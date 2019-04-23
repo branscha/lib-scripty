@@ -22,19 +22,27 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package branscha.scripty.spec.type;
+package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
+import branscha.scripty.parser.Eval;
 
 /**
- * Type checking per argument. Does not have the context of the complete
- * argument list.
- *
- * @param <T>
+ * An argument mapping is a small piece of code that provides arguments to the command parameters when the commands
+ * are invoked. An argument mapping is provisioned by decorating the parameters with the corresponding annotations.
  */
-public interface ITypeSpec<T> {
-    T guard(Object aArg, Context aCtx)
-    throws TypeSpecException;
+public interface ArgMapping {
 
-    String getSpecName();
+    /**
+     * The mapper can make use of the eval itself, its context and all arguments in order to provide a value.
+     * @param eval
+     * @param ctx
+     * @param args
+     * @return
+     * @throws ArgMappingException
+     */
+    Object map(Eval eval, Context ctx, Object args)
+    throws ArgMappingException;
+
+    void setOffset(int aOffset);
 }

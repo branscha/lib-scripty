@@ -33,7 +33,7 @@ import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Context;
 import branscha.scripty.repl.ReplEngine;
 import branscha.scripty.repl.ReplEngineException;
-import branscha.scripty.spec.map.IArgMapping;
+import branscha.scripty.spec.map.ArgMapping;
 import branscha.scripty.spec.map.IndexedMapping;
 import branscha.scripty.spec.map.PartialMapping;
 import branscha.scripty.spec.type.*;
@@ -43,11 +43,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * It uses Scripty itself to create a language to describe types. The users can use these type descriptions in
+ * the annotations.
+ */
 public class ArgListBuilderUtil {
+
     private static ReplEngine typeProcessor = new ReplEngine();
 
     public static class TypeCommands {
-        private static ITypeSpec SPEC_TYPE = new InstanceType(TypeTuple.class, false);
+        private static TypeSpec SPEC_TYPE = new InstanceType(TypeTuple.class, false);
 
         private static TypeTuple INTEGER_TUPLE = new TypeTuple(new IntegerType(), null);
         private static TypeTuple BIGDECIMAL_TUPLE = new TypeTuple(new BigDecimalType(), null);
@@ -143,13 +148,13 @@ public class ArgListBuilderUtil {
 
                 TypeTuple lTuple = (TypeTuple) aArgs[1];
                 Object lTypeCandidate = lTuple.getX();
-                Map<String, IArgMapping> lMappings = lTuple.getY();
+                Map<String, ArgMapping> lMappings = lTuple.getY();
 
-                if (lTypeCandidate == null || !(lTypeCandidate instanceof ITypeSpec)) {
+                if (lTypeCandidate == null || !(lTypeCandidate instanceof TypeSpec)) {
                     throw new CommandException("Invalid type expression ListOf(???) for the elements of the list.");
                 }
 
-                ITypeSpec lSpec = (ITypeSpec) lTypeCandidate;
+                TypeSpec lSpec = (TypeSpec) lTypeCandidate;
                 int lMin = (Integer) aArgs[2];
                 int lMax = (Integer) aArgs[3];
 
@@ -195,13 +200,13 @@ public class ArgListBuilderUtil {
 
                 TypeTuple lTuple = (TypeTuple) aArgs[1];
                 Object lTypeCandidate = lTuple.getX();
-                Map<String, IArgMapping> lMappings = lTuple.getY();
+                Map<String, ArgMapping> lMappings = lTuple.getY();
 
-                if (lTypeCandidate == null || !(lTypeCandidate instanceof ITypeSpec)) {
+                if (lTypeCandidate == null || !(lTypeCandidate instanceof TypeSpec)) {
                     throw new CommandException("Invalid type expression InstanceOrBinding(???) for the instance type.");
                 }
 
-                ITypeSpec lSpec = (ITypeSpec) lTypeCandidate;
+                TypeSpec lSpec = (TypeSpec) lTypeCandidate;
 
                 return new TypeTuple(new InstanceOrBinding(lSpec), lMappings);
             }
@@ -312,8 +317,8 @@ public class ArgListBuilderUtil {
         throws CommandException {
             try {
                 ONEOF_ARGLIST.guard(aArgs, aCtx);
-                Map<String, IArgMapping> lMappings = new HashMap<String, IArgMapping>();
-                ITypeSpec[] lSpecs = new ITypeSpec[aArgs.length - 1];
+                Map<String, ArgMapping> lMappings = new HashMap<String, ArgMapping>();
+                TypeSpec[] lSpecs = new TypeSpec[aArgs.length - 1];
                 for (int i = 1; i < aArgs.length; i++) {
                     TypeTuple lTuple = (TypeTuple) aArgs[i];
                     lSpecs[i - 1] = lTuple.getX();
@@ -338,12 +343,12 @@ public class ArgListBuilderUtil {
 
                 try {
                     Class lClass = Class.forName(lClassName);
-                    if (ITypeSpec.class.isAssignableFrom(lClass)) {
-                        ITypeSpec lSpec = (ITypeSpec) lClass.newInstance();
+                    if (TypeSpec.class.isAssignableFrom(lClass)) {
+                        TypeSpec lSpec = (TypeSpec) lClass.newInstance();
                         return new TypeTuple(lSpec, null);
                     }
                     else {
-                        String lMsg = String.format("The class '%s' does not seem to implement ITypeSpec.", lClassName);
+                        String lMsg = String.format("The class '%s' does not seem to implement TypeSpec.", lClassName);
                         throw new CommandException(lMsg);
                     }
                 }
@@ -413,14 +418,14 @@ public class ArgListBuilderUtil {
         }
     }
 
-    private static class TypeTuple extends Tuple<ITypeSpec, Map<String, IArgMapping>> {
-        private TypeTuple(ITypeSpec x, Map<String, IArgMapping> y) {
+    private static class TypeTuple extends Tuple<TypeSpec, Map<String, ArgMapping>> {
+        private TypeTuple(TypeSpec x, Map<String, ArgMapping> y) {
             super(x, y);
         }
     }
 
-    public static class ArgListTuple extends Tuple<ArgList, Map<String, IArgMapping>> {
-        public ArgListTuple(ArgList x, Map<String, IArgMapping> y) {
+    public static class ArgListTuple extends Tuple<ArgList, Map<String, ArgMapping>> {
+        public ArgListTuple(ArgList x, Map<String, ArgMapping> y) {
             super(x, y);
         }
     }
@@ -428,7 +433,7 @@ public class ArgListBuilderUtil {
     public static ArgListTuple buildArgList(ScriptyStdArgList aStdArgList)
     throws ArgSpecException {
         // We will collect the mappings we encounter in this map.
-        Map<String, IArgMapping> lMappings = new HashMap<String, IArgMapping>();
+        Map<String, ArgMapping> lMappings = new HashMap<String, ArgMapping>();
 
         ScriptyArg[] lFixedArgs = aStdArgList.fixed();
         FixedArg[] lFixedSpecs = new FixedArg[lFixedArgs.length];
@@ -449,8 +454,8 @@ public class ArgListBuilderUtil {
 
             try {
                 TypeTuple lTypeInfo = (TypeTuple) typeProcessor.startNonInteractive(lArgType);
-                ITypeSpec lTypeSpec = lTypeInfo.getX();
-                Map<String, IArgMapping> lTypeMappings = lTypeInfo.getY();
+                TypeSpec lTypeSpec = lTypeInfo.getX();
+                Map<String, ArgMapping> lTypeMappings = lTypeInfo.getY();
 
                 lFixedSpecs[i] = new FixedArg(lTypeSpec);
                 if (lTypeMappings != null) lMappings.putAll(lTypeMappings);
@@ -476,8 +481,8 @@ public class ArgListBuilderUtil {
 
             try {
                 TypeTuple lTypeInfo = (TypeTuple) typeProcessor.startNonInteractive(lArgType);
-                ITypeSpec lTypeSpec = lTypeInfo.getX();
-                Map<String, IArgMapping> lTypeMappings = lTypeInfo.getY();
+                TypeSpec lTypeSpec = lTypeInfo.getX();
+                Map<String, ArgMapping> lTypeMappings = lTypeInfo.getY();
 
                 lOptionalSpecs[j] = new OptionalArg(lTypeSpec, lArgValue);
                 if (lTypeMappings != null) lMappings.putAll(lTypeMappings);
@@ -504,8 +509,8 @@ public class ArgListBuilderUtil {
 
             try {
                 TypeTuple lTypeInfo = (TypeTuple) typeProcessor.startNonInteractive(lArgType);
-                ITypeSpec lTypeSpec = lTypeInfo.getX();
-                Map<String, IArgMapping> lTypeMappings = lTypeInfo.getY();
+                TypeSpec lTypeSpec = lTypeInfo.getX();
+                Map<String, ArgMapping> lTypeMappings = lTypeInfo.getY();
 
                 lNamedSpecs[k] = new NamedArg(lArgName, lTypeSpec, lArgValue, lArgOptional);
                 if (lTypeMappings != null) lMappings.putAll(lTypeMappings);
@@ -527,7 +532,7 @@ public class ArgListBuilderUtil {
     public static ArgListTuple buildArgList(ScriptyVarArgList aVarArgList)
     throws ArgSpecException {
         // We will collect the mappings we encounter in this map.
-        Map<String, IArgMapping> lMappings = new HashMap<String, IArgMapping>();
+        Map<String, ArgMapping> lMappings = new HashMap<String, ArgMapping>();
 
         ScriptyArg[] lFixedArgs = aVarArgList.fixed();
         FixedArg[] lFixedSpecs = new FixedArg[lFixedArgs.length];
@@ -550,8 +555,8 @@ public class ArgListBuilderUtil {
 
             try {
                 TypeTuple lTypeInfo = (TypeTuple) typeProcessor.startNonInteractive(lArgType);
-                ITypeSpec lTypeSpec = lTypeInfo.getX();
-                Map<String, IArgMapping> lTypeMappings = lTypeInfo.getY();
+                TypeSpec lTypeSpec = lTypeInfo.getX();
+                Map<String, ArgMapping> lTypeMappings = lTypeInfo.getY();
 
                 lFixedSpecs[i] = new FixedArg(lTypeSpec);
                 if (lTypeMappings != null) lMappings.putAll(lTypeMappings);
@@ -575,8 +580,8 @@ public class ArgListBuilderUtil {
 
             try {
                 TypeTuple lTypeInfo = (TypeTuple) typeProcessor.startNonInteractive(lArgType);
-                ITypeSpec lTypeSpec = lTypeInfo.getX();
-                Map<String, IArgMapping> lTypeMappings = lTypeInfo.getY();
+                TypeSpec lTypeSpec = lTypeInfo.getX();
+                Map<String, ArgMapping> lTypeMappings = lTypeInfo.getY();
 
                 lNamedSpecs[k] = new NamedArg(lArgName, lTypeSpec, lArgValue, lArgOptional);
                 if (lTypeMappings != null) lMappings.putAll(lTypeMappings);
@@ -598,8 +603,8 @@ public class ArgListBuilderUtil {
 
             try {
                 TypeTuple lTypeInfo = (TypeTuple) typeProcessor.startNonInteractive(lArgType);
-                ITypeSpec lTypeSpec = lTypeInfo.getX();
-                Map<String, IArgMapping> lTypeMappings = lTypeInfo.getY();
+                TypeSpec lTypeSpec = lTypeInfo.getX();
+                Map<String, ArgMapping> lTypeMappings = lTypeInfo.getY();
 
                 lVarArgSpec = new VarArg(lTypeSpec);
                 if (lTypeMappings != null) lMappings.putAll(lTypeMappings);

@@ -27,7 +27,7 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class InstanceType
-        implements ITypeSpec {
+        implements TypeSpec {
     private Class requiredClass;
     private boolean allowsNull = false;
     private String typeName;

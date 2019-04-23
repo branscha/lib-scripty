@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EnumType
-        implements ITypeSpec {
+        implements TypeSpec {
     private List<String> values = new ArrayList<String>();
 
     public EnumType(List<String> aValues) {

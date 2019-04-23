@@ -28,17 +28,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import branscha.scripty.spec.type.*;
 import org.junit.Test;
 
 import branscha.scripty.parser.Pair;
 import branscha.scripty.spec.args.ArgSpecException;
 import branscha.scripty.spec.args.ArgSpec;
 import branscha.scripty.spec.args.NamedArg;
-import branscha.scripty.spec.type.CheckedListType;
-import branscha.scripty.spec.type.ITypeSpec;
-import branscha.scripty.spec.type.InstanceType;
-import branscha.scripty.spec.type.IntegerType;
-import branscha.scripty.spec.type.TypeSpecException;
+import branscha.scripty.spec.type.TypeSpec;
 
 public class TestSpecs {
     @Test
@@ -51,7 +48,7 @@ public class TestSpecs {
     @Test
     public void testIntList()
     throws TypeSpecException {
-        ITypeSpec lSpec = new CheckedListType(new IntegerType());
+        TypeSpec lSpec = new CheckedListType(new IntegerType());
         List lList = new ArrayList();
         lList.add(13);
         lList.add(17);

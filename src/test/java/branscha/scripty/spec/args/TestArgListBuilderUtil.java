@@ -33,7 +33,7 @@ import branscha.scripty.annot.ScriptyParam;
 import branscha.scripty.annot.ScriptyStdArgList;
 import branscha.scripty.cmdlib.TeaLibrary;
 import branscha.scripty.parser.Context;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 import org.junit.Before;
 import org.junit.Test;
@@ -630,7 +630,7 @@ public class TestArgListBuilderUtil {
     }
 
     public static class CustomSpec
-            implements ITypeSpec {
+            implements TypeSpec {
         private Pattern pattern = Pattern.compile("a+b*");
 
         public Object guard(Object aArg, Context aCtx)

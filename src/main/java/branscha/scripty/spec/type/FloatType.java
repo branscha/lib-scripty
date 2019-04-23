@@ -27,7 +27,7 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class FloatType
-        implements ITypeSpec {
+        implements TypeSpec {
     public String getSpecName() {
         return "Float";
     }

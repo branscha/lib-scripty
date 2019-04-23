@@ -29,14 +29,14 @@ import branscha.scripty.parser.Pair;
 
 /**
  * There are 3 types of parameters in a standard argument list.
- * 1. Fixed and required arguments. Each with its own type.
+ * 1. Fixed, required arguments. Each with its own type.
  * 2. Optional. Each argument has its own type. These cannot be of type Pair, because this might conflict with the named arguments.
  * The optional parameters can have a default value which will be used when the argument is not present.
  * 3. Named (optional or required). These are pairs at the end of the command line.
  * The named parameters can have a default value.
  */
-public class StdArgList
-        implements ArgList {
+public class StdArgList implements ArgList {
+
     public static final ArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
 
     private FixedArg req[];

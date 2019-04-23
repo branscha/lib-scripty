@@ -30,17 +30,17 @@ import java.io.PrintStream;
 import java.util.*;
 
 /**
- * An Eval implementation suited to create a debugger environment.
+ * An ClassicEval implementation suited to create a debugger environment.
  * it provides a number of hooks where an external controller can hook  into.
  * It is a bit slower though.
  */
-public class Eval2 extends AbstractEval {
+public class HooksEval extends AbstractEval {
 
-    public Eval2() {
+    public HooksEval() {
         this(new BasicContext());
     }
 
-    public Eval2(Context aContext) {
+    public HooksEval(Context aContext) {
         super(aContext);
     }
 
@@ -48,7 +48,7 @@ public class Eval2 extends AbstractEval {
         void init(EvalStack aStack, StackFrame aFrame)
         throws CommandException;
 
-        void handleFrame(IEval aEval, EvalStack aStack, StackFrame aFrame)
+        void handleFrame(Eval aEval, EvalStack aStack, StackFrame aFrame)
         throws CommandException;
     }
 
@@ -349,21 +349,21 @@ public class Eval2 extends AbstractEval {
         for (EvalListener lListener : listeners) lListener.receivedException(EVENT);
     }
 
-    public Object eval(Object aExpr)
+    public Object eval(Object expr)
     throws CommandException {
-        return eval(aExpr, getContext());
+        return eval(expr, getContext());
     }
 
     private EvalStack currstack;
 
-    public Object eval(Object aExpr, Context aCtx)
+    public Object eval(Object expr, Context ctx)
     throws CommandException {
         // Create a new stack, and link the old stack to it.
         // This system is meant to work cross-commands.
         currstack = new EvalStack(currstack);
 
         // Push the current expression on the new stack.
-        currstack.push(aExpr, aCtx);
+        currstack.push(expr, ctx);
         // Notify listeners about the start of evaluation.
         fireStartEval(currstack);
 
@@ -410,16 +410,16 @@ public class Eval2 extends AbstractEval {
     private final MacroHandler MACRO_HANDLER = new MacroHandler();
     private final StandardHandler STANDARD_HANDLER = new StandardHandler();
 
-    public void setCommandRepo(CommandRepository aRepo) {
-        STANDARD_HANDLER.setCommands(aRepo);
+    public void setCommandRepo(CommandRepository cmdRepository) {
+        STANDARD_HANDLER.setCommands(cmdRepository);
     }
 
     public CommandRepository getCommandRepo() {
         return STANDARD_HANDLER.getCommands();
     }
 
-    public void setMacroRepo(CommandRepository aRepo) {
-        MACRO_HANDLER.setMacros(aRepo);
+    public void setMacroRepo(CommandRepository macroRepository) {
+        MACRO_HANDLER.setMacros(macroRepository);
     }
 
     public CommandRepository getMacroRepo() {
@@ -538,14 +538,14 @@ public class Eval2 extends AbstractEval {
     }
 }
 
-class AtomicHandler implements Eval2.IFrameHandler {
+class AtomicHandler implements HooksEval.IFrameHandler {
 
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // No stack frame space needed for atoms.
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final Object lExpr = aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -564,16 +564,16 @@ class AtomicHandler implements Eval2.IFrameHandler {
     }
 }
 
-class PairHandler implements Eval2.IFrameHandler {
+class PairHandler implements HooksEval.IFrameHandler {
 
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
 
         // Allocate stack data.
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final Object[] lData = aFrame.getData();
         final Context lCtx = aFrame.getCtx();
@@ -595,7 +595,7 @@ class PairHandler implements Eval2.IFrameHandler {
     }
 }
 
-class StandardHandler implements Eval2.IFrameHandler {
+class StandardHandler implements HooksEval.IFrameHandler {
 
     private CommandRepository commands = new CommandRepository();
 
@@ -610,7 +610,7 @@ class StandardHandler implements Eval2.IFrameHandler {
         commands = aCommands;
     }
 
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -619,7 +619,7 @@ class StandardHandler implements Eval2.IFrameHandler {
         aFrame.allocateData(lLstSize);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -727,7 +727,7 @@ class StandardHandler implements Eval2.IFrameHandler {
                 catch (CommandException e) {
                     // This type of error will be handled by our general mechanism.
                     // It does not need special handling here.
-                    Eval2.EvalStack lNestedStack = e.getStack();
+                    HooksEval.EvalStack lNestedStack = e.getStack();
                     e.setStack(aStack.merge(lNestedStack));
                     throw e;
                 }
@@ -777,8 +777,8 @@ class StandardHandler implements Eval2.IFrameHandler {
 }
 
 class QuoteHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+        implements HooksEval.IFrameHandler {
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -790,7 +790,7 @@ class QuoteHandler
             throw new CommandException("The 'quote' form should have the format (quote <expr>).", aStack);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
 
@@ -800,8 +800,8 @@ class QuoteHandler
 }
 
 class IfHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+        implements HooksEval.IFrameHandler {
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -814,7 +814,7 @@ class IfHandler
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because only one of the then or else part is evaluated depending on the outcome of the test.
         // It shortcuts evaluation of the other branch.
@@ -832,7 +832,7 @@ class IfHandler
             case 1:
                 // If the boolean expression evaluates positive we push the then-part
                 // on the stack, otherwise the else part.
-                if (Eval2.boolEval(lData[0])) aStack.push(lLstExpr.get(2), lCtx);
+                if (HooksEval.boolEval(lData[0])) aStack.push(lLstExpr.get(2), lCtx);
                     // The else is optional.
                 else if (lLstSize == 4) aStack.push(lLstExpr.get(3), lCtx);
                     // The result is null if there is no else part.
@@ -846,8 +846,8 @@ class IfHandler
 }
 
 class WhileHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+        implements HooksEval.IFrameHandler {
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -860,7 +860,7 @@ class WhileHandler
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because the test is evaluated again and again.
 
@@ -876,7 +876,7 @@ class WhileHandler
                 return;
             case 1:
                 // If the boolean expression evaluates positive we push the body on the stack.
-                if (Eval2.boolEval(lData[0])) {
+                if (HooksEval.boolEval(lData[0])) {
                     if (lLstSize == 3) {
                         // We evaluate the body.
                         aStack.push(lLstExpr.get(2), lCtx);
@@ -904,9 +904,9 @@ class WhileHandler
     }
 }
 
-class AndHandler implements Eval2.IFrameHandler {
+class AndHandler implements HooksEval.IFrameHandler {
 
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -918,7 +918,7 @@ class AndHandler implements Eval2.IFrameHandler {
         aFrame.allocateData(lLstSize - 1);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because it shortcuts evaluation if it encounters a
         // false value.
@@ -933,7 +933,7 @@ class AndHandler implements Eval2.IFrameHandler {
             aStack.push(lLstExpr.get(1), lCtx);
         }
         else {// Check the result of the last parameter.
-            if (!Eval2.boolEval(lData[lDataPtr - 1])) {
+            if (!HooksEval.boolEval(lData[lDataPtr - 1])) {
                 // We shortcut the evaluation if we find a false value.
                 // We can stop on the first false value we encounter.
                 aFrame.setResult(Boolean.FALSE);
@@ -954,9 +954,9 @@ class AndHandler implements Eval2.IFrameHandler {
     }
 }
 
-class OrHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+class OrHandler implements HooksEval.IFrameHandler {
+
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -968,7 +968,7 @@ class OrHandler
         aFrame.allocateData(lLstSize - 1);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
 
         // It is a special form because it shortcuts evaluation when a single true value
@@ -984,7 +984,7 @@ class OrHandler
             aStack.push(lLstExpr.get(1), lCtx);
         }
         else {// Check the result of the last parameter.
-            if (Eval2.boolEval(lData[lDataPtr - 1])) {
+            if (HooksEval.boolEval(lData[lDataPtr - 1])) {
                 // We shortcut the evaluation if we find a true value.
                 // We can stop on the first true value we encounter.
                 aFrame.setResult(Boolean.TRUE);
@@ -1005,9 +1005,9 @@ class OrHandler
     }
 }
 
-class NotHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+class NotHandler implements HooksEval.IFrameHandler {
+
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -1019,7 +1019,7 @@ class NotHandler
         aFrame.allocateData(1);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1029,17 +1029,17 @@ class NotHandler
             aStack.push(lLstExpr.get(1), lCtx);
         }
         else {
-            if (Eval2.boolEval(lData[0])) aFrame.setResult(Boolean.FALSE);
+            if (HooksEval.boolEval(lData[0])) aFrame.setResult(Boolean.FALSE);
             else aFrame.setResult(Boolean.TRUE);
         }
     }
 }
 
-class SetHandler implements Eval2.IFrameHandler {
+class SetHandler implements HooksEval.IFrameHandler {
 
-    private static class PairHandler implements Eval2.IFrameHandler {
+    private static class PairHandler implements HooksEval.IFrameHandler {
 
-        public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+        public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
         throws CommandException {
 
             final List lstExpr = (List) aFrame.getExpr();
@@ -1075,14 +1075,14 @@ class SetHandler implements Eval2.IFrameHandler {
             }
         }
 
-        public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+        public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
         throws CommandException {
         }
     }
 
-    private static class CoupleHandler
-            implements Eval2.IFrameHandler {
-        public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    private static class CoupleHandler implements HooksEval.IFrameHandler {
+
+        public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
         throws CommandException {
             final List lLstExpr = (List) aFrame.getExpr();
             final Context lCtx = aFrame.getCtx();
@@ -1109,15 +1109,15 @@ class SetHandler implements Eval2.IFrameHandler {
             }
         }
 
-        public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+        public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
         throws CommandException {
         }
     }
 
-    private static final Eval2.IFrameHandler PAIR_HANDLER = new PairHandler();
-    private static final Eval2.IFrameHandler COUPLE_HANDLER = new CoupleHandler();
+    private static final HooksEval.IFrameHandler PAIR_HANDLER = new PairHandler();
+    private static final HooksEval.IFrameHandler COUPLE_HANDLER = new CoupleHandler();
 
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // Allocate enpough space to evaluate the left and right side of the assignment.
         aFrame.allocateData(2);
@@ -1139,16 +1139,16 @@ class SetHandler implements Eval2.IFrameHandler {
         }
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // This handler will never be called, by now the frame handler will be replaced
         // by a more specific handler.
     }
 }
 
-class LetHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+class LetHandler implements HooksEval.IFrameHandler {
+
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -1169,7 +1169,7 @@ class LetHandler
         aFrame.setCtx(new CompositeContext(new BasicContext(), lCtx));
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1242,9 +1242,9 @@ class LetHandler
     }
 }
 
-class GetHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+class GetHandler implements HooksEval.IFrameHandler {
+
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -1255,7 +1255,7 @@ class GetHandler
         aFrame.allocateData(1);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1276,13 +1276,13 @@ class GetHandler
     }
 }
 
-class LambdaHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+class LambdaHandler implements HooksEval.IFrameHandler {
+
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because the parameter list nor the function body
         // should be evaluated at this point.
@@ -1317,9 +1317,9 @@ class LambdaHandler
     }
 }
 
-class DefunHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+class DefunHandler implements HooksEval.IFrameHandler {
+
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -1332,7 +1332,7 @@ class DefunHandler
         aFrame.allocateData(1);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because the parameter list nor the function body
         // should be evaluated at this point.
@@ -1377,9 +1377,9 @@ class DefunHandler
     }
 }
 
-class TimerHandler
-        implements Eval2.IFrameHandler {
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+class TimerHandler implements HooksEval.IFrameHandler {
+
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -1390,7 +1390,7 @@ class TimerHandler
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
 
         final List lLstExpr = (List) aFrame.getExpr();
@@ -1411,7 +1411,7 @@ class TimerHandler
     }
 }
 
-class MacroHandler implements Eval2.IFrameHandler {
+class MacroHandler implements HooksEval.IFrameHandler {
 
     private CommandRepository macros = new CommandRepository();
 
@@ -1430,14 +1430,14 @@ class MacroHandler implements Eval2.IFrameHandler {
         return macros.hasCommand(aName);
     }
 
-    public void init(Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         // Allocate a single slot for the evaluation of the macro expansion.
         aFrame.allocateData(1);
     }
 
     @SuppressWarnings("unchecked")
-    public void handleFrame(IEval aEval, Eval2.EvalStack aStack, Eval2.StackFrame aFrame)
+    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1453,7 +1453,7 @@ class MacroHandler implements Eval2.IFrameHandler {
                 aStack.push(lMacro.execute(aEval, lCtx, lArgs.toArray()), lCtx);
             }
             catch (CommandException e) {
-                Eval2.EvalStack lNestedStack = e.getStack();
+                HooksEval.EvalStack lNestedStack = e.getStack();
                 e.setStack(aStack.merge(lNestedStack));
                 throw e;
             }

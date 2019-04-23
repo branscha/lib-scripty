@@ -27,7 +27,7 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Context;
 
-public class SetResultMapping implements IResultMapping {
+public class SetResultMapping implements ResultMapping {
     private String binding;
 
     public SetResultMapping(String aBinding) {

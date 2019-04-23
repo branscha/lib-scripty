@@ -25,21 +25,21 @@
 package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 
 import java.util.List;
 
 public class IndexedMapping
-        implements IArgMapping {
+        implements ArgMapping {
     private int offset;
 
     public IndexedMapping(int aOffset) {
         offset = aOffset;
     }
 
-    public Object map(IEval aEval, Context aContext, Object aArgs)
+    public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
-        if (aArgs == null) {
+        if (args == null) {
             // TODO generate ERROR
             throw new ArgMappingException("...");
 
@@ -50,9 +50,9 @@ public class IndexedMapping
             throw new ArgMappingException("...");
         }
 
-        Class lArgsClass = aArgs.getClass();
+        Class lArgsClass = args.getClass();
         if (lArgsClass.isArray()) {
-            Object[] lArgs = (Object[]) aArgs;
+            Object[] lArgs = (Object[]) args;
             if (offset >= lArgs.length) {
                 // TODO generate ERROR
                 throw new ArgMappingException("...");
@@ -61,7 +61,7 @@ public class IndexedMapping
             return lArgs[offset];
         }
         else if (List.class.isAssignableFrom(lArgsClass)) {
-            List lArgs = (List) aArgs;
+            List lArgs = (List) args;
             if (offset >= lArgs.size()) {
                 // TODO generate error
                 throw new ArgMappingException("...");

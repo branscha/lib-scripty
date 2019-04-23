@@ -7,7 +7,7 @@ package branscha.scripty.parser;
 import java.util.List;
 
 /**
- * Utility class to render S-expressions to Strings. Strings with whitespace will become delimited, and
+ * Utility to render S-expressions to Strings. Strings with whitespace will become delimited, and
  * tabs and newlines will be encoded.
  */
 public class Printer {

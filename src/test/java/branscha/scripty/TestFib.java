@@ -28,7 +28,7 @@ import branscha.scripty.cmdlib.ListLibrary;
 import branscha.scripty.cmdlib.LoadLibrary;
 import branscha.scripty.cmdlib.MathLibrary;
 import branscha.scripty.spec.type.BigDecimalType;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class TestFib {
         scripty.process("(load cp:/fib.lsp)");
     }
 
-    private ITypeSpec bdspec = new BigDecimalType();
+    private TypeSpec bdspec = new BigDecimalType();
 
     public BigDecimal fib(int n)
     throws ProcessorException, TypeSpecException {

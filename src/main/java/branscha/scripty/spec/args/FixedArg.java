@@ -25,19 +25,19 @@
 package branscha.scripty.spec.args;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
 /**
- * Fixed arguments are positional (have a fixed location) and type.
+ * Represents a single fixed argument. Fixed arguments are positional (have a fixed location) and type.
  * They are required, the user has to provide them.
  */
-public class FixedArg
-        implements ArgSpec {
-    private ITypeSpec spec;
+public class FixedArg implements ArgSpec {
+
+    private TypeSpec spec;
     private String specName;
 
-    public FixedArg(ITypeSpec aSpec) {
+    public FixedArg(TypeSpec aSpec) {
         spec = aSpec;
         specName = "fixed: " + spec.getSpecName();
     }

@@ -27,7 +27,7 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class LongType
-        implements ITypeSpec<Long> {
+        implements TypeSpec<Long> {
     public String getSpecName() {
         return "Long";
     }

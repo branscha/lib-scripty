@@ -26,7 +26,7 @@ package branscha.scripty.spec.args;
 
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
 /**
@@ -39,13 +39,13 @@ import branscha.scripty.spec.type.TypeSpecException;
  * An optional parameter cannot be a pair, because it could conflict
  * with the named parameters which are grouped at the end of the list.
  */
-public class OptionalArg
-        implements ArgSpec {
-    private ITypeSpec spec;
+public class OptionalArg implements ArgSpec {
+
+    private TypeSpec spec;
     private String specName;
     private Object defaultVal;
 
-    public OptionalArg(ITypeSpec aSpec, Object aVal) {
+    public OptionalArg(TypeSpec aSpec, Object aVal) {
         spec = aSpec;
         defaultVal = aVal;
         specName = "opt: " + spec.getSpecName();

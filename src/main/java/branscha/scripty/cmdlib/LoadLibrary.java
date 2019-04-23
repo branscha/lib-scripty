@@ -27,10 +27,10 @@ package branscha.scripty.cmdlib;
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 import branscha.scripty.repl.ReplEngine;
 import branscha.scripty.repl.ReplEngineException;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 import branscha.scripty.spec.type.TypeUtil;
 
@@ -49,7 +49,7 @@ public class LoadLibrary {
 
     @ScriptyCommand(name = "load")
     @ScriptyVarArgList(vararg = @ScriptyArg(name = "loaders", type = "Custom branscha.scripty.cmdlib.LoadLibrary$LoaderType"))
-    public void load(@ScriptyParam("loaders") Object[] aLoaders, Context aCtx, IEval aEval)
+    public void load(@ScriptyParam("loaders") Object[] aLoaders, Context aCtx, Eval aEval)
     throws CommandException {
         List<Loader> lLoaders = new ArrayList<Loader>();
         for (Object lLoader : aLoaders) {
@@ -60,14 +60,14 @@ public class LoadLibrary {
 
     @ScriptyCommand(name = "reload")
     @ScriptyStdArgList()
-    public void reload(Context aContext, IEval aEval)
+    public void reload(Context aContext, Eval aEval)
     throws CommandException {
         List<Loader> lLoaders = new ArrayList<Loader>();
         lLoaders.addAll(loaders);
         internalLoad(lLoaders, aEval, aContext);
     }
 
-    private void internalLoad(List<Loader> aLoaders, IEval aEval, Context aContext)
+    private void internalLoad(List<Loader> aLoaders, Eval aEval, Context aContext)
     throws CommandException {
         Object lInput = aContext.getBinding(ReplEngine.INPUT);
         Object lOutput = aContext.getBinding(ReplEngine.OUTPUT);
@@ -186,7 +186,7 @@ public class LoadLibrary {
 
     @SuppressWarnings("unused")
     public static class LoaderType
-            implements ITypeSpec {
+            implements TypeSpec {
         public String getSpecName() {
             return "loader";
         }

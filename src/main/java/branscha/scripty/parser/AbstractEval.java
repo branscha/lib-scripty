@@ -28,7 +28,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 
-public abstract class AbstractEval implements IEval {
+public abstract class AbstractEval implements Eval {
 
     private Context context;
 

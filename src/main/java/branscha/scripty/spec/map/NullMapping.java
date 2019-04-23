@@ -25,10 +25,11 @@
 package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 
-public class NullMapping implements IArgMapping {
-    public Object map(IEval aEval, Context aContext, Object aArgs)
+public class NullMapping implements ArgMapping {
+
+    public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
         return null;
     }

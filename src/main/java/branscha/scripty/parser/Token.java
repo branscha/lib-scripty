@@ -25,6 +25,7 @@
 package branscha.scripty.parser;
 
 public class Token {
+
     // Difference between eof versus error.
     // We need this for the REPL. If a command is not complete, the user can continue 
     // the command on a fresh line. If there is an error, the message will be printed and a new

@@ -26,7 +26,10 @@ package branscha.scripty.spec.args;
 
 import branscha.scripty.parser.Context;
 
+/**
+ * A complete argument list.
+ */
 public interface ArgList {
-    public abstract Object[] guard(Object[] aArgs, Context aCtx)
+    Object[] guard(Object[] aArgs, Context aCtx)
     throws ArgSpecException;
 }

@@ -22,24 +22,20 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package branscha.scripty.parser;
+package branscha.scripty.spec.type;
 
-public interface IEval {
-    Context getContext();
+import branscha.scripty.parser.Context;
 
-    void setContext(Context context);
+/**
+ * Type checking per argument. Does not have the context of the complete
+ * argument list.
+ *
+ * @param <T>
+ */
+public interface TypeSpec<T> {
 
-    Object eval(Object aExpr)
-    throws CommandException;
+    T guard(Object aArg, Context aCtx)
+    throws TypeSpecException;
 
-    Object eval(Object aExpr, Context aContext)
-    throws CommandException;
-
-    public void setCommandRepo(CommandRepository aRepo);
-
-    CommandRepository getCommandRepo();
-
-    public void setMacroRepo(CommandRepository aRepo);
-
-    CommandRepository getMacroRepo();
+    String getSpecName();
 }

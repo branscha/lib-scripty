@@ -31,18 +31,18 @@ import java.util.ListIterator;
 import branscha.scripty.parser.Context;
 
 public class CheckedListType
-        implements ITypeSpec {
-    private ITypeSpec spec;
+        implements TypeSpec {
+    private TypeSpec spec;
     private int min;
     private int max;
 
-    public CheckedListType(ITypeSpec aSpec, int aMin, int aMax) {
+    public CheckedListType(TypeSpec aSpec, int aMin, int aMax) {
         spec = aSpec;
         min = aMin;
         max = aMax;
     }
 
-    public CheckedListType(ITypeSpec aSpec) {
+    public CheckedListType(TypeSpec aSpec) {
         spec = aSpec;
         min = -1;
         max = -1;

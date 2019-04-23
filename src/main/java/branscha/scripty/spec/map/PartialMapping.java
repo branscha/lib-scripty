@@ -25,12 +25,12 @@
 package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Eval;
 
 import java.util.Arrays;
 
 public class PartialMapping
-        implements IArgMapping {
+        implements ArgMapping {
     private int from;
     private int length;
 
@@ -39,12 +39,12 @@ public class PartialMapping
         length = aLength;
     }
 
-    public Object map(IEval aEval, Context aContext, Object aArgs)
+    public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
         // TODO TODO
         // Add code for lists/collections
 
-        Object[] lArgs = (Object[]) aArgs;
+        Object[] lArgs = (Object[]) args;
         int lLength = 0;
         if (length < 0) {
             lLength = lArgs.length - from;
