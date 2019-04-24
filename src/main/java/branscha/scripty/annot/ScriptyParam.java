@@ -30,8 +30,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Bind an argument  from a {@link ScriptyStdArgList} or {@link ScriptyVarArgList} to the java parameter.
- * The argument will be bound to the parameter of the method implementing the command.
+ * Command parameter annotation. Bind a {@link ScriptyArg}  from a {@link ScriptyStdArgList} or {@link ScriptyVarArgList}
+ * to the java parameter. The argument will be bound to the parameter of the method implementing the command.
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

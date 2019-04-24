@@ -27,14 +27,24 @@ package branscha.scripty.spec.args;
 import branscha.scripty.parser.Context;
 
 /**
- * Single argument specification. It can use all arguments to make a decision.
- * Is aware of the location within the arguments list.
- * The argument specs will be provisioned by the annotations.
+ * Single argument specification. It can use all arguments to make a decision. Is aware of the location within the
+ * arguments list. The argument specs are described by the {@link branscha.scripty.annot.ScriptyArg} annotation and
+ * will eventually lead to the creation of a concrete subclass.
+ *
+ * The type checks are implemented in the ArgSpec implementations.
  *
  * @param <T>
  */
 public interface ArgSpec<T> {
 
+    /**
+     * Verify the argument at that specified position.
+     * @param aArgs The complete argument list.
+     * @param aPos The index of the argument that should be verified.
+     * @param aCtx The eval context.
+     * @return The effective argument (which could be converted)
+     * @throws ArgSpecException
+     */
     T guard(Object[] aArgs, int aPos, Context aCtx)
     throws ArgSpecException;
 

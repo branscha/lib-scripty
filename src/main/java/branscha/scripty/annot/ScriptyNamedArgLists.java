@@ -30,7 +30,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Define a number of argument list definitions on a class so that they can be re-used in multiple command
+ * Define multiple argument lists so that they can be re-used in multiple command
  * definitions using {@link ScriptyRefArgList}. The common shared argument list definitions can be defined
  * once in a single location.
  */

@@ -25,26 +25,25 @@
 package branscha.scripty.annot;
 
 /**
- * Provide argument type details in an {@link ScriptyStdArgList} or al {@link ScriptyVarArgList}.
+ * Part of an argument list. Provide argument details in an {@link ScriptyStdArgList} or al {@link ScriptyVarArgList}.
  * Argument list annotations are used to specify the interface for a command, the Scripty engine will automatically
  * enforce this interface.
  * <p>
  * The example defines a command interface with a single argument of type String.
  *
  * <pre>
- *     @ScriptyStdArgList(
- *    fixed={
- *       @ScriptyArg(name="uno", type="String")})
+ *    {@literal @}ScriptyStdArgList(fixed={{@literal @}ScriptyArg(name="uno", type="String")})
  * </pre>
  */
 public @interface ScriptyArg {
     /**
-     * The name of the argument.
+     * The name of the argument. It can be used to map the description to a command parameter using the
+     * {@link ScriptyParam} annotation.
      */
     String name();
 
     /**
-     * The type of the argument, the description is in the type DSL.
+     * The type of the argument, the description is in the type DSL (written in Scripty).
      */
     String type();
 

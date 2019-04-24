@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
                 @ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name = "path", type = "String", value = ".")}),
                 @ScriptyStdArgList(name = "path + quiet option",
                         named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")},
-                        optional = {@ScriptyArg(name = "path", type = "String", value = ".")  })}
+                        optional = {@ScriptyArg(name = "path", type = "String", value = ".")})}
 )
 public class BeanLibrary {
 

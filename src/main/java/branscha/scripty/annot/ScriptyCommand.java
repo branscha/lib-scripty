@@ -32,7 +32,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark a method as a command. You can register the commands individually using
+ * Command annotation. Mark a method as a command. You can register the commands individually using
  * {@link branscha.scripty.ScriptyCapable#addCommand(String, Command)} or group the commands in a
  * {@link ScriptyLibrary} to manage them together.
  */

@@ -30,7 +30,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A macro receives the list structure and can transform it before evaluating it in the normal way.
+ * Macro annotation. A macro receives the list structure and can transform it before evaluating it in the normal way.
+ * The difference between a macro and a command is that the macro has access to the un-evaluated arguments and
+ * has the possibility to modify them before handing it over to the eval. Macros are used to create meta-commands.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -30,7 +30,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Bind a Scripty context variable to a Java parameter.
+ * Command parameter annotation. Bind a Scripty context variable to a Java parameter.
  * The context parameter will be bound to the parameter of the method implementing the command.
  */
 @Target(ElementType.PARAMETER)

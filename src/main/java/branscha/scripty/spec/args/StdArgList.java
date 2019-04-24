@@ -30,85 +30,52 @@ import branscha.scripty.parser.Pair;
 /**
  * There are 3 types of parameters in a standard argument list.
  * 1. Fixed, required arguments. Each with its own type.
- * 2. Optional. Each argument has its own type. These cannot be of type Pair, because this might conflict with the named arguments.
+ * 2. Optional. Each argument has its own type. These cannot be of type Pair, because this might conflict with the namedArgs arguments.
  * The optional parameters can have a default value which will be used when the argument is not present.
  * 3. Named (optional or required). These are pairs at the end of the command line.
- * The named parameters can have a default value.
+ * The namedArgs parameters can have a default value.
  */
-public class StdArgList implements ArgList {
+public class StdArgList extends AbstractArgList {
 
-    public static final ArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
+//    public static final ArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
 
-    private FixedArg req[];
-    private OptionalArg[] opt;
-    private NamedArg[] named;
+    private OptionalArg[] optArgs;
 
-    public StdArgList(FixedArg aReq[], OptionalArg[] aOpt, NamedArg[] aNamed) {
-        req = aReq;
-        opt = aOpt;
-        named = aNamed;
+    public StdArgList(FixedArg[] fixedArgs, OptionalArg[] optionalArgs, NamedArg[] namedArgs) {
+        super(fixedArgs, namedArgs);
+        optArgs = optionalArgs;
     }
 
     /**
-     * The ars are expected to have the form ("CMD", arg-1, arg-2, ... arg-n).
+     * The args are expected to have the form ("CMD", arg-1, arg-2, ... arg-n).
      */
-    public Object[] guard(Object[] aArgs, Context aCtx)
+    public Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException {
         // Create a new argument list where we will accumulate the
         // converted results.
-        Object[] lNewArgs = new Object[1 + req.length + opt.length + named.length];
-        // Copy the command name to the new argument list, the structure will remain the same.
-        lNewArgs[0] = aArgs[0];
-
-        // Check the fixed.
-        if (aArgs.length - 1 < req.length)
-            throw new ArgSpecException(String.format("Too few arguments. Expected at least %d arguments but received %d.", req.length, aArgs.length - 1));
-
-        // We skip the command name.
-        int lArgIdx = 1;
-        for (int i = 0; i < req.length; i++) {
-            lNewArgs[lArgIdx] = req[i].guard(aArgs, lArgIdx++, aCtx);
-        }
+        Object[] newArgs = new Object[1 + fixedArgs.length + optArgs.length + namedArgs.length];
+        int newArgsEnd = resolveFixedArgs(args, ctx, newArgs);
 
         // Check the optional ones.
         // Start looking after the fixed args, 
         // Provide the expected index.
-        for (ArgSpec lSpec : opt) {
-            lNewArgs[lArgIdx] = lSpec.guard(aArgs, lArgIdx++, aCtx);
+        for (ArgSpec lSpec : optArgs) {
+            newArgs[newArgsEnd] = lSpec.guard(args, newArgsEnd++, ctx);
         }
 
         // If there are still arguments left that are not pairs there are 
         // too many arguments.
-        if (lArgIdx < aArgs.length && !(aArgs[lArgIdx] instanceof Pair))
-            throw new ArgSpecException(String.format("Too many arguments. Expected at most %d arguments.", req.length + opt.length));
+        if (newArgsEnd < args.length && !(args[newArgsEnd] instanceof Pair))
+            throw new ArgSpecException(String.format("Too many arguments. Expected at most %d arguments.", fixedArgs.length + optArgs.length));
 
-        // Check the named args.
+        // Check the namedArgs args.
         // We look for all pairs at the end of the argument list. We will only
         // consider these trailing pairs.
-        int lStartNamed = aArgs.length - 1;
-        while (lStartNamed > 0 && (aArgs[lStartNamed] instanceof Pair)) lStartNamed--;
-        // Now we can resolve the named arguments within this range.
-        for (ArgSpec lSpec : named) {
-            lNewArgs[lArgIdx++] = lSpec.guard(aArgs, lStartNamed, aCtx);
-        }
-        // Finally we go looking for spurious named parameters that were not specified ...
-        for (int i = lStartNamed; i < aArgs.length; i++) {
-            if (aArgs[i] instanceof Pair) {
-                final Pair lPair = (Pair) aArgs[i];
-                if (!(lPair.getLeft() instanceof String))
-                    throw new ArgSpecException(String.format("Found an badly formed named argument, where the name is not a string but an instance of type '%s'.", lPair.getLeft() == null ? "null" : lPair.getLeft().getClass().getCanonicalName()));
-                String lPairName = (String) lPair.getLeft();
-                boolean found = false;
-                for (int j = 0; j < named.length; j++) {
-                    if (named[j].getName().equals(lPairName)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                    throw new ArgSpecException(String.format("Found an unexpected named argument '%s'.", lPairName));
-            }
-        }
-        return lNewArgs;
+        int firstNamedArg = args.length - 1;
+        while (firstNamedArg > 0 && (args[firstNamedArg] instanceof Pair)) firstNamedArg--;
+        // Now we can resolve the namedArgs arguments within this range.
+        resolveNamedArgs(args, ctx, newArgs, newArgsEnd, firstNamedArg);
+        return newArgs;
     }
+
 }

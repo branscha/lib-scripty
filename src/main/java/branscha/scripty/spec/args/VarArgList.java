@@ -34,99 +34,62 @@ import branscha.scripty.parser.Pair;
  * It is the same type that can occur min to max times. A repetition of the same type.
  * Eg. a list of 1 or more integers.
  * 3. Named (optional or required). These are pairs at the end of the command line.
- * The named parameters can have a default value.
+ * The namedArgs parameters can have a default value.
  * <p>
  * Warning: The fixed args will be put first in the argument list.
- * After that, the (!) named args will be put in the list.
+ * After that, the (!) namedArgs args will be put in the list.
  * Finally, the variable part.
  */
-public class VarArgList implements ArgList {
+public class VarArgList extends AbstractArgList {
 
-    private FixedArg req[];
-    private VarArg var;
-    private NamedArg[] named;
-    int min, max;
+    private VarArg varArg;
+    private int min, max;
 
-    public VarArgList(FixedArg aReq[], VarArg aVar, int aMin, int aMax, NamedArg[] aNamed) {
-        req = aReq;
-        var = aVar;
-        named = aNamed;
-        min = aMin;
-        max = aMax;
+    public VarArgList(FixedArg[] fixedArgs, VarArg varArg, int minOccurs, int maxOccurs, NamedArg[] namedArgs) {
+        super(fixedArgs, namedArgs);
+        this.varArg = varArg;
+        min = minOccurs;
+        max = maxOccurs;
     }
 
     /**
      * The args are expected to have the form ("CMD", arg-1, arg-2, ... arg-n).
      * The result is in this order:
      * - First the fixed.
-     * - Then !!! the named.
+     * - Then !!! the namedArgs.
      * - Lastly the varargs.
      */
-    public Object[] guard(Object[] aArgs, Context aCtx)
+    public Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException {
         // We look for all pairs at the end of the argument list. We will only
         // consider these trailing pairs.
-        int lStartNamed = aArgs.length - 1;
-        while (lStartNamed > 0 && (aArgs[lStartNamed] instanceof Pair)) lStartNamed--;
-        int lNrVar = lStartNamed - req.length;
-        if (lNrVar < 0) lNrVar = 0;
+        int firstNamedArg = args.length - 1;
+        while (firstNamedArg > 0 && (args[firstNamedArg] instanceof Pair)) firstNamedArg--;
+        int nrVarArgs = firstNamedArg - fixedArgs.length;
+        if (nrVarArgs < 0) nrVarArgs = 0;
 
-        if (min >= 0 && lNrVar < min)
-            throw new ArgSpecException(String.format("Too few arguments of type '%s'. Expected at least %d and received %d.", var.getSpecName(), min, lNrVar));
-        if (max >= 0 && lNrVar > max)
-            throw new ArgSpecException(String.format("Too many arguments of type '%s'. Expected at most %d and received %d.", var.getSpecName(), max, lNrVar));
+        if (min >= 0 && nrVarArgs < min)
+            throw new ArgSpecException(String.format("Too few arguments of type '%s'. Expected at least %d and received %d.", varArg.getSpecName(), min, nrVarArgs));
+        if (max >= 0 && nrVarArgs > max)
+            throw new ArgSpecException(String.format("Too many arguments of type '%s'. Expected at most %d and received %d.", varArg.getSpecName(), max, nrVarArgs));
 
-        // Create a new argument list where we will accumulate the
-        // converted results.
-        Object[] lNewArgs = new Object[1 + req.length + lNrVar + named.length];
+        // Create a new argument list where we will accumulate the converted results.
+        Object[] newArgs = new Object[1 + fixedArgs.length + nrVarArgs + namedArgs.length];
         // Copy the command name to the new argument list, the structure will remain the same.
-        lNewArgs[0] = aArgs[0];
+        int newArgsEnd = resolveFixedArgs(args, ctx, newArgs);
 
-        // Check the fixed.
-        if (aArgs.length - 1 < req.length)
-            throw new ArgSpecException(String.format("Too few arguments. Expected at least %d arguments but received %d.", req.length, aArgs.length - 1));
+        // Check the namedArgs args.
+        // We look for all pairs at the end of the argument list. We will only consider these trailing pairs.
+        while (firstNamedArg > 0 && (args[firstNamedArg] instanceof Pair)) firstNamedArg--;
+        // Now we can resolve the namedArgs arguments within this range.
+        newArgsEnd = resolveNamedArgs(args, ctx, newArgs, newArgsEnd, firstNamedArg);
 
-        // We skip the command name.
-        int lArgIdx = 1;
-        for (int i = 0; i < req.length; i++) {
-            lNewArgs[lArgIdx] = req[i].guard(aArgs, lArgIdx++, aCtx);
+        // Check the varArg ones.
+        // Start looking after the fixed args, Provide the expected index. Skip the cmd in the beginning of the arguments.
+        final int firstVarArg = 1 + fixedArgs.length;
+        for (int i = 0; i < nrVarArgs; i++) {
+            newArgs[newArgsEnd++] = varArg.guard(args, firstVarArg + i, ctx);
         }
-
-        // Check the named args.
-        // We look for all pairs at the end of the argument list. We will only
-        // consider these trailing pairs.
-        while (lStartNamed > 0 && (aArgs[lStartNamed] instanceof Pair)) lStartNamed--;
-        // Now we can resolve the named arguments within this range.
-        for (ArgSpec lSpec : named) {
-            lNewArgs[lArgIdx++] = lSpec.guard(aArgs, lStartNamed, aCtx);
-        }
-        // Finally we go looking for spurious named parameters that were not specified ...
-        for (int i = lStartNamed; i < aArgs.length; i++) {
-            if (aArgs[i] instanceof Pair) {
-                final Pair lPair = (Pair) aArgs[i];
-                if (!(lPair.getLeft() instanceof String))
-                    throw new ArgSpecException(String.format("Found an badly formed named argument, where the name is not a string but an instance of type '%s'.", lPair.getLeft() == null ? "null" : lPair.getLeft().getClass().getCanonicalName()));
-                String lPairName = (String) lPair.getLeft();
-                boolean found = false;
-                for (int j = 0; j < named.length; j++) {
-                    if (named[j].getName().equals(lPairName)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                    throw new ArgSpecException(String.format("Found an unexpected named argument '%s'.", lPairName));
-            }
-        }
-
-        // Check the var ones.
-        // Start looking after the fixed args,
-        // Provide the expected index.
-        // Skip the cmd in the beginning of the arguments.
-        final int lStartVar = 1 + req.length;
-        for (int i = 0; i < lNrVar; i++) {
-            lNewArgs[lArgIdx++] = var.guard(aArgs, lStartVar + i, aCtx);
-        }
-        return lNewArgs;
+        return newArgs;
     }
 }

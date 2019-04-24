@@ -33,16 +33,16 @@ import java.awt.*;
 public class ExitLibrary {
     @ScriptyCommand
     @ScriptyStdArgList(optional = {@ScriptyArg(name = "code", type = "Integer", value = "0")})
-    public static void exit(@ScriptyParam("code") Integer aCode) {
+    public static void exit(@ScriptyParam("code") Integer exitCode) {
         final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        final boolean lIsHeadless = ge.isHeadless();
-        if (lIsHeadless) {
+        final boolean isHeadless = ge.isHeadless();
+        if (!isHeadless) {
             // We have to close all frames. Closing our main frame is not enough,
             // since the help system for instance creates other frames that have to be disposed as well.
-            for (Frame lAppFrm : JFrame.getFrames()) lAppFrm.dispose();
+            for (Frame frame : JFrame.getFrames()) frame.dispose();
         }
         else {
-            System.exit(aCode);
+            System.exit(exitCode);
         }
     }
 }

@@ -34,16 +34,14 @@ import java.io.PrintWriter;
 @ScriptyLibrary(name = "System", type = ScriptyLibraryType.STATIC)
 public class PrintLibrary {
     @ScriptyCommand
-    public static String print(Object[] aArgs,
-                               @ScriptyBindingParam("*output") PrintWriter aWriter) {
+    public static String print(Object[] aArgs, @ScriptyBindingParam("*output") PrintWriter aWriter) {
         final String lResult = buildString(aArgs);
         if (aWriter != null) aWriter.print(lResult);
         return lResult;
     }
 
     @ScriptyCommand
-    public static String println(Object[] aArgs,
-                                 @ScriptyBindingParam("*output") PrintWriter aWriter) {
+    public static String println(Object[] aArgs, @ScriptyBindingParam("*output") PrintWriter aWriter) {
         final String lResult = buildString(aArgs);
         if (aWriter != null) aWriter.println(lResult);
         return lResult;

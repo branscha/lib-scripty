@@ -30,6 +30,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * An argument list definition which can be used to define the interface of a command. The type checks will be verified
+ * when the command is invoked.
+ *
  * A standard argument list with the structure:
  * <ul>
  * <li>A fixed number of required {@link ScriptyArg}.</li>
@@ -41,14 +44,26 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyStdArgList {
     /**
-     * The name of the argument list so that it can be reused later using {@link ScriptyRefArgList}.
+     * The name of the argument list so that it can be referenced later using {@link ScriptyRefArgList}.
+     * The argument list can be defined before it is used (potentially multiple times).
      */
     String name() default "";
 
+    /**
+     * The array of positional argument descriptors. They are required and have a fixed location.
+     * This is the standard type of parameter.
+     */
     ScriptyArg[] fixed() default {};
 
-
+    /**
+     * The array of optional arguments which can have default values when not provided explicitly.
+     * These are positional as well.
+     */
     ScriptyArg[] optional() default {};
 
+    /**
+     * The named arguments are last and are provided using key=value pairs. The can be optional or
+     * required, depending on the definition.
+     */
     ScriptyArg[] named() default {};
 }

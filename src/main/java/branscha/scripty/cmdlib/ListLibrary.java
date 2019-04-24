@@ -32,11 +32,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Some Lisp like commands that act on lists. This module provides the basic
- * data manipulation commands, they are not built-in but provided as a separate module.
- * The semantics deviates from common lisp because we based our lists on Java lists and not on cons constructs.
- * Consing for example modifies the existing list, while in Lisp it creates a new version, the original binding refers to the sublist.
- * This can lead to surprising results if one is used to the original Lisp semantics.
+ * Some Lisp like commands that act on lists. This module provides the basic data manipulation commands, they are not
+ * built-in but provided as a separate module. The semantics deviates from common lisp because we based our lists on
+ * Java lists and not on cons constructs. Consing for example modifies the existing list, while in Lisp it creates a
+ * new version, the original binding refers to the sublist. This can lead to surprising results if one is used to the
+ * original Lisp semantics.
  * <p>
  * <ul>
  * <li><b>list?</b> A test to see if the argument is a list or not. The other command types are only applicable if this test turns out positive.</li>
