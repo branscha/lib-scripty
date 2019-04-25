@@ -32,24 +32,24 @@ public class ByteType implements TypeSpec<Byte> {
         return "Byte";
     }
 
-    public Byte guard(Object aArg, Context aCtx)
+    public Byte guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof Byte) {
-            return (Byte) aArg;
+        if (arg instanceof Byte) {
+            return (Byte) arg;
         }
-        else if (aArg instanceof Number) {
-            return ((Number) aArg).byteValue();
+        else if (arg instanceof Number) {
+            return ((Number) arg).byteValue();
         }
-        else if (aArg instanceof String) {
+        else if (arg instanceof String) {
             try {
-                return Byte.parseByte((String) aArg);
+                return Byte.parseByte((String) arg);
             }
             catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
             }
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

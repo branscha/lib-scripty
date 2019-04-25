@@ -629,15 +629,15 @@ public class TestArgListBuilderUtil {
         }
     }
 
-    public static class CustomSpec
-            implements TypeSpec {
+    public static class CustomSpec implements TypeSpec {
+
         private Pattern pattern = Pattern.compile("a+b*");
 
-        public Object guard(Object aArg, Context aCtx)
+        public Object guard(Object arg, Context ctx)
         throws TypeSpecException {
-            if (aArg instanceof String) {
-                Matcher lMatcher = pattern.matcher(((String) aArg));
-                if (lMatcher.matches()) return aArg;
+            if (arg instanceof String) {
+                Matcher lMatcher = pattern.matcher(((String) arg));
+                if (lMatcher.matches()) return arg;
             }
             throw new TypeSpecException("Not a+b*.");
         }

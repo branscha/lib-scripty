@@ -28,30 +28,30 @@ import java.math.BigDecimal;
 
 import branscha.scripty.parser.Context;
 
-public class BigDecimalType
-        implements TypeSpec<BigDecimal> {
+public class BigDecimalType implements TypeSpec<BigDecimal> {
+
     public String getSpecName() {
         return "BigDecimal";
     }
 
-    public BigDecimal guard(Object aArg, Context aCtx)
+    public BigDecimal guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof BigDecimal) {
-            return (BigDecimal) aArg;
+        if (arg instanceof BigDecimal) {
+            return (BigDecimal) arg;
         }
-        else if (aArg instanceof Number) {
-            return new BigDecimal(((Number) aArg).doubleValue());
+        else if (arg instanceof Number) {
+            return new BigDecimal(((Number) arg).doubleValue());
         }
-        else if (aArg instanceof String) {
+        else if (arg instanceof String) {
             try {
-                return new BigDecimal((String) aArg);
+                return new BigDecimal((String) arg);
             }
             catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
             }
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

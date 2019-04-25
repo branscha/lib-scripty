@@ -25,21 +25,27 @@
 package branscha.scripty.spec.type;
 
 public class TypeUtil {
+
+    private static final String ERR010 = "TypeUtil/010: Expected type '%s' and received null value.";
+    private static final String ERR020 = "TypeUtil/020: Expected type '%s' and received incompatible type '%s' value '%s'.";
+    private static final String ERR030 = "TypeUtil/030: Expected type '%s' and received null value.";
+    private static final String ERR040 = "TypeUtil/040: Expected type '%s' and received incompatible string representation '%s'.";
+
     public static final String msgExpectedOther(String aExpected, Object aObj) {
         String lMsg;
         if (aObj == null)
-            lMsg = String.format("Expected type '%s' and received null value.", aExpected);
+            lMsg = String.format(ERR010, aExpected);
         else
-            lMsg = String.format("Expected type '%s' and received incompatible type '%s' value '%s'.", aExpected, aObj.getClass().getCanonicalName(), aObj.toString());
+            lMsg = String.format(ERR020, aExpected, aObj.getClass().getCanonicalName(), aObj.toString());
         return lMsg;
     }
 
     public static final String msgBadRepr(String aExpected, String aRepr) {
         String lMsg;
         if (aRepr == null)
-            lMsg = String.format("Expected type '%s' and received null value.", aExpected);
+            lMsg = String.format(ERR030, aExpected);
         else
-            lMsg = String.format("Expected type '%s' and received incompatible string representation '%s'.", aExpected, aRepr);
+            lMsg = String.format(ERR040, aExpected, aRepr);
         return lMsg;
     }
 }

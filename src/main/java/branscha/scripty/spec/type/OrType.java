@@ -26,8 +26,8 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class OrType
-        implements TypeSpec {
+public class OrType implements TypeSpec {
+
     private TypeSpec[] types;
     private String name;
 
@@ -45,11 +45,11 @@ public class OrType
         return name;
     }
 
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
         for (int i = 0; i < types.length; i++) {
             try {
-                return types[i].guard(aArg, aCtx);
+                return types[i].guard(arg, ctx);
             }
             catch (TypeSpecException e) {
                 // Ignore, try the next one!   
@@ -58,6 +58,6 @@ public class OrType
         }
 
         // If we arrive here, then none of the typespecs was true.
-        throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+        throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
     }
 }

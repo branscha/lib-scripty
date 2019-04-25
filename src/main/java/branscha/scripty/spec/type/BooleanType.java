@@ -26,21 +26,21 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class BooleanType
-        implements TypeSpec<Boolean> {
+public class BooleanType implements TypeSpec<Boolean> {
+
     public static final TypeSpec<Boolean> BOOLEAN_TYPE = new BooleanType();
 
     public String getSpecName() {
         return "Boolean";
     }
 
-    public Boolean guard(Object aArg, Context aCtx)
+    public Boolean guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof Boolean) {
-            return (Boolean) aArg;
+        if (arg instanceof Boolean) {
+            return (Boolean) arg;
         }
-        else if (aArg instanceof String) {
-            final String lStr = ((String) aArg).trim().toLowerCase();
+        else if (arg instanceof String) {
+            final String lStr = ((String) arg).trim().toLowerCase();
             if ("true".equals(lStr) || "on".equals(lStr) || "yes".equals(lStr) || "ok".equals(lStr))
                 return Boolean.TRUE;
             else if ("false".equals(lStr) || "off".equals(lStr) || "no".equals(lStr) || "nok".equals(lStr))
@@ -48,7 +48,7 @@ public class BooleanType
             else throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), lStr));
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

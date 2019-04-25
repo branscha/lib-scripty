@@ -46,6 +46,7 @@ public class VarArgList extends AbstractArgList {
     private int min, max;
 
     public VarArgList(FixedArg[] fixedArgs, VarArg varArg, int minOccurs, int maxOccurs, NamedArg[] namedArgs) {
+
         super(fixedArgs, namedArgs);
         this.varArg = varArg;
         min = minOccurs;
@@ -61,6 +62,10 @@ public class VarArgList extends AbstractArgList {
      */
     public Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException {
+        if(args == null || args.length < 1) {
+            throw new ArgSpecException("Badly formed argument list. It should ad least start with the command name.");
+        }
+
         // We look for all pairs at the end of the argument list. We will only
         // consider these trailing pairs.
         int firstNamedArg = args.length - 1;

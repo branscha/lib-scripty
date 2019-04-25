@@ -26,30 +26,30 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class ShortType
-        implements TypeSpec {
+public class ShortType implements TypeSpec {
+
     public String getSpecName() {
         return "Short";
     }
 
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof Short) {
-            return aArg;
+        if (arg instanceof Short) {
+            return arg;
         }
-        else if (aArg instanceof Number) {
-            return ((Number) aArg).shortValue();
+        else if (arg instanceof Number) {
+            return ((Number) arg).shortValue();
         }
-        else if (aArg instanceof String) {
+        else if (arg instanceof String) {
             try {
-                return Short.parseShort((String) aArg);
+                return Short.parseShort((String) arg);
             }
             catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
             }
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

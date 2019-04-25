@@ -41,6 +41,8 @@ import branscha.scripty.spec.type.TypeSpecException;
  */
 public class OptionalArg implements ArgSpec {
 
+    private static final String ERR010 = "OptionalArg/010: Optional argument at position %d: %s";
+
     private TypeSpec spec;
     private String specName;
     private Object defaultVal;
@@ -63,7 +65,7 @@ public class OptionalArg implements ArgSpec {
             else return spec.guard(aArgs[aPos], aCtx);
         }
         catch (TypeSpecException e) {
-            throw new ArgSpecException(String.format("Optional argument at position %d: %s", aPos, e.getMessage()));
+            throw new ArgSpecException(String.format(ERR010, aPos, e.getMessage()));
         }
     }
 }

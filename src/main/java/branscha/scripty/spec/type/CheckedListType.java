@@ -30,8 +30,8 @@ import java.util.ListIterator;
 
 import branscha.scripty.parser.Context;
 
-public class CheckedListType
-        implements TypeSpec {
+public class CheckedListType implements TypeSpec {
+
     private TypeSpec spec;
     private int min;
     private int max;
@@ -57,11 +57,11 @@ public class CheckedListType
     }
 
     @SuppressWarnings("unchecked")
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (!(aArg instanceof List))
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
-        final List lListArg = (List) aArg;
+        if (!(arg instanceof List))
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+        final List lListArg = (List) arg;
 
         if (min >= 0 && lListArg.size() < min)
             throw new TypeSpecException(String.format("Not enough elements in the list. There should be at least %d elements.", min));
@@ -75,7 +75,7 @@ public class CheckedListType
             while (lIter.hasNext()) {
                 Object lObj = lIter.next();
                 lIter.remove();
-                lIter.add(spec.guard(lObj, aCtx));
+                lIter.add(spec.guard(lObj, ctx));
             }
             return lListArg;
         }
@@ -85,7 +85,7 @@ public class CheckedListType
             //
             final List lNewList = new ArrayList(lListArg.size());
             for (Object lArg : lListArg) {
-                lNewList.add(spec.guard(lArg, aCtx));
+                lNewList.add(spec.guard(lArg, ctx));
             }
             return lNewList;
         }

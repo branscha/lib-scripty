@@ -27,9 +27,10 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 /**
- * Specification of a type. A TypeSpec is associated with an {@link branscha.scripty.spec.args.ArgSpec} subclass
- * by means of a {@link branscha.scripty.annot.ScriptyArg} annotation. By associating a type with an argument
- * description the eval engine will check the parameter passed to the command and can do a conversion if necessary.
+ * Specification of a type that is part of the Scripty type system. A TypeSpec is associated with an
+ * {@link branscha.scripty.spec.args.ArgSpec} subclass by means of a {@link branscha.scripty.annot.ScriptyArg} annotation.
+ * By associating a type with an argument description the eval engine can check the parameter passed to the command and
+ * can do a conversion if necessary.
  *
  * It is the root of a complete type system.
  *
@@ -39,12 +40,12 @@ public interface TypeSpec<T> {
 
     /**
      * Verify that an object satisfies the type.
-     * @param aArg The object that needs verification.
-     * @param aCtx The eval context.
+     * @param arg The object that needs verification.
+     * @param ctx The eval context.
      * @return The checked object (which could have been converted).
      * @throws TypeSpecException
      */
-    T guard(Object aArg, Context aCtx)
+    T guard(Object arg, Context ctx)
     throws TypeSpecException;
 
     String getSpecName();

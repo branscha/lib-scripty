@@ -26,19 +26,19 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class StringType
-        implements TypeSpec {
+public class StringType implements TypeSpec {
+
     public static final StringType STRING_TYPE = new StringType();
 
     public String getSpecName() {
         return "String";
     }
 
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof String) return aArg;
+        if (arg instanceof String) return arg;
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

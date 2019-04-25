@@ -29,10 +29,13 @@ import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
 /**
- * Represents a single fixed argument. Fixed arguments are positional (have a fixed location) and type.
- * They are required, the user has to provide them.
+ * Represents a single fixed argument. Fixed arguments are positional (have a fixed location) and type. Their position
+ * is enough to identify them so they don't need a name. They are required, the user has to provide them.
  */
 public class FixedArg implements ArgSpec {
+
+    private static final String ERR010 = "FixedArg/010: The required argument at position %d, type %s missing.";
+    private static final String ERR020 = "FixedArg/020: The required argument at position %d: %s";
 
     private TypeSpec spec;
     private String specName;
@@ -50,11 +53,11 @@ public class FixedArg implements ArgSpec {
     throws ArgSpecException {
         try {
             if (aPos < 0 || aPos >= aArgs.length)
-                throw new ArgSpecException(String.format("The required argument at position %d, type %s missing.", aPos, spec.getSpecName()));
+                throw new ArgSpecException(String.format(ERR010, aPos, spec.getSpecName()));
             else return spec.guard(aArgs[aPos], aCtx);
         }
         catch (TypeSpecException e) {
-            throw new ArgSpecException(String.format("The required argument at position %d: %s", aPos, e.getMessage()));
+            throw new ArgSpecException(String.format(ERR020, aPos, e.getMessage()));
         }
     }
 }

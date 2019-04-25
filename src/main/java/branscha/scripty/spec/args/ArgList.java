@@ -27,9 +27,19 @@ package branscha.scripty.spec.args;
 import branscha.scripty.parser.Context;
 
 /**
- * A complete argument list.
+ * A complete argument list specification. When it is applied to a argument array that was provided to a command, it
+ * will verify the types of all the arguments (type checking) and supply the missing optional arguments (completion)
+ * which have a default value.
  */
 public interface ArgList {
-    Object[] guard(Object[] aArgs, Context aCtx)
+    /**
+     * Do the magic on the arguments: provide the missing optional and named arguments, and check the type of the
+     * arguments.
+     * @param args The arguments that should be completed and tested.
+     * @param ctx The contents of the context can be used for some verifications.
+     * @return The completed argument list. It will be longer than or equal to the provided argument list.
+     * @throws ArgSpecException
+     */
+    Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException;
 }

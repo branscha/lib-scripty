@@ -27,6 +27,7 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 public class IntegerRangeType implements TypeSpec {
+
     private int from;
     private int to;
     private IntegerType intSpec = new IntegerType();
@@ -40,11 +41,11 @@ public class IntegerRangeType implements TypeSpec {
         return String.format("IntegerRange %d...%d", from, to);
     }
 
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        final Integer lInt = (Integer) intSpec.guard(aArg, aCtx);
+        final Integer lInt = (Integer) intSpec.guard(arg, ctx);
         if (lInt < from || lInt > to)
-            throw new TypeSpecException(String.format("Value out of range. Expected type '%s' and received an incompatible type '%s' value '%s'.", getSpecName(), aArg.getClass().getCanonicalName(), aArg.toString()));
+            throw new TypeSpecException(String.format("Value out of range. Expected type '%s' and received an incompatible type '%s' value '%s'.", getSpecName(), arg.getClass().getCanonicalName(), arg.toString()));
         else return lInt;
     }
 }

@@ -26,30 +26,30 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class LongType
-        implements TypeSpec<Long> {
+public class LongType implements TypeSpec<Long> {
+
     public String getSpecName() {
         return "Long";
     }
 
-    public Long guard(Object aArg, Context aCtx)
+    public Long guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof Long) {
-            return (Long) aArg;
+        if (arg instanceof Long) {
+            return (Long) arg;
         }
-        else if (aArg instanceof Number) {
-            return ((Number) aArg).longValue();
+        else if (arg instanceof Number) {
+            return ((Number) arg).longValue();
         }
-        else if (aArg instanceof String) {
+        else if (arg instanceof String) {
             try {
-                return Long.parseLong((String) aArg);
+                return Long.parseLong((String) arg);
             }
             catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
             }
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

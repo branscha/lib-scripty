@@ -28,27 +28,27 @@ import java.math.BigInteger;
 
 import branscha.scripty.parser.Context;
 
-public class BigIntegerType
-        implements TypeSpec<BigInteger> {
+public class BigIntegerType implements TypeSpec<BigInteger> {
+
     public String getSpecName() {
         return "BigInteger";
     }
 
-    public BigInteger guard(Object aArg, Context aCtx)
+    public BigInteger guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof BigInteger) {
-            return (BigInteger) aArg;
+        if (arg instanceof BigInteger) {
+            return (BigInteger) arg;
         }
-        else if (aArg instanceof String || aArg instanceof Number) {
+        else if (arg instanceof String || arg instanceof Number) {
             try {
-                return new BigInteger(aArg.toString());
+                return new BigInteger(arg.toString());
             }
             catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
             }
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

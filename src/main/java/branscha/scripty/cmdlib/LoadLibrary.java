@@ -185,17 +185,17 @@ public class LoadLibrary {
     }
 
     @SuppressWarnings("unused")
-    public static class LoaderType
-            implements TypeSpec {
+    public static class LoaderType implements TypeSpec {
+
         public String getSpecName() {
             return "loader";
         }
 
-        public Object guard(Object aArg, Context aCtx)
+        public Object guard(Object arg, Context ctx)
         throws TypeSpecException {
             Loader lCandLdr;
-            if (aArg instanceof String) {
-                String lPath = (String) aArg;
+            if (arg instanceof String) {
+                String lPath = (String) arg;
                 if (lPath.startsWith("classpath:")) {
                     lCandLdr = new ClasspathLoader(lPath.substring(10));
                 }
@@ -207,13 +207,13 @@ public class LoadLibrary {
                     lCandLdr = new FileLoader(lPath);
                 }
             }
-            else if (aArg instanceof File) {
+            else if (arg instanceof File) {
                 // Easy for us.
-                lCandLdr = new FileLoader((File) aArg);
+                lCandLdr = new FileLoader((File) arg);
             }
             else {
                 // Don't know how to handle this.
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), aArg.toString()));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), arg.toString()));
             }
 
             try {

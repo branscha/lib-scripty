@@ -31,6 +31,9 @@ import branscha.scripty.spec.type.TypeSpecException;
 
 public class NamedArg implements ArgSpec {
 
+    private static final String ERR010 = "NamedArg/010: Named argument '%s': %s";
+    private static final String ERR020 = "NamedArg/020: Missing named argument '%s'.";
+
     private String paramName;
     private Object value;
     private TypeSpec valueSpec;
@@ -62,7 +65,7 @@ public class NamedArg implements ArgSpec {
                         return lNewPair.getRight();
                     }
                     catch (TypeSpecException e) {
-                        throw new ArgSpecException(String.format("Named argument '%s': %s", paramName, e.getMessage()));
+                        throw new ArgSpecException(String.format(ERR010, paramName, e.getMessage()));
                     }
                 }
             }
@@ -70,7 +73,7 @@ public class NamedArg implements ArgSpec {
 
         try {
             if (optional) return valueSpec.guard(value, aCtx);
-            else throw new ArgSpecException(String.format("Missing named argument '%s'.", paramName));
+            else throw new ArgSpecException(String.format(ERR020, paramName));
         }
         catch (TypeSpecException e) {
             throw new ArgSpecException(e.getMessage());

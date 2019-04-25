@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EnumType
-        implements TypeSpec {
+public class EnumType implements TypeSpec {
+
     private List<String> values = new ArrayList<String>();
 
     public EnumType(List<String> aValues) {
@@ -42,12 +42,12 @@ public class EnumType
         values.addAll(Arrays.asList(aValues));
     }
 
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg == null || !values.contains(aArg.toString())) {
-            throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+        if (arg == null || !values.contains(arg.toString())) {
+            throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
         }
-        return aArg.toString();
+        return arg.toString();
     }
 
     public String getSpecName() {

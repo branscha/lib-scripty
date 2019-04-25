@@ -26,30 +26,30 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class FloatType
-        implements TypeSpec {
+public class FloatType implements TypeSpec {
+
     public String getSpecName() {
         return "Float";
     }
 
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg instanceof Float) {
-            return aArg;
+        if (arg instanceof Float) {
+            return arg;
         }
-        else if (aArg instanceof Number) {
-            return ((Number) aArg).floatValue();
+        else if (arg instanceof Number) {
+            return ((Number) arg).floatValue();
         }
-        else if (aArg instanceof String) {
+        else if (arg instanceof String) {
             try {
-                return Float.parseFloat((String) aArg);
+                return Float.parseFloat((String) arg);
             }
             catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
             }
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 }

@@ -26,26 +26,26 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class InstanceOrBinding
-        implements TypeSpec {
+public class InstanceOrBinding implements TypeSpec {
+
     private TypeSpec innerSpec;
 
     public InstanceOrBinding(TypeSpec aSpec) {
         innerSpec = aSpec;
     }
 
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
         try {
-            if (aArg instanceof String && aCtx.isBound((String) aArg)) {
-                aArg = aCtx.getBinding((String) aArg);
+            if (arg instanceof String && ctx.isBound((String) arg)) {
+                arg = ctx.getBinding((String) arg);
             }
-            return innerSpec.guard(aArg, aCtx);
+            return innerSpec.guard(arg, ctx);
         }
         catch (TypeSpecException e) {
             // Convert the exception from the inner type spec to 
             // our own message. We hijack the exception here.
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg), e);
+            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg), e);
         }
     }
 

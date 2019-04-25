@@ -26,8 +26,8 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
-public class InstanceType
-        implements TypeSpec {
+public class InstanceType implements TypeSpec {
+
     private Class requiredClass;
     private boolean allowsNull = false;
     private String typeName;
@@ -43,16 +43,16 @@ public class InstanceType
     }
 
     @SuppressWarnings("unchecked")
-    public Object guard(Object aArg, Context aCtx)
+    public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        if (aArg == null) {
+        if (arg == null) {
             if (allowsNull) return null;
             else
                 throw new TypeSpecException(String.format("Null value. Expected type '%s' and null is not allowed.", typeName));
         }
         else {
-            if (requiredClass.isAssignableFrom(aArg.getClass())) return aArg;
-            else throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+            if (requiredClass.isAssignableFrom(arg.getClass())) return arg;
+            else throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
         }
     }
 
