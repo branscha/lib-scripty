@@ -44,7 +44,7 @@ public class BigIntegerType implements TypeSpec<BigInteger> {
                 return new BigInteger(arg.toString());
             }
             catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
+                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), arg.toString()));
             }
         }
         else {

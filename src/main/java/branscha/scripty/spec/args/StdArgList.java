@@ -51,7 +51,7 @@ public class StdArgList extends AbstractArgList {
      */
     public static final ArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
 
-    private static final String ERR010 = "StdArgList/010: Badly formed argument list. It should ad least contain with the command name.";
+    private static final String ERR010 = "StdArgList/010: Badly formed argument list. It should at least contain the command name.";
     private static final String ERR020 = "StdArgList/020: Too many arguments. Expected at most %d arguments.";
 
     private OptionalArg[] optArgs;

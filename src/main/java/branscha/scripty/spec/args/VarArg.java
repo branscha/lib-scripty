@@ -43,15 +43,15 @@ public class VarArg implements ArgSpec {
         return specName;
     }
 
-    public Object guard(Object[] aArgs, int aPos, Context aCtx)
+    public Object guard(Object[] args, int pos, Context ctx)
     throws ArgSpecException {
         try {
-            if (aPos < 0 || aPos >= aArgs.length || aArgs[aPos] instanceof Pair)
-                throw new ArgSpecException(String.format("Var argument at position %d: argument not present or type Pair found.", aPos));
-            else return spec.guard(aArgs[aPos], aCtx);
+            if (pos < 0 || pos >= args.length || args[pos] instanceof Pair)
+                throw new ArgSpecException(String.format("Var argument at position %d: argument not present or type Pair found.", pos));
+            else return spec.guard(args[pos], ctx);
         }
         catch (TypeSpecException e) {
-            throw new ArgSpecException(String.format("Var argument at position %d: %s", aPos, e.getMessage()));
+            throw new ArgSpecException(String.format("Var argument at position %d: %s", pos, e.getMessage()));
         }
     }
 }

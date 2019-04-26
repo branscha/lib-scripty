@@ -28,7 +28,6 @@ import branscha.scripty.parser.Context;
 
 public class IntegerType implements TypeSpec {
 
-    @Deprecated
     public static final IntegerType INTEGER_TYPE = new IntegerType();
 
     public String getSpecName() {

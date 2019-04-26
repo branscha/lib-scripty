@@ -25,6 +25,7 @@
 package branscha.scripty.spec.type;
 
 public class AnyType extends InstanceType {
+
     public AnyType(boolean aNullAllowed) {
         super(Object.class, aNullAllowed);
     }

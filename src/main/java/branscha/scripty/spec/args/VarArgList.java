@@ -27,20 +27,28 @@ package branscha.scripty.spec.args;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * There are 3 types of parameters in a variable argument list.
- * 1. Fixed (always required) arguments, each argument has its own type.
- * 2. Variable length. These all have the same type. These cannot be pairs.
- * It is the same type that can occur min to max times. A repetition of the same type.
- * Eg. a list of 1 or more integers.
- * 3. Named (optional or required). These are pairs at the end of the command line.
- * The namedArgs parameters can have a default value.
+ *
+ * <ol>
+ * <li>Fixed (always required) arguments, each argument has its own type.</li>
+ * <li>Variable length. These all have the same type. These cannot be pairs.
+ * It is the same type that can occur min to max times. A repetition of the same type. Eg. a list of 1 or more integers.</li>
+ * <li>Named (optional or required). These are pairs at the end of the command line. The namedArgs parameters can have a default value.</li>
+ * </ol>
  * <p>
  * Warning: The fixed args will be put first in the argument list.
  * After that, the (!) namedArgs args will be put in the list.
  * Finally, the variable part.
  */
 public class VarArgList extends AbstractArgList {
+
+    private static final String ERR010 = "VarArgList/010: Badly formed argument list. It should at least start with the command name.";
+    private static final String ERR020 = "VarArgList/020: Too few arguments of type '%s'. Expected at least %d and received %d.";
+    private static final String ERR030 = "VarArgList/030: Too many arguments of type '%s'. Expected at most %d and received %d.";
 
     private VarArg varArg;
     private int min, max;
@@ -63,7 +71,7 @@ public class VarArgList extends AbstractArgList {
     public Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException {
         if(args == null || args.length < 1) {
-            throw new ArgSpecException("Badly formed argument list. It should ad least start with the command name.");
+            throw new ArgSpecException(ERR010);
         }
 
         // We look for all pairs at the end of the argument list. We will only
@@ -74,9 +82,9 @@ public class VarArgList extends AbstractArgList {
         if (nrVarArgs < 0) nrVarArgs = 0;
 
         if (min >= 0 && nrVarArgs < min)
-            throw new ArgSpecException(String.format("Too few arguments of type '%s'. Expected at least %d and received %d.", varArg.getSpecName(), min, nrVarArgs));
+            throw new ArgSpecException(String.format(ERR020, varArg.getSpecName(), min, nrVarArgs));
         if (max >= 0 && nrVarArgs > max)
-            throw new ArgSpecException(String.format("Too many arguments of type '%s'. Expected at most %d and received %d.", varArg.getSpecName(), max, nrVarArgs));
+            throw new ArgSpecException(String.format(ERR030, varArg.getSpecName(), max, nrVarArgs));
 
         // Create a new argument list where we will accumulate the converted results.
         Object[] newArgs = new Object[1 + fixedArgs.length + nrVarArgs + namedArgs.length];
@@ -96,5 +104,36 @@ public class VarArgList extends AbstractArgList {
             newArgs[newArgsEnd++] = varArg.guard(args, firstVarArg + i, ctx);
         }
         return newArgs;
+    }
+
+    public static class Builder {
+        private List<FixedArg> fixed = new ArrayList<>();
+        private List<NamedArg> named = new ArrayList<>();
+        private VarArg varArg;
+        private int minOccurs=0, maxOccurs=-1;
+
+        public VarArgList build() {
+            return new VarArgList(
+                    fixed.toArray(new FixedArg[0]),
+                    varArg, minOccurs, maxOccurs,
+                    named.toArray(new NamedArg[0]));
+        }
+
+        public VarArgList.Builder addFixed(FixedArg arg) {
+            fixed.add(arg);
+            return this;
+        }
+
+        public VarArgList.Builder addNamed(NamedArg arg) {
+            named.add(arg);
+            return this;
+        }
+
+        public VarArgList.Builder addVarArg(VarArg arg, int minOccurs, int maxOccurs) {
+            this.varArg = arg;
+            this.minOccurs = minOccurs;
+            this.maxOccurs = maxOccurs;
+            return this;
+        }
     }
 }
