@@ -24,14 +24,12 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
+/**
+ * A type generator for Object instances. There is a type for nullable instances and a type for non-nullable
+ * instances.
+ */
 public class AnyType extends InstanceType {
-
-    public AnyType(boolean aNullAllowed) {
-        super(Object.class, aNullAllowed);
-    }
-
-    @Override
-    public String getSpecName() {
-        return "Any";
+    public AnyType(boolean nullAllowed) {
+        super(Object.class, "Any" + (nullAllowed ? " nullAllowed=true" : ""), nullAllowed);
     }
 }

@@ -24,32 +24,24 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
+public class DoubleType extends InstanceType {
 
-public class DoubleType implements TypeSpec {
+    public static DoubleType DOUBLE_TYPE = new DoubleType();
 
-    public String getSpecName() {
-        return "Double";
+    DoubleType() {
+        super(Double.class, "Double", false);
     }
 
-    public Object guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof Double) {
-            return arg;
-        }
-        else if (arg instanceof Number) {
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
             return ((Number) arg).doubleValue();
         }
         else if (arg instanceof String) {
-            try {
-                return Double.parseDouble((String) arg);
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
-            }
+            return Double.parseDouble((String) arg);
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

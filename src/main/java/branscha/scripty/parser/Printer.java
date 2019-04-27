@@ -33,21 +33,26 @@ public class Printer {
             }
             else if (sExpr instanceof String) {
                 String str = sExpr.toString();
-                if (str.matches(".*\\s+.*")) {
-                    // The string contains whitespace.
-                    // In order to preserve it we must wrap it with double quotes and translate the whitespace.
-                    str = str.replace("\\", "\\\\");
-                    str = str.replace("\"", "\\");
-                    str = str.replace("\t", "\\t");
-                    str = str.replace("\n", "\\n");
-                    str = "\"" + str + "\"";
-                }
+                str = printString(str);
                 builder.append(str);
             }
             else {
                 builder.append(sExpr);
             }
         }
+    }
+
+    public static String printString(String str) {
+        if (str.matches(".*\\s+.*")) {
+            // The string contains whitespace.
+            // In order to preserve it we must wrap it with double quotes and translate the whitespace.
+            str = str.replace("\\", "\\\\");
+            str = str.replace("\"", "\\");
+            str = str.replace("\t", "\\t");
+            str = str.replace("\n", "\\n");
+            str = "\"" + str + "\"";
+        }
+        return str;
     }
 
     private static void printList(StringBuilder builder, List<Object> sExpr, boolean pretty, String indent) {

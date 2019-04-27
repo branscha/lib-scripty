@@ -24,21 +24,14 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
-
-public class StringType implements TypeSpec {
+/**
+ * String type, a non nullable type.
+ */
+public class StringType extends InstanceType {
 
     public static final StringType STRING_TYPE = new StringType();
 
-    public String getSpecName() {
-        return "String";
-    }
-
-    public Object guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof String) return arg;
-        else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
-        }
+    StringType() {
+        super(String.class, "String", false);
     }
 }

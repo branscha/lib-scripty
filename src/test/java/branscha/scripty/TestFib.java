@@ -36,6 +36,8 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
+import static branscha.scripty.spec.type.BigDecimalType.BIGDECIMAL_TYPE;
+
 public class TestFib {
     private ScriptyStreamProcessor scripty;
 
@@ -47,7 +49,7 @@ public class TestFib {
         scripty.process("(load cp:/fib.lsp)");
     }
 
-    private TypeSpec bdspec = new BigDecimalType();
+    private TypeSpec bdspec = BIGDECIMAL_TYPE;
 
     public BigDecimal fib(int n)
     throws ProcessorException, TypeSpecException {

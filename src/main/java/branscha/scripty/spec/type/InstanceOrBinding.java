@@ -26,12 +26,23 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
+/**
+ * A type generator that accepts both variable names and instances. A variable name will be resolved
+ * in the context and if it is not found it is converted to the inner type specification.
+ */
 public class InstanceOrBinding implements TypeSpec {
 
     private TypeSpec innerSpec;
+    private String typeName;
+
+    public InstanceOrBinding(TypeSpec innerSpec, String specName) {
+        this.innerSpec = innerSpec;
+        this.typeName = specName;
+    }
 
     public InstanceOrBinding(TypeSpec aSpec) {
         innerSpec = aSpec;
+        typeName = "InstanceOrBinding (" + innerSpec.getSpecName() + ")";
     }
 
     public Object guard(Object arg, Context ctx)
@@ -50,6 +61,6 @@ public class InstanceOrBinding implements TypeSpec {
     }
 
     public String getSpecName() {
-        return "Binding or " + innerSpec.getSpecName();
+        return typeName;
     }
 }

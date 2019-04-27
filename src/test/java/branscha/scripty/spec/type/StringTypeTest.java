@@ -23,7 +23,7 @@ public class StringTypeTest {
     public void guard_Bad()
     throws TypeSpecException {
         try {
-            StringType.STRING_TYPE.guard(Integer.valueOf(13), new BasicContext());
+            StringType.STRING_TYPE.guard(13, new BasicContext());
             fail("Expected guard to fail.");
         }
         catch (TypeSpecException e) {

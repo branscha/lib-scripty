@@ -24,32 +24,24 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
+public class FloatType extends InstanceType {
 
-public class FloatType implements TypeSpec {
+    public static final FloatType FLOAT_TYPE = new FloatType();
 
-    public String getSpecName() {
-        return "Float";
+    FloatType() {
+        super(Float.class, "Float", false);
     }
 
-    public Object guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof Float) {
-            return arg;
-        }
-        else if (arg instanceof Number) {
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
             return ((Number) arg).floatValue();
         }
         else if (arg instanceof String) {
-            try {
-                return Float.parseFloat((String) arg);
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
-            }
+            return Float.parseFloat((String) arg);
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

@@ -26,29 +26,21 @@ package branscha.scripty.spec.type;
 
 import java.math.BigInteger;
 
-import branscha.scripty.parser.Context;
+public class BigIntegerType extends InstanceType {
 
-public class BigIntegerType implements TypeSpec<BigInteger> {
+    public static final BigIntegerType BIGINTEGER_TYPE = new BigIntegerType();
 
-    public String getSpecName() {
-        return "BigInteger";
+    BigIntegerType() {
+        super(BigInteger.class, "BigInteger", false);
     }
 
-    public BigInteger guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof BigInteger) {
-            return (BigInteger) arg;
-        }
-        else if (arg instanceof String || arg instanceof Number) {
-            try {
-                return new BigInteger(arg.toString());
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), arg.toString()));
-            }
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof String || arg instanceof Number) {
+            return new BigInteger(arg.toString());
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

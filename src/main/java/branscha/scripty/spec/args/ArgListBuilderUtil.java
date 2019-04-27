@@ -43,6 +43,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static branscha.scripty.spec.type.BigDecimalType.BIGDECIMAL_TYPE;
+import static branscha.scripty.spec.type.BigIntegerType.BIGINTEGER_TYPE;
+import static branscha.scripty.spec.type.BooleanType.BOOLEAN_TYPE;
+import static branscha.scripty.spec.type.ByteType.BYTE_TYPE;
+import static branscha.scripty.spec.type.DoubleType.DOUBLE_TYPE;
+import static branscha.scripty.spec.type.FloatType.FLOAT_TYPE;
+import static branscha.scripty.spec.type.IntegerType.INTEGER_TYPE;
+import static branscha.scripty.spec.type.LongType.LONG_TYPE;
+import static branscha.scripty.spec.type.ShortType.SHORT_TYPE;
+import static branscha.scripty.spec.type.StringType.STRING_TYPE;
+
 /**
  * It uses Scripty itself to create a language to describe types. The users can use these type descriptions in
  * the annotations.
@@ -54,26 +65,26 @@ public class ArgListBuilderUtil {
     public static class TypeCommands {
         private static TypeSpec SPEC_TYPE = new InstanceType(TypeTuple.class, false);
 
-        private static TypeTuple INTEGER_TUPLE = new TypeTuple(new IntegerType(), null);
-        private static TypeTuple BIGDECIMAL_TUPLE = new TypeTuple(new BigDecimalType(), null);
-        private static TypeTuple BIGINTEGER_TUPLE = new TypeTuple(new BigIntegerType(), null);
-        private static TypeTuple BOOLEAN_TUPLE = new TypeTuple(new BooleanType(), null);
-        private static TypeTuple BYTE_TUPLE = new TypeTuple(new ByteType(), null);
-        private static TypeTuple DOUBLE_TUPLE = new TypeTuple(new DoubleType(), null);
-        private static TypeTuple FLOAT_TUPLE = new TypeTuple(new FloatType(), null);
-        private static TypeTuple LONG_TUPLE = new TypeTuple(new LongType(), null);
-        private static TypeTuple SHORT_TUPLE = new TypeTuple(new ShortType(), null);
-        private static TypeTuple STRING_TUPLE = new TypeTuple(new StringType(), null);
+        private static TypeTuple INTEGER_TUPLE = new TypeTuple(INTEGER_TYPE, null);
+        private static TypeTuple BIGDECIMAL_TUPLE = new TypeTuple(BIGDECIMAL_TYPE, null);
+        private static TypeTuple BIGINTEGER_TUPLE = new TypeTuple(BIGINTEGER_TYPE, null);
+        private static TypeTuple BOOLEAN_TUPLE = new TypeTuple(BOOLEAN_TYPE, null);
+        private static TypeTuple BYTE_TUPLE = new TypeTuple(BYTE_TYPE, null);
+        private static TypeTuple DOUBLE_TUPLE = new TypeTuple(DOUBLE_TYPE, null);
+        private static TypeTuple FLOAT_TUPLE = new TypeTuple(FLOAT_TYPE, null);
+        private static TypeTuple LONG_TUPLE = new TypeTuple(LONG_TYPE, null);
+        private static TypeTuple SHORT_TUPLE = new TypeTuple(SHORT_TYPE, null);
+        private static TypeTuple STRING_TUPLE = new TypeTuple(STRING_TYPE, null);
 
         private static NamedArg NAMED_MINLEN = new NamedArg("minLength", new IntegerRangeType(-1, Integer.MAX_VALUE), -1, true);
         private static NamedArg NAMED_MAXLEN = new NamedArg("maxLength", new IntegerRangeType(-1, Integer.MAX_VALUE), -1, true);
         private static NamedArg NAMED_MIN = new NamedArg("min", new IntegerRangeType(Integer.MIN_VALUE, Integer.MAX_VALUE), Integer.MIN_VALUE, true);
         private static NamedArg NAMED_MAX = new NamedArg("max", new IntegerRangeType(Integer.MIN_VALUE, Integer.MAX_VALUE), Integer.MAX_VALUE, true);
-        private static NamedArg NAMED_NULLALLOWED = new NamedArg("nullAllowed", new BooleanType(), false, true);
+        private static NamedArg NAMED_NULLALLOWED = new NamedArg("nullAllowed", BOOLEAN_TYPE, false, true);
 
         private static FixedArg FIXED_TYPE = new FixedArg(SPEC_TYPE);
-        private static FixedArg FIXED_CLASSNAME = new FixedArg(new StringType());
-        private static VarArg VAR_STRING = new VarArg(new StringType());
+        private static FixedArg FIXED_CLASSNAME = new FixedArg(STRING_TYPE);
+        private static VarArg VAR_STRING = new VarArg(STRING_TYPE);
 
         private static StdArgList NOARGS = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
 

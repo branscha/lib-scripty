@@ -34,6 +34,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
+import static branscha.scripty.spec.type.BigDecimalType.BIGDECIMAL_TYPE;
+
 @ScriptyNamedArgLists(
         std = {
                 @ScriptyStdArgList(name = "2numbers", fixed = {@ScriptyArg(name = "arg1", type = "BigDecimal"), @ScriptyArg(name = "arg2", type = "BigDecimal")}),
@@ -111,7 +113,7 @@ public class MathLibrary {
     @ScriptyRefArgList(ref = "1object")
     public boolean isNumber(@ScriptyParam("arg") Object aArg, Context aCtx) {
         try {
-            new BigDecimalType().guard(aArg, aCtx);
+            BIGDECIMAL_TYPE.guard(aArg, aCtx);
         }
         catch (TypeSpecException e) {
             return false;

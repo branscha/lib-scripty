@@ -24,32 +24,24 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
+public class ByteType extends InstanceType {
 
-public class ByteType implements TypeSpec<Byte> {
+    public static final ByteType BYTE_TYPE = new ByteType();
 
-    public String getSpecName() {
-        return "Byte";
+    ByteType() {
+        super(Byte.class, "Byte", false);
     }
 
-    public Byte guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof Byte) {
-            return (Byte) arg;
-        }
-        else if (arg instanceof Number) {
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
             return ((Number) arg).byteValue();
         }
         else if (arg instanceof String) {
-            try {
-                return Byte.parseByte((String) arg);
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
-            }
+            return Byte.parseByte((String) arg);
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

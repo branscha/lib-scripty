@@ -24,32 +24,28 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
+/**
+ * Long type, a non nullable numerical type.
+ */
+public class LongType extends InstanceType {
 
-public class LongType implements TypeSpec<Long> {
+    public static final LongType LONG_TYPE = new LongType();
 
-    public String getSpecName() {
-        return "Long";
+    LongType() {
+        super(Long.class, "Long", false);
     }
 
-    public Long guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof Long) {
-            return (Long) arg;
-        }
-        else if (arg instanceof Number) {
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
             return ((Number) arg).longValue();
         }
         else if (arg instanceof String) {
-            try {
-                return Long.parseLong((String) arg);
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
-            }
+            // The caller will deal with the exceptions.
+            return Long.parseLong((String) arg);
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

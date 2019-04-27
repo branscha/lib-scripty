@@ -37,6 +37,8 @@ import branscha.scripty.spec.args.ArgSpec;
 import branscha.scripty.spec.args.NamedArg;
 import branscha.scripty.spec.type.TypeSpec;
 
+import static branscha.scripty.spec.type.IntegerType.INTEGER_TYPE;
+
 public class TestSpecs {
     @Test
     public void testClassSpec()
@@ -48,7 +50,7 @@ public class TestSpecs {
     @Test
     public void testIntList()
     throws TypeSpecException {
-        TypeSpec lSpec = new CheckedListType(new IntegerType());
+        TypeSpec lSpec = new CheckedListType(INTEGER_TYPE);
         List lList = new ArrayList();
         lList.add(13);
         lList.add(17);
@@ -59,7 +61,7 @@ public class TestSpecs {
     @Test
     public void testNamedArgs()
     throws ArgSpecException {
-        ArgSpec lSpec = new NamedArg("oele", new IntegerType(), Integer.valueOf(13), true);
+        ArgSpec lSpec = new NamedArg("oele", INTEGER_TYPE, Integer.valueOf(13), true);
         Object[] args = new Object[]{1, 2, 3, new Pair("oele", Integer.valueOf(17))};
         lSpec.guard(args, 0, null);
         System.out.println(Arrays.toString(args));

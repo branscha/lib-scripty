@@ -32,8 +32,8 @@ import java.io.*;
 import java.util.List;
 
 /**
- * The Repl understands a simplified lisp syntax, only strings and lists can be expressed
- * on the command line. Command evaluation can have any kind of Java object as a result.
+ * The Repl understands a simplified lisp syntax, only strings and lists can be expressed on the command line. Command
+ * evaluation can have any kind of Java object as a result.
  * <p>
  * Outermost parenthesis should be omitted so that the user is not set back by the lisp syntax.
  * <p>
@@ -42,8 +42,7 @@ import java.util.List;
  * <p>
  * Editing commands:
  * <ul>
- * <li><b><code>break</code></b> will delete the current command that is being edited and
- * will start a fresh line.</li>
+ * <li><b><code>break</code></b> will delete the current command that is being edited and will start a fresh line.</li>
  * <li>A line with a <b><code>backslash</code></b> will automatically continue with the next line. This allows for some
  * nice formatting.</li>
  * </ul>

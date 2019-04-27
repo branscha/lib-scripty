@@ -26,32 +26,24 @@ package branscha.scripty.spec.type;
 
 import java.math.BigDecimal;
 
-import branscha.scripty.parser.Context;
+public class BigDecimalType extends InstanceType {
 
-public class BigDecimalType implements TypeSpec<BigDecimal> {
+    public static final BigDecimalType BIGDECIMAL_TYPE = new BigDecimalType();
 
-    public String getSpecName() {
-        return "BigDecimal";
+    BigDecimalType() {
+        super(BigDecimal.class, "BigDecimal", false);
     }
 
-    public BigDecimal guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof BigDecimal) {
-            return (BigDecimal) arg;
-        }
-        else if (arg instanceof Number) {
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
             return new BigDecimal(((Number) arg).doubleValue());
         }
         else if (arg instanceof String) {
-            try {
-                return new BigDecimal((String) arg);
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
-            }
+            return new BigDecimal((String) arg);
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

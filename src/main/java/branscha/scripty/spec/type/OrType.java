@@ -26,30 +26,42 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
+/**
+ * A type generator for a set of types. The resulting type will be the union of the specified types. The order of the
+ * types is important, the conversions will be attempted from the left to the right the first type for which the
+ * conversion succeeds will be taken. It is best to specify the "smallest" types first, otherwise the "larger' types
+ * might capture all the values.
+ */
 public class OrType implements TypeSpec {
 
     private TypeSpec[] types;
-    private String name;
+    private String typeName;
+
+    public OrType(TypeSpec[] types, String name) {
+        this.types = types;
+        this.typeName = name;
+    }
 
     public OrType(TypeSpec[] types) {
         this.types = types;
-        StringBuilder buf = new StringBuilder();
+
+        StringBuilder buf = new StringBuilder("OneOf ");
         for (int i = 0; i < this.types.length; i++) {
-            buf.append(this.types[i].getSpecName());
-            if (i < this.types.length - 1) buf.append(" or ");
+            buf.append("(").append(this.types[i].getSpecName()).append(")");
+            if (i < this.types.length - 1) buf.append(" ");
         }
-        name = buf.toString();
+        typeName = buf.toString();
     }
 
     public String getSpecName() {
-        return name;
+        return typeName;
     }
 
     public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        for (int i = 0; i < types.length; i++) {
+        for (TypeSpec type : types) {
             try {
-                return types[i].guard(arg, ctx);
+                return type.guard(arg, ctx);
             }
             catch (TypeSpecException e) {
                 // Ignore, try the next one!   
@@ -57,7 +69,7 @@ public class OrType implements TypeSpec {
             }
         }
 
-        // If we arrive here, then none of the typespecs was true.
+        // If we arrive here, then none of the {@link TypeSpec}s was true.
         throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
     }
 }

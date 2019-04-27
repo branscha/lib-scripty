@@ -24,32 +24,28 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
+/**
+ * Short type, a non nullable numerical type.
+ */
+public class ShortType extends InstanceType {
 
-public class ShortType implements TypeSpec {
+    public static final ShortType SHORT_TYPE = new ShortType();
 
-    public String getSpecName() {
-        return "Short";
+    ShortType() {
+        super(Short.class, "Short", false);
     }
 
-    public Object guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof Short) {
-            return arg;
-        }
-        else if (arg instanceof Number) {
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
             return ((Number) arg).shortValue();
         }
         else if (arg instanceof String) {
-            try {
-                return Short.parseShort((String) arg);
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
-            }
+            // The caller will deal with any exceptions.
+            return Short.parseShort((String) arg);
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

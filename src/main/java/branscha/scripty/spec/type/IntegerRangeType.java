@@ -26,26 +26,32 @@ package branscha.scripty.spec.type;
 
 import branscha.scripty.parser.Context;
 
+import static branscha.scripty.spec.type.IntegerType.INTEGER_TYPE;
+
 public class IntegerRangeType implements TypeSpec {
+
+    public static final String ERR010 = "IntegerRangeType/010: Value out of range. Expected type '%s' and received an incompatible type '%s' value '%s'.";
 
     private int from;
     private int to;
-    private IntegerType intSpec = new IntegerType();
 
-    public IntegerRangeType(int aFrom, int aTo) {
-        from = aFrom;
-        to = aTo;
+    public IntegerRangeType(int from, int to) {
+        this.from = from;
+        this.to = to;
     }
 
     public String getSpecName() {
-        return String.format("IntegerRange %d...%d", from, to);
+        return String.format("IntegerRange %d %d", from, to);
     }
 
     public Object guard(Object arg, Context ctx)
     throws TypeSpecException {
-        final Integer lInt = (Integer) intSpec.guard(arg, ctx);
-        if (lInt < from || lInt > to)
-            throw new TypeSpecException(String.format("Value out of range. Expected type '%s' and received an incompatible type '%s' value '%s'.", getSpecName(), arg.getClass().getCanonicalName(), arg.toString()));
-        else return lInt;
+        final Integer value = (Integer) INTEGER_TYPE.guard(arg, ctx);
+        if (value < from || value > to) {
+            throw new TypeSpecException(String.format(ERR010, getSpecName(), arg.getClass().getCanonicalName(), arg.toString()));
+        }
+        else {
+            return value;
+        }
     }
 }

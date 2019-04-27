@@ -24,34 +24,28 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
-
-public class IntegerType implements TypeSpec {
+/**
+ * Integer type, a non nullable numerical type.
+ */
+public class IntegerType extends InstanceType{
 
     public static final IntegerType INTEGER_TYPE = new IntegerType();
 
-    public String getSpecName() {
-        return "Integer";
+    IntegerType() {
+        super(Integer.class, "Integer", false);
     }
 
-    public Object guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof Integer) {
-            return arg;
-        }
-        else if (arg instanceof Number) {
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
             return ((Number) arg).intValue();
         }
         else if (arg instanceof String) {
-            try {
-                return Integer.parseInt((String) arg);
-            }
-            catch (NumberFormatException e) {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) arg));
-            }
+            // Caller will handle exceptions.
+            return Integer.parseInt((String) arg);
         }
         else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+            return super.convertArg(arg);
         }
     }
 }

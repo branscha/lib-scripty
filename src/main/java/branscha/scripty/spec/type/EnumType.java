@@ -27,19 +27,29 @@ package branscha.scripty.spec.type;
 import branscha.scripty.parser.Context;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Type generator where the value can be one of the strings in the predefined set.
+ */
 public class EnumType implements TypeSpec {
 
     private List<String> values = new ArrayList<String>();
+    private String typeName;
+
+    public EnumType(List<String> values, String typeName) {
+        this.values = values;
+        this.typeName = typeName;
+    }
 
     public EnumType(List<String> aValues) {
         values.addAll(aValues);
-    }
 
-    public EnumType(String... aValues) {
-        values.addAll(Arrays.asList(aValues));
+        StringBuilder buf = new StringBuilder("Enum");
+        if(values.size() > 0) {
+            values.stream().forEach((val)->buf.append(" ").append(val));
+        }
+        typeName = buf.toString();
     }
 
     public Object guard(Object arg, Context ctx)
@@ -51,6 +61,6 @@ public class EnumType implements TypeSpec {
     }
 
     public String getSpecName() {
-        return String.format("Enum %s", values.toString());
+        return typeName;
     }
 }

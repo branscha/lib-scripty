@@ -24,31 +24,26 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.Context;
+public class BooleanType extends InstanceType {
 
-public class BooleanType implements TypeSpec<Boolean> {
+    public static final BooleanType BOOLEAN_TYPE = new BooleanType();
 
-    public static final TypeSpec<Boolean> BOOLEAN_TYPE = new BooleanType();
-
-    public String getSpecName() {
-        return "Boolean";
+    BooleanType() {
+        super(Boolean.class, "Boolean", false);
     }
 
-    public Boolean guard(Object arg, Context ctx)
-    throws TypeSpecException {
-        if (arg instanceof Boolean) {
-            return (Boolean) arg;
-        }
-        else if (arg instanceof String) {
-            final String lStr = ((String) arg).trim().toLowerCase();
-            if ("true".equals(lStr) || "on".equals(lStr) || "yes".equals(lStr) || "ok".equals(lStr))
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof String) {
+            final String str = ((String) arg).trim().toLowerCase();
+            if ("true".equals(str) || "on".equals(str) || "yes".equals(str) || "ok".equals(str) || "1".equals(str))
                 return Boolean.TRUE;
-            else if ("false".equals(lStr) || "off".equals(lStr) || "no".equals(lStr) || "nok".equals(lStr))
+            else if ("false".equals(str) || "off".equals(str) || "no".equals(str) || "nok".equals(str) || "0".equals(str))
                 return Boolean.FALSE;
-            else throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), lStr));
         }
-        else {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), arg));
+        else if(arg instanceof Number) {
+            return ((Number) arg).intValue() != 0;
         }
+        return super.convertArg(arg);
     }
 }
