@@ -29,8 +29,13 @@ import branscha.scripty.parser.Eval;
 
 import java.util.Arrays;
 
-public class PartialMapping
-        implements ArgMapping {
+/**
+ * This mapping is used to fetch the variable argument list from the guarded args array and inject them into
+ * an array parameter so that the var arg values are directly accessible. The current implementation only supports
+ * array parameters.
+ */
+public class PartialMapping implements ArgMapping {
+
     private int from;
     private int length;
 
@@ -41,8 +46,6 @@ public class PartialMapping
 
     public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
-        // TODO TODO
-        // Add code for lists/collections
 
         Object[] lArgs = (Object[]) args;
         int lLength = 0;

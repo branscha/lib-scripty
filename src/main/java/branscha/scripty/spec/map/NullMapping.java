@@ -27,14 +27,13 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Eval;
 
+/**
+ * Null will be injected into the command parameter.
+ */
 public class NullMapping implements ArgMapping {
 
     public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
         return null;
-    }
-
-    public void setOffset(int aOffset) {
-        // Nop.
     }
 }

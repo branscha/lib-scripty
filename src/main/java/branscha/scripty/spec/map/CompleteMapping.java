@@ -27,14 +27,13 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Eval;
 
-public class CompleteMapping
-        implements ArgMapping {
+/**
+ * This mapper injects the complete argument list. It is used to provide the guarded (converted and checked) argument
+ * array to the command method.
+ */
+public class CompleteMapping implements ArgMapping {
     public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
         return args;
-    }
-
-    public void setOffset(int aOffset) {
-        // Nop.
     }
 }

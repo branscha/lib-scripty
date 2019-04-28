@@ -72,8 +72,12 @@ public class NamedArg implements ArgSpec {
         }
 
         try {
-            if (optional) return valueSpec.guard(value, aCtx);
-            else throw new ArgSpecException(String.format(ERR020, paramName));
+            if (optional) {
+                return valueSpec.guard(value, aCtx);
+            }
+            else {
+                throw new ArgSpecException(String.format(ERR020, paramName));
+            }
         }
         catch (TypeSpecException e) {
             throw new ArgSpecException(e.getMessage());

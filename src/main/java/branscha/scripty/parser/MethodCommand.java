@@ -27,7 +27,7 @@ package branscha.scripty.parser;
 import branscha.scripty.cmdlib.CmdUtil;
 import branscha.scripty.spec.args.ArgSpecException;
 import branscha.scripty.spec.args.ArgList;
-import branscha.scripty.spec.map.ArgListMapping;
+import branscha.scripty.spec.map.CmdMethodInjector;
 import branscha.scripty.spec.map.ArgMappingException;
 import branscha.scripty.spec.map.ResultMapping;
 import branscha.scripty.spec.map.ResultMappingException;
@@ -39,7 +39,7 @@ public class MethodCommand implements Command {
 
     private ArgList argList;
     private Object instance;
-    private ArgListMapping argMapping;
+    private CmdMethodInjector argMapping;
     private ResultMapping resultMapping;
     private Method method;
 
@@ -51,7 +51,7 @@ public class MethodCommand implements Command {
         resultMapping = null;
     }
 
-    public MethodCommand(Object aInstance, Method aMethod, ArgList aArgList, ArgListMapping aArgListMapping, ResultMapping aResultMapping) {
+    public MethodCommand(Object aInstance, Method aMethod, ArgList aArgList, CmdMethodInjector aArgListMapping, ResultMapping aResultMapping) {
         argList = aArgList;
         method = aMethod;
         instance = aInstance;

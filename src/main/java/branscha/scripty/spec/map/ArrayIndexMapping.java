@@ -27,24 +27,30 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Eval;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Fetch an argument from the argument array at the specified position. Position 0 is always the name of the command.
+ * These mappings are automatically created by the {@link branscha.scripty.spec.args.ArgListBuilder} when the argument
+ * list descriptions are converted to runtime information, and these are used by the {@link CmdMethodInjector} to inject
+ * the requested arguments in command parameters.
+ */
+public class ArrayIndexMapping implements ArgMapping {
 
-public class ArgListMapping {
+    public static final String ERR010 = "ArrayIndexMapping/010: Error while fetching argument %d from the argument array.";
 
-    private List<ArgMapping> mappings = new ArrayList<ArgMapping>();
+    private int index;
 
-    public void addArgMapping(ArgMapping aArgMapping) {
-        mappings.add(aArgMapping);
+    public ArrayIndexMapping(int index) {
+        this.index = index;
     }
 
-    public Object[] map(Eval aEval, Context aContext, Object[] aArgs)
+    @Override
+    public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
-        Object[] lMapped = new Object[mappings.size()];
-        int i = 0;
-        for (ArgMapping lMapping : mappings) {
-            lMapped[i++] = lMapping.map(aEval, aContext, aArgs);
+        try {
+            return ((Object[]) args)[index];
         }
-        return lMapped;
+        catch (Exception e) {
+            throw new ArgMappingException(String.format(ERR010, index));
+        }
     }
 }

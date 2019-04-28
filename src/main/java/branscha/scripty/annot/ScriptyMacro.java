@@ -37,5 +37,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyMacro {
-     String name() default "";
+    String name() default "";
 }

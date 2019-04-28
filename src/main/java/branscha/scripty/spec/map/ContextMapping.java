@@ -27,14 +27,13 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Eval;
 
-public class ContextMapping
-        implements ArgMapping {
+/**
+ * This mapper injects the Eval {@link Context}. It is used to inject the context into the command method parameter
+ * that has the appropriate type.
+ */
+public class ContextMapping implements ArgMapping {
     public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
         return ctx;
-    }
-
-    public void setOffset(int aOffset) {
-        // Nop.
     }
 }

@@ -28,21 +28,24 @@ import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Eval;
 
 /**
- * An argument mapping is a small piece of code that provides arguments to the command parameters when the commands
- * are invoked. An argument mapping is provisioned by decorating the parameters with the corresponding annotations.
+ * An single argument mapping is a piece of code that knows how to fetch specific information from the
+ * available data structures Eval, Context and the args. For each command method, a {@link CmdMethodInjector} will be
+ * created that contains an argument mapping for each parameter. Before the methdod is invoked we will call the
+ * mappers to collect the correct arguments from the Scripty context.
+ *
+ * Also see {@link ResultMapping} which maps the result of a method invokation.
  */
 public interface ArgMapping {
 
     /**
      * The mapper can make use of the eval itself, its context and all arguments in order to provide a value.
-     * @param eval
-     * @param ctx
-     * @param args
-     * @return
-     * @throws ArgMappingException
+     *
+     * @param eval The Scripty {@link Eval} engine.
+     * @param ctx  The Scripty eval {@link Context}.
+     * @param args The guarded (converted + augmented + checked) command arguments.
+     * @return Some part of the available information that can be used somewhere.
      */
     Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException;
 
-    void setOffset(int aOffset);
 }

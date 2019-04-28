@@ -34,14 +34,16 @@ public class IntegerRangeType implements TypeSpec {
 
     private int from;
     private int to;
+    private String typeName;
 
     public IntegerRangeType(int from, int to) {
         this.from = from;
         this.to = to;
+        typeName = String.format("IntegerRange min=%d max=%d", from, to);
     }
 
     public String getSpecName() {
-        return String.format("IntegerRange %d %d", from, to);
+        return typeName;
     }
 
     public Object guard(Object arg, Context ctx)

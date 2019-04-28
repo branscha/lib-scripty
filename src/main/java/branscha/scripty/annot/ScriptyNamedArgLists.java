@@ -30,14 +30,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Define multiple argument lists so that they can be re-used in multiple command
- * definitions using {@link ScriptyRefArgList}. The common shared argument list definitions can be defined
- * once in a single location.
+ * Define multiple argument lists so that they can be re-used in multiple command definitions using
+ * {@link ScriptyRefArgList}. The common shared argument list definitions can be defined once in a single location.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyNamedArgLists {
+    /**
+     * List of named standard argument lists.
+     */
     ScriptyStdArgList[] std() default {};
 
+    /**
+     * List of variadic argument lists.
+     */
     ScriptyVarArgList[] var() default {};
 }

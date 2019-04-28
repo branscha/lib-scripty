@@ -30,9 +30,10 @@ import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandRepository;
 import branscha.scripty.parser.Command;
 import branscha.scripty.parser.MethodCommand;
-import branscha.scripty.spec.args.ArgListBuilderUtil;
+import branscha.scripty.spec.args.ArgListBuilder;
 import branscha.scripty.spec.args.ArgSpecException;
 import branscha.scripty.spec.args.ArgList;
+import branscha.scripty.spec.args.RuntimeArgList;
 import branscha.scripty.spec.map.*;
 
 import java.lang.reflect.Method;
@@ -50,13 +51,11 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         macroRepo = new CommandRepository();
     }
 
-    public void addCommand(String aName, Command command)
-    throws ExtensionException {
+    public void addCommand(String aName, Command command) {
         commandRepo.registerCommand(aName, command);
     }
 
-    public void addMacro(String aName, Command macro)
-    throws ExtensionException {
+    public void addMacro(String aName, Command macro) {
         macroRepo.registerCommand(aName, macro);
     }
 
@@ -94,7 +93,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         }
     }
 
-    private void registerClassArgList(Class aClass, ScriptyStdArgList aStdLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>> aNamedLists)
+    private void registerClassArgList(Class aClass, ScriptyStdArgList aStdLst, Map<String, RuntimeArgList> aNamedLists)
     throws ExtensionException {
         final String lName = aStdLst.name();
         if (lName.length() == 0) {
@@ -104,7 +103,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
 
         try {
             // Build it.
-            final ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aStdLst);
+            final RuntimeArgList lTuple = ArgListBuilder.buildArgList(aStdLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
         }
@@ -114,7 +113,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         }
     }
 
-    private void registerClassArgList(Class aClass, ScriptyVarArgList aVarLst, Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>> aNamedLists)
+    private void registerClassArgList(Class aClass, ScriptyVarArgList aVarLst, Map<String, RuntimeArgList> aNamedLists)
     throws ExtensionException {
         final String lName = aVarLst.name();
         if (lName.length() == 0) {
@@ -124,7 +123,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
 
         try {
             // Build it.
-            final ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>> lTuple = ArgListBuilderUtil.buildArgList(aVarLst);
+            final RuntimeArgList lTuple = ArgListBuilder.buildArgList(aVarLst);
             // Remember it for references if the argument list spec has a name that is.
             aNamedLists.put(lName, lTuple);
         }
@@ -137,7 +136,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
     private void addLibrary(String aLibName, Object aLibInstance, Class aClass)
     throws ExtensionException {
         // We keep track of the named arglists in this datastructure. 
-        Map<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>> lNamedArgLists = new HashMap<String, ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>>>();
+        Map<String, RuntimeArgList> lNamedArgLists = new HashMap<String, RuntimeArgList>();
 
         // Library (Class) annotations.
         ///////////////////////////////
@@ -221,9 +220,9 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             if (lRefArgListAnnot != null) {
                 final String lRef = lRefArgListAnnot.ref();
                 if (lNamedArgLists.containsKey(lRef)) {
-                    ArgListBuilderUtil.Tuple<ArgList, Map<String, ArgMapping>> lTuple = lNamedArgLists.get(lRef);
-                    lArgList = lTuple.getX();
-                    lMappings = lTuple.getY();
+                    RuntimeArgList lTuple = lNamedArgLists.get(lRef);
+                    lArgList = lTuple.getArgList();
+                    lMappings = lTuple.getArgMappings();
                 }
                 else {
                     final String lMsg = String.format("Class '%s' has a macro/command method '%s' with a reference to a named argument list '%s' which does not exist.", aClass, lMethod.getName(), lRef);
@@ -233,13 +232,13 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             else if (lStdArgListAnnot != null) {
                 try {
                     // Build the arglist.
-                    ArgListBuilderUtil.ArgListTuple lTuple = ArgListBuilderUtil.buildArgList(lStdArgListAnnot);
+                    RuntimeArgList lTuple = ArgListBuilder.buildArgList(lStdArgListAnnot);
                     // Remember it for references if the argument list spec has a name that is.
                     if (lStdArgListAnnot.name().length() > 0) {
                         lNamedArgLists.put(lStdArgListAnnot.name(), lTuple);
                     }
-                    lArgList = lTuple.getX();
-                    lMappings = lTuple.getY();
+                    lArgList = lTuple.getArgList();
+                    lMappings = lTuple.getArgMappings();
                 }
                 catch (ArgSpecException e) {
                     final String lMsg = String.format("While processing a standard argument list specification for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
@@ -249,13 +248,13 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             else if (lVarArgListAnnot != null) {
                 try {
                     // Build the arglist.
-                    ArgListBuilderUtil.ArgListTuple lTuple = ArgListBuilderUtil.buildArgList(lVarArgListAnnot);
+                    RuntimeArgList lTuple = ArgListBuilder.buildArgList(lVarArgListAnnot);
                     // Remember it for references if the argument list spec has a name that is.
                     if (lVarArgListAnnot.name().length() > 0) {
                         lNamedArgLists.put(lVarArgListAnnot.name(), lTuple);
                     }
-                    lArgList = lTuple.getX();
-                    lMappings = lTuple.getY();
+                    lArgList = lTuple.getArgList();
+                    lMappings = lTuple.getArgMappings();
                 }
                 catch (ArgSpecException e) {
                     final String lMsg = String.format("While processing a variable argument list specification for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
@@ -282,9 +281,9 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                 }
 
                 // Construct the argument mapping.
-                ArgListMapping lArgListMapping = null;
+                CmdMethodInjector lArgListMapping = null;
                 try {
-                    lArgListMapping = ArgMappingBuilderUtil.buildArgMapping(lMethod, lMappings);
+                    lArgListMapping = CmdMethodInjectorBuilder.buildArgMapping(lMethod, lMappings);
                 }
                 catch (ArgMappingException e) {
                     final String lMsg = String.format("While constructing the argument mapping for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
@@ -299,7 +298,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
 
                     commandRepo.registerCommand(lCmdName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));
                 }
-                else if (lMacroAnnot != null) {
+                else {
                     String lMacroName = lMacroAnnot.name();
                     if (lMacroName.length() == 0) lMacroName = lMethod.getName();
                     macroRepo.registerCommand(lMacroName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));
@@ -314,7 +313,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             String lLibraryName = lLib.getClass().getSimpleName();
             ScriptyLibraryType lLibraryType = ScriptyLibraryType.AUTO;
 
-            ScriptyLibrary lScriptyLibrary = (ScriptyLibrary) lLib.getClass().getAnnotation(ScriptyLibrary.class);
+            ScriptyLibrary lScriptyLibrary = lLib.getClass().getAnnotation(ScriptyLibrary.class);
             if (lScriptyLibrary != null) {
                 lLibraryName = lScriptyLibrary.name();
                 lLibraryType = lScriptyLibrary.type();

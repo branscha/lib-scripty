@@ -27,14 +27,13 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Eval;
 
+/**
+ * Map the {@link Eval} itself into a command parameter. This can be useful for commands that want to do their own
+ * expression evaluation.
+ */
 public class EvalMapping implements ArgMapping {
-
     public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
         return eval;
-    }
-
-    public void setOffset(int aOffset) {
-        // Nop.
     }
 }

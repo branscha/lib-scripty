@@ -29,8 +29,13 @@ import branscha.scripty.parser.Eval;
 
 import java.util.List;
 
-public class IndexedMapping
-        implements ArgMapping {
+/**
+ * This mapper can fetch an object from a list or an array. It is mainly used to fetch a named argument from
+ * the complete list of arguments if it is explicitly mapped to a command parameter (in stead of to the complete
+ * list of arguments).
+ */
+public class IndexedMapping implements ArgMapping {
+
     private int offset;
 
     public IndexedMapping(int aOffset) {

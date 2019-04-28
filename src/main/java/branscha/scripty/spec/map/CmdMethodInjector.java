@@ -22,45 +22,37 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package branscha.scripty.spec.args;
+package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.spec.type.TypeSpec;
-import branscha.scripty.spec.type.TypeSpecException;
+import branscha.scripty.parser.Eval;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Represents a single fixed argument. Fixed arguments are positional (have a fixed location) and type. Their position
- * is enough to identify them so they don't need a name. They are required, the user has to provide them.
+ * A composite mapper that will inject the correct information in the command method parameters.
+ * Some parameter types are automatically recognized by Scripty such as Eval, Context, Object[] and will
+ * get the corresponding Scripty objects, and named arguments can also be injected in a parameter when it is
+ * annotated with the argument name using {@link @branscha.scripty.annot.ScriptyParam}.
  */
-public class FixedArg implements ArgSpec {
+public class CmdMethodInjector {
 
-    private static final String ERR010 = "FixedArg/010: The required argument at position %d, type %s missing.";
-    private static final String ERR020 = "FixedArg/020: The required argument at position %d: %s";
+    private List<ArgMapping> mappings = new ArrayList<ArgMapping>();
 
-    private TypeSpec spec;
-    private String specName;
-
-    public FixedArg(TypeSpec spec) {
-        this.spec = spec;
-        specName = "fixed: " + this.spec.getSpecName();
+    public void addArgMapping(ArgMapping argMapping) {
+        mappings.add(argMapping);
     }
 
-    public String getSpecName() {
-        return specName;
-    }
-
-    public Object guard(Object[] args, int pos, Context ctx)
-    throws ArgSpecException {
-        try {
-            if (pos < 0 || pos >= args.length) {
-                throw new ArgSpecException(String.format(ERR010, pos, spec.getSpecName()));
-            }
-            else {
-                return spec.guard(args[pos], ctx);
-            }
+    public Object[] map(Eval eval, Context ctx, Object[] args)
+    throws ArgMappingException {
+        // Create a new method argument list.
+        final Object[] inject = new Object[mappings.size()];
+        // Inject each method argument with a piece of information from the Scripty context.
+        int i = 0;
+        for (ArgMapping mapping : mappings) {
+            inject[i++] = mapping.map(eval, ctx, args);
         }
-        catch (TypeSpecException e) {
-            throw new ArgSpecException(String.format(ERR020, pos, e.getMessage()));
-        }
+        return inject;
     }
 }

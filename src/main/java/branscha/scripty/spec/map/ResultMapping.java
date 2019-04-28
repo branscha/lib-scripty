@@ -26,7 +26,17 @@ package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
 
+/**
+ * A piece of code that maps the result of a method invocation to somewhere else.
+ *
+ * Also see {@link ArgMapping} which maps information to the command parameters.
+ */
 public interface ResultMapping {
-    public void map(Object aResult, Context aContext)
+    /**
+     * Do something with the result of a command execution.
+     * @param cmdResult The result of the command.
+     * @param ctx The Scripty variable context.
+     */
+    void map(Object cmdResult, Context ctx)
     throws ResultMappingException;
 }

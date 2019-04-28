@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 @SuppressWarnings("ALL")
-public class TestArgListBuilderUtil {
+public class TestArgListBuilder {
     
     private ScriptyStreamProcessor scripty;
 
@@ -623,7 +623,7 @@ public class TestArgListBuilderUtil {
 
     public static class CustomTypes {
         @ScriptyCommand(name = "do-custom")
-        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Custom branscha.scripty.spec.args.TestArgListBuilderUtil$CustomSpec")})
+        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Custom branscha.scripty.spec.args.TestArgListBuilder$CustomSpec")})
         public Object custom(@ScriptyParam("arg") Object aArg) {
             return aArg;
         }

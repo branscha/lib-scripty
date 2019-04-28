@@ -39,8 +39,9 @@ import branscha.scripty.parser.Context;
 public interface TypeSpec<T> {
 
     /**
-     * Verify that an object satisfies the type.
-     * @param arg The object that needs verification.
+     * Verify that an object satisfies the type. Try to convert the object into the required type.
+     *
+     * @param arg The object that needs conversion and verification.
      * @param ctx The eval context.
      * @return The checked object (which could have been converted).
      * @throws TypeSpecException

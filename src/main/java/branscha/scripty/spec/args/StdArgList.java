@@ -46,11 +46,6 @@ import java.util.List;
  */
 public class StdArgList extends AbstractArgList {
 
-    /**
-     * An empty argument list for commands that do not accept any arguments.
-     */
-    public static final ArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
-
     private static final String ERR010 = "StdArgList/010: Badly formed argument list. It should at least contain the command name.";
     private static final String ERR020 = "StdArgList/020: Too many arguments. Expected at most %d arguments.";
 

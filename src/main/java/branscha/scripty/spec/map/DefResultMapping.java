@@ -26,16 +26,16 @@ package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
 
-public class DefResultMapping
-        implements ResultMapping {
+public class DefResultMapping implements ResultMapping {
+
     private String binding;
 
     public DefResultMapping(String aBinding) {
         binding = aBinding;
     }
 
-    public void map(Object aResult, Context aContext)
+    public void map(Object cmdResult, Context ctx)
     throws ResultMappingException {
-        aContext.defBinding(binding, aResult);
+        ctx.defBinding(binding, cmdResult);
     }
 }

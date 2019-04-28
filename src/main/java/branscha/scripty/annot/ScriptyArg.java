@@ -25,7 +25,7 @@
 package branscha.scripty.annot;
 
 /**
- * Part of an argument list. Provide argument details in an {@link ScriptyStdArgList} or al {@link ScriptyVarArgList}.
+ * Part of an argument list annotation. Provide argument details in an {@link ScriptyStdArgList} or al {@link ScriptyVarArgList}.
  * Argument list annotations are used to specify the interface for a command, the Scripty engine will automatically
  * enforce this interface.
  * <p>

@@ -24,32 +24,33 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.annot.ScriptyBindingParam;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Eval;
 
 /**
  * This mapping fetches data from the {@link Context} of the {@link Eval} and provides it as an argument
- * of the {@link ScriptyBindingParam} annotated command parameter.
+ * to a Script command method when it is part of a {@link  CmdMethodInjector}.
  */
 public class BindingMapping implements ArgMapping {
 
-    private String binding;
+    private  static final String ERR010 = "BindingMapping/010: The context does not contain a binding '%s' to inject into a command.";
+
+    private String bindingKey;
     private boolean excIfNull;
 
-    public BindingMapping(String binding, boolean excIfNull) {
-        this.binding = binding;
+    public BindingMapping(String bindingKey, boolean excIfNull) {
+        this.bindingKey = bindingKey;
         this.excIfNull = excIfNull;
     }
 
     public Object map(Eval eval, Context ctx, Object args)
     throws ArgMappingException {
-        if (ctx.isBound(binding)) return ctx.getBinding(binding);
-        else if (excIfNull) throw new ArgMappingException("... no such binding ...");
+        if (ctx.isBound(bindingKey)) {
+            return ctx.getBinding(bindingKey);
+        }
+        else if (excIfNull) {
+            throw new ArgMappingException(String.format(ERR010, bindingKey));
+        }
         else return null;
-    }
-
-    public void setOffset(int aOffset) {
-        // Nop.
     }
 }

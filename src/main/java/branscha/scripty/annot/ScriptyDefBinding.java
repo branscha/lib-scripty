@@ -30,16 +30,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Command annotation. The result of the {@link ScriptyCommand} will be defined in the Scripty context (global storage) so that
- * it becomes available for other commands. After defining a binding it can be modified
- * using {@link ScriptySetBinding} commands. This annotation is used by commands that create new
- * things in the context for other commands to work on.
+ * Command annotation. The result of the {@link ScriptyCommand} will be defined in the Scripty context (global storage)
+ * so that it becomes available for other commands. After defining a binding it can be modified using
+ * {@link ScriptySetBinding} commands. This annotation is used by commands that create new things in the context for
+ * other commands to work on.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyDefBinding {
     /**
-     * The name of the binding. The result of the command will be written to the context using this name as a key.
+     * The name of the binding. The result of the command will be written to the context using this name as the key.
      */
     String value();
 }

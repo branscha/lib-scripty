@@ -60,9 +60,15 @@ public class OptionalArg implements ArgSpec {
     public Object guard(Object[] aArgs, int aPos, Context aCtx)
     throws ArgSpecException {
         try {
-            if (aPos < 0 || aPos >= aArgs.length) return spec.guard(defaultVal, aCtx);
-            else if (aArgs[aPos] instanceof Pair) return spec.guard(defaultVal, aCtx);
-            else return spec.guard(aArgs[aPos], aCtx);
+            if (aPos < 0 || aPos >= aArgs.length) {
+                return spec.guard(defaultVal, aCtx);
+            }
+            else if (aArgs[aPos] instanceof Pair) {
+                return spec.guard(defaultVal, aCtx);
+            }
+            else {
+                return spec.guard(aArgs[aPos], aCtx);
+            }
         }
         catch (TypeSpecException e) {
             throw new ArgSpecException(String.format(ERR010, aPos, e.getMessage()));

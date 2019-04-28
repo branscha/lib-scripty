@@ -27,20 +27,25 @@ package branscha.scripty.spec.map;
 import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Context;
 
+/**
+ * Put the result of a command execution into the context.
+ */
 public class SetResultMapping implements ResultMapping {
+
+    public static final String ERR010 = "SetResultMapping/010: The result could not be bound to '%s' in the context, the binding does not exist.";
     private String binding;
 
     public SetResultMapping(String aBinding) {
         binding = aBinding;
     }
 
-    public void map(Object aResult, Context aContext)
+    public void map(Object cmdResult, Context ctx)
     throws ResultMappingException {
         try {
-            aContext.setBinding(binding, aResult);
+            ctx.setBinding(binding, cmdResult);
         }
         catch (CommandException e) {
-            throw new ResultMappingException(String.format("The result could not be bound to '%s' in the context because the binding does not exist.", binding));
+            throw new ResultMappingException(String.format(ERR010, binding));
         }
     }
 }
