@@ -58,7 +58,7 @@ Example
 
 **bound?**
 
-A test to see whether a bindingKey exists. You need to provide the name of the bindingKey.
+A test to see whether a binding exists. You need to provide the name of the binding.
 
 Example
 
@@ -88,7 +88,7 @@ A recursive definition of the factorial function. It is not the most efficient i
 
 **defvar**
 
-This form creates a global bindingKey. It evaluates the value before setting, the result is the value: (defvar name val) | (defvar name=val). The value can be changed with set.
+This form creates a global binding. It evaluates the value before setting, the result is the value: (defvar name val) | (defvar name=val). The value can be changed with set.
 Example 1
 
 	> defvar pi 3.141592653
@@ -131,7 +131,7 @@ Example
  
 **get**
 
-This form retrieves a bindingKey. It does not do any evaluation: (get name) or the shorthand notational convenience $name does exactly the same thing. It does not do Perl-like interpolation in strings, don't let the notation mislead you.
+This form retrieves a binding. It does not do any evaluation: (get name) or the shorthand notational convenience $name does exactly the same thing. It does not do Perl-like interpolation in strings, don't let the notation mislead you.
 
 Example The two forms are equivalent.
 
@@ -212,28 +212,28 @@ Example: The result of the evaluation is a list, the print command is not execut
 	
 **set**
 
-set changes an existing bindingKey. It evaluates the value before setting, the result is the value: `(set name val) | (set name=val)`. Set generates an error if the bindingKey does not exist. A bindingKey can initially be created using one of the following constructs. After a bindingKey is created it can be modified with set.
+set changes an existing binding. It evaluates the value before setting, the result is the value: `(set name val) | (set name=val)`. Set generates an error if the binding does not exist. A binding can initially be created using one of the following constructs. After a binding is created it can be modified with set.
 
-* A defvar which creates/overwrites a global bindingKey.
+* A defvar which creates/overwrites a global binding.
 * A defun which (re-)binds a global variable to a lambda.
 * A let or let* block which adds a number of bindings for the duration of a block.
 
 Some commands add something to the context too. It is up to the various commands to specify this.
 
-Example 1: A bindingKey must exist before a set can be executed.
+Example 1: A binding must exist before a set can be executed.
 
 	> set newvar 13
-	ERROR: There is no bindingKey for 'newvar' in the context.
+	ERROR: There is no binding for 'newvar' in the context.
 	-> [set, newvar, 13]
 
-Example 2: An existing bindingKey is changed here.
+Example 2: An existing binding is changed here.
 
 	> defvar myvar 17
 	> set myvar=3
 	> print $myvar
 	3 
 
-Example 3: The form works on the bindingKey that can be 'seen' within the scope of the assignment.
+Example 3: The form works on the binding that can be 'seen' within the scope of the assignment.
 
 	> defvar myvar 17
 	> let (myvar=3) (progn (set myvar=7) (print $myvar))

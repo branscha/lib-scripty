@@ -79,7 +79,7 @@ Nested expressions
 
 * OneOf (String) (Integer) ...
 * CheckedList (Integer) min=..., max=...
-* InstanceOrBinding (...), it goes looking for a bindingKey in the context and if the bindingKey is not found, it will try to convert the value itself to the type.
+* InstanceOrBinding (...), it goes looking for a binding in the context and if the binding is not found, it will try to convert the value itself to the type.
 * CustomType "classname", add your own custom type specification. The class should implement ITypeSpec<T>. Your implementation class should have a default constructor.
 * TypeChain (String) (Integer) ..., worden na elkaar toegepast in volgorde. Dit kan nuttig zijn om eerst alles naar een string om te zetten met @ScriptyString en vervolgens de String naar iets anders om te zetten met bvb. een custom type.
 
@@ -137,13 +137,13 @@ Certain types will be recognized automatically by Scripty, these don't have to b
 
 **@ScriptyParam("name")**. Will lookup the name in the argument specification. We do not need to introduce a separate annotation for the variable part when using variable argument lists, it can be named just like the other parameters. 
 
-**@ScriptyContextParam("name", unboundException=false)** will get a specific bindingKey from the context. The behavior if the parameter is not present will depend on the unboundException setting. If unboundException is false, a null value will be passed if the bindingKey was not present. Otherwise an exception will be thrown.
+**@ScriptyContextParam("name", unboundException=false)** will get a specific binding from the context. The behavior if the parameter is not present will depend on the unboundException setting. If unboundException is false, a null value will be passed if the binding was not present. Otherwise an exception will be thrown.
 
 These method annotations define what to do with the return value. Only one of these can be present. If the annotation is present, the return value will be bound automatically in the context.
 
-**@ScriptyDefBinding("name")** The "def" wil be used, it will create a new bindingKey or it will overwrite an existing bindingKey.
+**@ScriptyDefBinding("name")** The "def" wil be used, it will create a new binding or it will overwrite an existing binding.
 
-**@ScriptySetBinding("name")** It will change an existing bindingKey, it will throw an exception if the bindingKey does not exist.
+**@ScriptySetBinding("name")** It will change an existing binding, it will throw an exception if the binding does not exist.
 
 #### Examples
 

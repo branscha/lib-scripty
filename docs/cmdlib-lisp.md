@@ -1,5 +1,5 @@
 
-Some Lisp like commands that act on lists. This module provides the basic Data manipulation commands, they are not built-in but provided as a separate command library. The semantics deviates from common lisp because we based our lists on Java lists and not on cons constructs. Consing for example modifies the existing list, while in Lisp it creates a new version, the original bindingKey refers to the sublist. This can lead to surprising results if one is used to the original Lisp semantics.
+Some Lisp like commands that act on lists. This module provides the basic Data manipulation commands, they are not built-in but provided as a separate command library. The semantics deviates from common lisp because we based our lists on Java lists and not on cons constructs. Consing for example modifies the existing list, while in Lisp it creates a new version, the original binding refers to the sublist. This can lead to surprising results if one is used to the original Lisp semantics.
 
 **list?**
 
