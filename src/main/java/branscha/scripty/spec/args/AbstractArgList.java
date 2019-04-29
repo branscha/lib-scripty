@@ -29,7 +29,7 @@ import branscha.scripty.parser.Pair;
 
 public abstract class AbstractArgList implements ArgList {
 
-    private static final String ERR010 = "AbstractArgList/010: Found an badly formed named argument, where the name is not a string but an instance of type '%s'.";
+    private static final String ERR010 = "AbstractArgList/010: Found a badly formed named argument, where the name is not a string but an instance of type '%s'.";
     private static final String ERR020 = "AbstractArgList/020: Found an unexpected named argument '%s'.";
     private static final String ERR030 = "AbstractArgList/030: Not enough arguments. Expected at least %d arguments and received %d.";
 

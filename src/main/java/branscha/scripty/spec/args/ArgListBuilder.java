@@ -70,7 +70,12 @@ public class ArgListBuilder {
      */
     public static RuntimeArgList buildArgList(ScriptyStdArgList stdArgListAnnotation)
     throws ArgSpecException {
-        // We will collect the mappings we encounter in this map.
+
+        /*
+         * We will collect the mappings we encounter in this map. The key is the argument spec name, the value is
+         * a mapper that can fetch the argument value and eventually we can inject that value in an annotated
+         * method parameter. We must collect them first so that we can provide what the parameter annotations ask for.
+         */
         Map<String, ArgMapping> argMappings = new HashMap<>();
 
         ScriptyArg[] fixedArgAnnotations = stdArgListAnnotation.fixed();
@@ -165,7 +170,7 @@ public class ArgListBuilder {
         return new RuntimeArgList(argList, argMappings);
     }
 
-    private static int compileNamedArgs(Map<String, ArgMapping> argMappings, ScriptyArg[] lNamedArgs, NamedArg[] lNamedSpecs, int argIndex)
+    private static int compileNamedArgs(Map<String, ArgMapping> argMappings, ScriptyArg[] lNamedArgs, NamedArg[] namedArgSpecs, int argIndex)
     throws ArgSpecException {
         int k = 0;
 
@@ -179,7 +184,7 @@ public class ArgListBuilder {
 
             try {
                 TypeSpec typeSpec = (TypeSpec) typeProcessor.startNonInteractive(argType);
-                lNamedSpecs[k] = new NamedArg(argName, typeSpec, argValue, argIsOptional);
+                namedArgSpecs[k] = new NamedArg(argName, typeSpec, argValue, argIsOptional);
                 // Offset with 1, the mappings should skip element 0 which is the name of the command.
                 argMappings.put(argName, new ArrayIndexMapping(argIndex + 1));
 

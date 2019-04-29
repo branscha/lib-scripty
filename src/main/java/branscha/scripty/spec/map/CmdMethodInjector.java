@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class CmdMethodInjector {
 
-    private List<ArgMapping> mappings = new ArrayList<ArgMapping>();
+    private List<ArgMapping> mappings = new ArrayList<>();
 
     public void addArgMapping(ArgMapping argMapping) {
         mappings.add(argMapping);

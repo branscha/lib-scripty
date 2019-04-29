@@ -32,8 +32,7 @@ import branscha.scripty.parser.Eval;
  * that has the appropriate type.
  */
 public class ContextMapping implements ArgMapping {
-    public Object map(Eval eval, Context ctx, Object args)
-    throws ArgMappingException {
+    public Object map(Eval eval, Context ctx, Object args) {
         return ctx;
     }
 }

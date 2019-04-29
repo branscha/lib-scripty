@@ -44,16 +44,13 @@ public class PartialMapping implements ArgMapping {
         length = aLength;
     }
 
-    public Object map(Eval eval, Context ctx, Object args)
-    throws ArgMappingException {
-
+    public Object map(Eval eval, Context ctx, Object args) {
         Object[] lArgs = (Object[]) args;
         int lLength = 0;
         if (length < 0) {
             lLength = lArgs.length - from;
             if (lLength <= 0) lLength = 0;
         }
-
         return Arrays.copyOfRange(lArgs, from, from + lLength);
     }
 

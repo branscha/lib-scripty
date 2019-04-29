@@ -35,7 +35,7 @@ import branscha.scripty.parser.Eval;
  */
 public class ArrayIndexMapping implements ArgMapping {
 
-    public static final String ERR010 = "ArrayIndexMapping/010: Error while fetching argument %d from the argument array.";
+    public static final String ERR010 = "ArrayIndexMapping/010: Error fetching argument %d from argument array.";
 
     private int index;
 

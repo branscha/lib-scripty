@@ -32,7 +32,8 @@ import branscha.scripty.parser.Context;
  */
 public class SetResultMapping implements ResultMapping {
 
-    public static final String ERR010 = "SetResultMapping/010: The result could not be bound to '%s' in the context, the binding does not exist.";
+    private  static final String ERR010 = "SetResultMapping/010: The result could not be bound to '%s' in the context, the binding does not exist.";
+
     private String binding;
 
     public SetResultMapping(String aBinding) {

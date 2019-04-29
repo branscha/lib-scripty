@@ -24,15 +24,38 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.Context;
-import branscha.scripty.parser.Eval;
+import org.junit.Test;
 
-/**
- * Map the {@link Eval} itself into a command parameter. This can be useful for commands that want to do their own
- * expression evaluation.
- */
-public class EvalMapping implements ArgMapping {
-    public Object map(Eval eval, Context ctx, Object args) {
-        return eval;
+import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class ArrayIndexMappingTest {
+
+    @Test
+    public void map_Good()
+    throws ArgMappingException {
+        final Object[] args = {0, 1, 2, 3, 4, 5};
+        for (int i = 0; i < args.length; i++) {
+            ArgMapping aim = new ArrayIndexMapping(i);
+            assertEquals(i, aim.map(null, null, args));
+        }
+    }
+
+    @Test
+    public void map_Bad()
+    throws ArgMappingException {
+        final Object[] args = {0, 1, 2, 3, 4, 5};
+
+        ArgMapping aim = new ArrayIndexMapping(100);
+        try {
+            aim.map(null, null, args);
+            fail("Mapper should have failed.");
+        }
+        catch (ArgMappingException e) {
+            assertThat(e.getMessage(), containsString("ArrayIndexMapping/010"));
+        }
     }
 }

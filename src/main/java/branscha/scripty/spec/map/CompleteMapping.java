@@ -32,8 +32,7 @@ import branscha.scripty.parser.Eval;
  * array to the command method.
  */
 public class CompleteMapping implements ArgMapping {
-    public Object map(Eval eval, Context ctx, Object args)
-    throws ArgMappingException {
+    public Object map(Eval eval, Context ctx, Object args) {
         return args;
     }
 }

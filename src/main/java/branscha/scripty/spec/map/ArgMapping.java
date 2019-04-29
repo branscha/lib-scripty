@@ -29,7 +29,7 @@ import branscha.scripty.parser.Eval;
 
 /**
  * An single argument mapping is a piece of code that knows how to fetch specific information from the
- * available data structures Eval, Context and the args. For each command method, a {@link CmdMethodInjector} will be
+ * available data structures Eval, Context and the command arguments. For each command method, a {@link CmdMethodInjector} will be
  * created that contains an argument mapping for each parameter. Before the methdod is invoked we will call the
  * mappers to collect the correct arguments from the Scripty context.
  *

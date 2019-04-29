@@ -60,12 +60,12 @@ public class MethodCommand implements Command {
         resultMapping = null;
     }
 
-    public MethodCommand(Object aInstance, Method aMethod, ArgList aArgList, CmdMethodInjector aArgListMapping, ResultMapping aResultMapping) {
-        argList = aArgList;
-        method = aMethod;
-        instance = aInstance;
-        cmdMethodInjector = aArgListMapping;
-        resultMapping = aResultMapping;
+    public MethodCommand(Object instance, Method method, ArgList argList, CmdMethodInjector cmdMethodInjector, ResultMapping resultMapping) {
+        this.argList = argList;
+        this.method = method;
+        this.instance = instance;
+        this.cmdMethodInjector = cmdMethodInjector;
+        this.resultMapping = resultMapping;
     }
 
     public Object execute(Eval eval, Context ctx, Object[] args)
@@ -74,14 +74,17 @@ public class MethodCommand implements Command {
             Object[] guarded = args;
 
             if (argList != null) {
+                // Verify the arguments, to the conversions.
                 guarded = argList.guard(args, ctx);
             }
 
+            Object[] cmdArgs = guarded;
             if (cmdMethodInjector != null) {
-                guarded = cmdMethodInjector.map(eval, ctx, guarded);
+                // Extract the method arguments.
+                cmdArgs = cmdMethodInjector.map(eval, ctx, guarded);
             }
 
-            Object result = method.invoke(instance, guarded);
+            Object result = method.invoke(instance, cmdArgs);
 
             if (resultMapping != null) {
                 resultMapping.map(result, ctx);

@@ -280,10 +280,10 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                     throw new ExtensionException(String.format("Method '%s' in class '%s' is not static, and there is no library instance.", lMethod.getName(), aClass.getSimpleName()));
                 }
 
-                // Construct the argument mapping.
-                CmdMethodInjector lArgListMapping = null;
+                // Construct the argument injector.
+                CmdMethodInjector cmdInjector = null;
                 try {
-                    lArgListMapping = CmdMethodInjectorBuilder.buildArgMapping(lMethod, lMappings);
+                    cmdInjector = CmdMethodInjectorBuilder.buildCmdMethodInjector(lMethod, lMappings);
                 }
                 catch (ArgMappingException e) {
                     final String lMsg = String.format("While constructing the argument mapping for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
@@ -296,12 +296,12 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                     String lCmdName = lCmdAnnot.name();
                     if (lCmdName.length() == 0) lCmdName = lMethod.getName();
 
-                    commandRepo.registerCommand(lCmdName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));
+                    commandRepo.registerCommand(lCmdName, new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping));
                 }
                 else {
                     String lMacroName = lMacroAnnot.name();
                     if (lMacroName.length() == 0) lMacroName = lMethod.getName();
-                    macroRepo.registerCommand(lMacroName, new MethodCommand(aLibInstance, lMethod, lArgList, lArgListMapping, lResultMapping));
+                    macroRepo.registerCommand(lMacroName, new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping));
                 }
             }
         }

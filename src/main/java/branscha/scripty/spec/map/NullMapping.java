@@ -32,8 +32,7 @@ import branscha.scripty.parser.Eval;
  */
 public class NullMapping implements ArgMapping {
 
-    public Object map(Eval eval, Context ctx, Object args)
-    throws ArgMappingException {
+    public Object map(Eval eval, Context ctx, Object args) {
         return null;
     }
 }

@@ -34,8 +34,7 @@ public class DefResultMapping implements ResultMapping {
         binding = aBinding;
     }
 
-    public void map(Object cmdResult, Context ctx)
-    throws ResultMappingException {
+    public void map(Object cmdResult, Context ctx) {
         ctx.defBinding(binding, cmdResult);
     }
 }
