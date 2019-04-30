@@ -22,7 +22,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package branscha.scripty.cmdlib;
+package branscha.scripty.cmdlib.gui;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;

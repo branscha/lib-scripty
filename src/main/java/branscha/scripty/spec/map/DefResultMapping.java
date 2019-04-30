@@ -26,15 +26,22 @@ package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.Context;
 
+/**
+ * Define a binding in the context with the result of the command.
+ */
 public class DefResultMapping implements ResultMapping {
 
-    private String binding;
+    private String bindingKey;
 
-    public DefResultMapping(String aBinding) {
-        binding = aBinding;
+    /**
+     * Create a result binder to the context. If the binding already exists, it will be overwritten.
+     * @param bindingKey The name of the binding that will be created in the context.
+     */
+    public DefResultMapping(String bindingKey) {
+        this.bindingKey = bindingKey;
     }
 
     public void map(Object cmdResult, Context ctx) {
-        ctx.defBinding(binding, cmdResult);
+        ctx.defBinding(bindingKey, cmdResult);
     }
 }

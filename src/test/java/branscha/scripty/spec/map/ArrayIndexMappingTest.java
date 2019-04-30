@@ -30,7 +30,6 @@ import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ArrayIndexMappingTest {
 
@@ -45,8 +44,7 @@ public class ArrayIndexMappingTest {
     }
 
     @Test
-    public void map_Bad()
-    throws ArgMappingException {
+    public void map_Bad() {
         final Object[] args = {0, 1, 2, 3, 4, 5};
 
         ArgMapping aim = new ArrayIndexMapping(100);

@@ -31,7 +31,6 @@ import branscha.scripty.parser.Eval;
  * Null will be injected into the command parameter.
  */
 public class NullMapping implements ArgMapping {
-
     public Object map(Eval eval, Context ctx, Object args) {
         return null;
     }

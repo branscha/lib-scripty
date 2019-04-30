@@ -39,22 +39,27 @@ public class PartialMapping implements ArgMapping {
     private int from;
     private int length;
 
-    public PartialMapping(int aFrom, int aLength) {
-        from = aFrom;
-        length = aLength;
+    /**
+     * Retrieve part of the arguments array. This is used to extract the variadic arguments into a separate array.
+     *
+     * @param from offset in the arguments array.
+     * @param length the number of arguments to extract. If -1 then all the arguments from the offset will be copied.
+     */
+    public PartialMapping(int from, int length) {
+        this.from = from;
+        this.length = length;
     }
 
     public Object map(Eval eval, Context ctx, Object args) {
-        Object[] lArgs = (Object[]) args;
-        int lLength = 0;
+        Object[] argsArray = (Object[]) args;
+        int effectiveLength = 0;
         if (length < 0) {
-            lLength = lArgs.length - from;
-            if (lLength <= 0) lLength = 0;
+            effectiveLength = argsArray.length - from;
+            if (effectiveLength <= 0) effectiveLength = 0;
         }
-        return Arrays.copyOfRange(lArgs, from, from + lLength);
-    }
-
-    public void setOffset(int aOffset) {
-        from = from + aOffset;
+        else {
+            effectiveLength = length;
+        }
+        return Arrays.copyOfRange(argsArray, from, from + effectiveLength);
     }
 }

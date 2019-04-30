@@ -39,19 +39,20 @@ import java.util.List;
 public class CmdMethodInjector {
 
     private List<ArgMapping> mappings = new ArrayList<>();
+    private ArgMapping[] compiledMappings = new ArgMapping[0];
 
     public void addArgMapping(ArgMapping argMapping) {
         mappings.add(argMapping);
+        compiledMappings = mappings.toArray(new ArgMapping[]{});
     }
 
     public Object[] map(Eval eval, Context ctx, Object[] args)
     throws ArgMappingException {
         // Create a new method argument list.
-        final Object[] inject = new Object[mappings.size()];
+        final Object[] inject = new Object[compiledMappings.length];
         // Inject each method argument with a piece of information from the Scripty context.
-        int i = 0;
-        for (ArgMapping mapping : mappings) {
-            inject[i++] = mapping.map(eval, ctx, args);
+        for(int i = 0; i < compiledMappings.length; i++) {
+            inject[i] = compiledMappings[i].map(eval, ctx, args);
         }
         return inject;
     }

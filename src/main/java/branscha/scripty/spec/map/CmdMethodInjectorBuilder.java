@@ -35,16 +35,16 @@ import java.lang.reflect.Parameter;
 import java.util.Map;
 
 /**
- * Converts the {@link ScriptyParam} annotations and other known Scripty types into argument mappers to construct
- * the inputs for the command method.
+ * Converts the {@link ScriptyParam} annotations and other known Scripty types into {@link CmdMethodInjector} which
+ * provide the inputs for the command method.
  */
 public class CmdMethodInjectorBuilder {
 
-    private static final String ERR010 = "CmdMethodInjectorBuilder/010: Using both @ScriptyParam and @ScriptyBindingParam at the same time is not possible for parameter '%s' in method '%s'.";
-    private static final String ERR020 = "CmdMethodInjectorBuilder/020: There is no argument named '%s' to inject in the parameter '%s' of method '%s'.";
+    private static final String ERR010 = "CmdMethodInjectorBuilder/010: Using both @ScriptyParam and @ScriptyBindingParam at the same time is not possible for parameter '%s' in method '%s()'.";
+    private static final String ERR020 = "CmdMethodInjectorBuilder/020: There is no argument named '%s' to inject in the parameter '%s' of method '%s()'.";
 
     /**
-     * Construct a set of argument mappings that map arguments specified in the argument list to command method
+     * Construct a list of argument mappings that map arguments specified in the argument list to command method
      * parameters as indicated by the {@link ScriptyParam} annotations and {@link ScriptyBindingParam} annotations
      * or the class names Eval, Context and Object[].
      *
@@ -54,16 +54,16 @@ public class CmdMethodInjectorBuilder {
      */
     public static CmdMethodInjector buildCmdMethodInjector(Method method, Map<String, ArgMapping> argMappings)
     throws ArgMappingException {
-        CmdMethodInjector injector = new CmdMethodInjector();
+        final CmdMethodInjector injector = new CmdMethodInjector();
+        final String methodName = method.getName();
+        final Parameter[] parameters = method.getParameters();
 
-        String methodName = method.getName();
-        Parameter[] parameters = method.getParameters();
-        for(Parameter p : parameters) {
-            Annotation[] annotations = p.getAnnotations();
-            Class<?> paramType = p.getType();
-            String paramName = p.getName();
+        for(final Parameter p : parameters) {
+            final Annotation[] annotations = p.getAnnotations();
+            final Class<?> paramType = p.getType();
+            final String paramName = p.getName();
 
-            ArgMapping argMapping = buildSingleMapping(methodName, paramName, paramType, annotations, argMappings);
+            final ArgMapping argMapping = buildSingleMapping(methodName, paramName, paramType, annotations, argMappings);
             injector.addArgMapping(argMapping);
         }
         return injector;
@@ -71,8 +71,7 @@ public class CmdMethodInjectorBuilder {
 
     private static ArgMapping buildSingleMapping(
             String methodName, String paramName, Class<?> paramClass,
-            Annotation[] annotations, Map<String, ArgMapping> argMappings)
-    throws ArgMappingException {
+            Annotation[] annotations, Map<String, ArgMapping> argMappings) throws ArgMappingException {
 
         if (annotations.length <= 0) {
             // If there are no parameter annotations, we check if
@@ -98,15 +97,19 @@ public class CmdMethodInjectorBuilder {
             }
 
             if (paramAnnotation != null && bindingAnnotation != null) {
-                throw new ArgMappingException(String.format(ERR010, methodName, paramName));
+                throw new ArgMappingException(String.format(ERR010, paramName, methodName));
             }
             else if (paramAnnotation != null) {
-                String argName = paramAnnotation.value();
-                if (argMappings != null && argMappings.containsKey(argName)) return argMappings.get(argName);
-                else throw new ArgMappingException(String.format(ERR020, argName, paramName, methodName));
+                final String argName = paramAnnotation.value();
+                if (argMappings != null && argMappings.containsKey(argName)) {
+                    return argMappings.get(argName);
+                }
+                else {
+                    throw new ArgMappingException(String.format(ERR020, argName, paramName, methodName));
+                }
             }
             else if (bindingAnnotation != null) {
-                String bindingName = bindingAnnotation.value();
+                final String bindingName = bindingAnnotation.value();
                 boolean exceptionIfNull = bindingAnnotation.unboundException();
                 return new BindingMapping(bindingName, exceptionIfNull);
             }

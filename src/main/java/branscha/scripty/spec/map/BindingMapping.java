@@ -51,6 +51,8 @@ public class BindingMapping implements ArgMapping {
         else if (excIfNull) {
             throw new ArgMappingException(String.format(ERR010, bindingKey));
         }
-        else return null;
+        else {
+            return null;
+        }
     }
 }

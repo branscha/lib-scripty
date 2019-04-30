@@ -72,9 +72,10 @@ public class ArgListBuilder {
     throws ArgSpecException {
 
         /*
-         * We will collect the mappings we encounter in this map. The key is the argument spec name, the value is
+         * We collect the argument mappings  for the arguments we encounter. The key is the argument spec name, the value is
          * a mapper that can fetch the argument value and eventually we can inject that value in an annotated
-         * method parameter. We must collect them first so that we can provide what the parameter annotations ask for.
+         * method parameter. We must collect them so that we can provide what the parameter annotations ask for later on.
+         * We create and collect the mappers here because we know the index where we will store the argument.
          */
         Map<String, ArgMapping> argMappings = new HashMap<>();
 

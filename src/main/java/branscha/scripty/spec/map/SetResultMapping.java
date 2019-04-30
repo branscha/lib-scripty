@@ -28,11 +28,12 @@ import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Context;
 
 /**
- * Put the result of a command execution into the context.
+ * Put the result of a command execution into the context. the binding must already exist or otherwise an
+ * exception will be thrown.
  */
 public class SetResultMapping implements ResultMapping {
 
-    private  static final String ERR010 = "SetResultMapping/010: The result could not be bound to '%s' in the context, the binding does not exist.";
+    private  static final String ERR010 = "SetResultMapping/010: The result could not be bound to '%s', undefined binding.";
 
     private String binding;
 
