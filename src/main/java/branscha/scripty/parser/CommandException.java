@@ -28,11 +28,11 @@ public class CommandException extends Exception {
 
     private static final long serialVersionUID = -4301173601968482098L;
 
-    // The stack will be filled in by the HooksEval implementation.
+    // The stack will be filled in by the ModularEval implementation.
     // The ClassicEval implementation does not manage a stack of its own, it will only
     // produce a message without actual stack.
 
-    private HooksEval.EvalStack stack;
+    private ModularEval.EvalStack stack;
 
     // Normal constructors without stack.
     // Used by the ClassicEval implementation.
@@ -54,41 +54,41 @@ public class CommandException extends Exception {
     }
 
     // Stack constructors.
-    // These are used by the HooksEval implementation.
+    // These are used by the ModularEval implementation.
 
-    public CommandException(HooksEval.EvalStack aStack) {
+    public CommandException(ModularEval.EvalStack aStack) {
         super();
         this.stack = aStack;
     }
 
-    public CommandException(String message, Throwable cause, HooksEval.EvalStack aStack) {
+    public CommandException(String message, Throwable cause, ModularEval.EvalStack aStack) {
         super(message, cause);
         this.stack = aStack;
     }
 
-    public CommandException(String message, HooksEval.EvalStack aStack) {
+    public CommandException(String message, ModularEval.EvalStack aStack) {
         super(message);
         this.stack = aStack;
     }
 
-    public CommandException(Throwable cause, HooksEval.EvalStack aStack) {
+    public CommandException(Throwable cause, ModularEval.EvalStack aStack) {
         super(cause);
         this.stack = aStack;
     }
 
-    public HooksEval.EvalStack getStack() {
+    public ModularEval.EvalStack getStack() {
         return stack;
     }
 
-    public void setStack(HooksEval.EvalStack stack) {
+    public void setStack(ModularEval.EvalStack stack) {
         this.stack = stack;
     }
 
     @Override
     public String getMessage() {
-        // This method accomodates both ClassicEval and HooksEval implementations.
+        // This method accomodates both ClassicEval and ModularEval implementations.
         // If it is an exception from ClassicEval, normally only the message will be available.
-        // If it is a message from HooksEval, we will include our own stacktrace.
+        // If it is a message from ModularEval, we will include our own stacktrace.
 
         final String lMsg = super.getMessage();
         if (stack != null) return lMsg + "\n" + stack.toString();

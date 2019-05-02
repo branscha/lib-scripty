@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
 
 public class TestEval {
     private Parser parser;
-    private List<Eval> evals = Arrays.asList(new ClassicEval(), new HooksEval());
+    private List<Eval> evals = Arrays.asList(new ClassicEval(), new ModularEval());
 
     @Before
     public void setup() {

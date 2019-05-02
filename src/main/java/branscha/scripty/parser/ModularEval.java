@@ -34,17 +34,19 @@ import java.util.*;
  * it provides a number of hooks where an external controller can hook  into.
  * It is a bit slower though.
  */
-public class HooksEval extends AbstractEval {
+public class ModularEval extends AbstractEval {
 
-    public HooksEval() {
+    private static final String ERR010 = "ModularEval/010: Internal eval error, invalid stack state.";
+
+    public ModularEval() {
         this(new BasicContext());
     }
 
-    public HooksEval(Context aContext) {
+    public ModularEval(Context aContext) {
         super(aContext);
     }
 
-    public interface IFrameHandler {
+    public interface FrameHandler {
         void init(EvalStack aStack, StackFrame aFrame)
         throws CommandException;
 
@@ -53,6 +55,9 @@ public class HooksEval extends AbstractEval {
     }
 
     public static class StackFrame {
+
+        private static final String ERR010 = "StackFrame/010: Data pointer out of bounds.";
+
         private static final Object[] EMPTY = new Object[0];
 
         private Object expr;
@@ -61,7 +66,7 @@ public class HooksEval extends AbstractEval {
         private Context ctx;
         private Object result;
         private boolean evaluated;
-        private IFrameHandler handler;
+        private FrameHandler handler;
 
         public StackFrame(Object aExpr, Context aCtx) {
             expr = aExpr;
@@ -104,7 +109,7 @@ public class HooksEval extends AbstractEval {
 
         public void pushData(Object aData) {
             if (dataptr < 0 || dataptr > data.length)
-                throw new IllegalArgumentException("Data pointer out of bounds in stackframe.");
+                throw new IllegalArgumentException(ERR010);
 
             // Pushing a piece of data into a slot after the  normal slots will set the result.
             if (dataptr == data.length) setResult(aData);
@@ -121,11 +126,11 @@ public class HooksEval extends AbstractEval {
             reset();
         }
 
-        public void setHandler(IFrameHandler aHandler) {
+        public void setHandler(FrameHandler aHandler) {
             handler = aHandler;
         }
 
-        public IFrameHandler getHandler() {
+        public FrameHandler getHandler() {
             return handler;
         }
 
@@ -168,6 +173,9 @@ public class HooksEval extends AbstractEval {
 
     public static class EvalStack {
 
+        private static final String ERR010 = "EvalStack/010: top() called on empty stack.";
+        private static final String ERR020 = "EvalStack/020: pop() called on empty stack.";
+
         private List<StackFrame> stack = new ArrayList<>();
         private EvalStack prevstack;
 
@@ -184,12 +192,12 @@ public class HooksEval extends AbstractEval {
         }
 
         public StackFrame top() {
-            if (isEmpty()) throw new IllegalArgumentException("top on empty stack.");
+            if (isEmpty()) throw new IllegalArgumentException(ERR010);
             return stack.get(stack.size() - 1);
         }
 
         public StackFrame pop() {
-            if (isEmpty()) throw new IllegalArgumentException("pop on empty stack.");
+            if (isEmpty()) throw new IllegalArgumentException(ERR020);
             return stack.remove(stack.size() - 1);
         }
 
@@ -300,7 +308,7 @@ public class HooksEval extends AbstractEval {
         void receivedException(EvalEvent aEvent);
     }
 
-    // It is an array because it is hit an *enormous* amout of times.
+    // It is an array because it is hit an *enormous* amount of times.
     // If it would be a hashed based structure, it would produce
     // a humongous amount of iterator artifacts!
     private EvalListener[] listeners = new EvalListener[0];
@@ -388,24 +396,24 @@ public class HooksEval extends AbstractEval {
     throws CommandException {
         while (aStack.hasMoreSteps()) step(aStack);
         if (aStack.size() == 1 && aStack.top().isEvaluated()) return aStack.top().getResult();
-        else throw new CommandException("Internal eval error, invalid state.", aStack);
+        else throw new CommandException(ERR010, aStack);
     }
 
-    private static final IFrameHandler ATOMIC_HANDLER = new AtomicHandler();
-    private static final IFrameHandler PAIR_HANDLER = new PairHandler();
+    private static final FrameHandler ATOMIC_HANDLER = new AtomicHandler();
+    private static final FrameHandler PAIR_HANDLER = new PairHandler();
 
-    private static final IFrameHandler QUOTE_HANDLER = new QuoteHandler();
-    private static final IFrameHandler IF_HANDLER = new IfHandler();
-    private static final IFrameHandler WHILE_HANDLER = new WhileHandler();
-    private static final IFrameHandler AND_HANDLER = new AndHandler();
-    private static final IFrameHandler OR_HANDLER = new OrHandler();
-    private static final IFrameHandler NOT_HANDLER = new NotHandler();
-    private static final IFrameHandler SET_HANDLER = new SetHandler();
-    private static final IFrameHandler LET_HANDLER = new LetHandler();
-    private static final IFrameHandler GET_HANDLER = new GetHandler();
-    private static final IFrameHandler LAMBDA_HANDLER = new LambdaHandler();
-    private static final IFrameHandler DEFUN_HANDLER = new DefunHandler();
-    private static final IFrameHandler TIMER_HANDLER = new TimerHandler();
+    private static final FrameHandler QUOTE_HANDLER = new QuoteHandler();
+    private static final FrameHandler IF_HANDLER = new IfHandler();
+    private static final FrameHandler WHILE_HANDLER = new WhileHandler();
+    private static final FrameHandler AND_HANDLER = new AndHandler();
+    private static final FrameHandler OR_HANDLER = new OrHandler();
+    private static final FrameHandler NOT_HANDLER = new NotHandler();
+    private static final FrameHandler SET_HANDLER = new SetHandler();
+    private static final FrameHandler LET_HANDLER = new LetHandler();
+    private static final FrameHandler GET_HANDLER = new GetHandler();
+    private static final FrameHandler LAMBDA_HANDLER = new LambdaHandler();
+    private static final FrameHandler DEFUN_HANDLER = new DefunHandler();
+    private static final FrameHandler TIMER_HANDLER = new TimerHandler();
 
     private final MacroHandler MACRO_HANDLER = new MacroHandler();
     private final StandardHandler STANDARD_HANDLER = new StandardHandler();
@@ -426,7 +434,7 @@ public class HooksEval extends AbstractEval {
         return MACRO_HANDLER.getMacros();
     }
 
-    private static final Map<String, IFrameHandler> HANDLERS = new HashMap<String, IFrameHandler>();
+    private static final Map<String, FrameHandler> HANDLERS = new HashMap<String, FrameHandler>();
 
     static {
         HANDLERS.put("quote", QUOTE_HANDLER);
@@ -450,7 +458,7 @@ public class HooksEval extends AbstractEval {
 
         final StackFrame lFrame = aStack.top();
         final Object lExpr = lFrame.getExpr();
-        final IFrameHandler lHandler = lFrame.getHandler();
+        final FrameHandler lHandler = lFrame.getHandler();
 
         try {
             if (lFrame.isEvaluated()) {
@@ -508,7 +516,7 @@ public class HooksEval extends AbstractEval {
                         if (lCmdCandidate instanceof String) {
                             // Find the most appropriate handler and install it in the stackframe.
                             // We only have to do this lookup once for a new stackframe.
-                            final IFrameHandler lNewHandler = HANDLERS.get(lCmdCandidate);
+                            final FrameHandler lNewHandler = HANDLERS.get(lCmdCandidate);
                             if (lNewHandler != null) lFrame.setHandler(lNewHandler);
                             else if (MACRO_HANDLER.hasMacro((String) lCmdCandidate)) lFrame.setHandler(MACRO_HANDLER);
                         }
@@ -538,14 +546,14 @@ public class HooksEval extends AbstractEval {
     }
 }
 
-class AtomicHandler implements HooksEval.IFrameHandler {
+class AtomicHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         // No stack frame space needed for atoms.
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final Object lExpr = aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -564,16 +572,16 @@ class AtomicHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class PairHandler implements HooksEval.IFrameHandler {
+class PairHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
 
         // Allocate stack data.
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final Object[] lData = aFrame.getData();
         final Context lCtx = aFrame.getCtx();
@@ -595,7 +603,37 @@ class PairHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class StandardHandler implements HooksEval.IFrameHandler {
+class StandardHandler implements ModularEval.FrameHandler {
+
+    private static final String ERR010 =
+            "StandardHandler/010: Form 'eval' should have a single argument.";
+    private static final String ERR020 =
+            "StandardHandler/020: Form 'eq' should have two arguments.";
+    private static final String ERR030 =
+            "StandardHandler/030: Form 'bound?' should have a single argument.";
+    private static final String ERR040 =
+            "StandardHandler/040: Form 'bound?' should have a single string argument.";
+    private static final String ERR050 =
+            "StandardHandler/050: Form 'progn' should have at least one argument.";
+    private static final String ERR060 =
+            "StandardHandler/060: Form 'funcall' should have format (funcall name <args>).";
+    private static final String ERR070 =
+            "StandardHandler/070: Function '%s' was not found in the context.";
+    private static final String ERR080 =
+            "StandardHandler/080: First argument in form 'funcall' should evaluate to a string or lambda, and " +
+                    "received 'null'.";
+    private static final String ERR090 =
+            "StandardHandler/090: First argument in form 'funcall' should evaluate to a string or a lambda and " +
+                    "received an instance of class '%s'.";
+    private static final String ERR100 =
+            "StandardHandler/100: Command '%s' failed.%n%s";
+    private static final String ERR110 =
+            "StandardHandler/110: Command or form '%s' does not exist.";
+    private static final String ERR120 =
+            "StandardHandler/120: Command name should evaluate to a string or a lambda and found 'null'.";
+    private static final String ERR130 =
+            "StandardHandler/130: Command name should evaluate to a string or a lambda and found an instance '%s' of " +
+                    "class '%s', which cannot be interpreted as a function.";
 
     private CommandRepository commands = new CommandRepository();
 
@@ -610,7 +648,7 @@ class StandardHandler implements HooksEval.IFrameHandler {
         commands = aCommands;
     }
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -619,7 +657,7 @@ class StandardHandler implements HooksEval.IFrameHandler {
         aFrame.allocateData(lLstSize);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -649,11 +687,11 @@ class StandardHandler implements HooksEval.IFrameHandler {
 
             if ("eval".equals(lCmdName)) {
                 if (lLstSize != 2)
-                    throw new CommandException("The 'eval' form should have a single argument.", aStack);
+                    throw new CommandException(ERR010, aStack);
                 aStack.push(lData[1], lCtx);
             }
             else if ("eq".equals(lCmdName)) {
-                if (lLstSize != 3) throw new CommandException("The 'eq' form should have two arguments.", aStack);
+                if (lLstSize != 3) throw new CommandException(ERR020, aStack);
                 Object lArg1 = lData[1];
                 Object lArg2 = lData[2];
                 Boolean lResult;
@@ -665,17 +703,17 @@ class StandardHandler implements HooksEval.IFrameHandler {
             }
             else if ("bound?".equals(lCmdName)) {
                 if (lLstSize != 2)
-                    throw new CommandException("The 'bound?' form should have a single argument.", aStack);
+                    throw new CommandException(ERR030, aStack);
                 if (lData[1] instanceof String) {
                     String lName = (String) lData[1];
                     aFrame.setResult(lCtx.isBound(lName));
                 }
                 else
-                    throw new CommandException("The 'bound?' form should have a single string argument.", aStack);
+                    throw new CommandException(ERR040, aStack);
             }
             else if ("progn".equals(lCmdName)) {
                 if (lLstSize < 2)
-                    throw new CommandException("The 'progn' form should have at least one argument.", aStack);
+                    throw new CommandException(ERR050, aStack);
                 aFrame.setResult(lData[lData.length - 1]);
             }
             else if ("funcall".equals(lCmdName)) {
@@ -685,7 +723,7 @@ class StandardHandler implements HooksEval.IFrameHandler {
 
                 // Quick test on the number of arguments.
                 if (lLstSize < 2)
-                    throw new CommandException("The 'funcall' form should have the format (funcall name <args>).", aStack);
+                    throw new CommandException(ERR060, aStack);
                 // Test the function name / lambda.
                 final Object lName = lData[1];
 
@@ -701,15 +739,15 @@ class StandardHandler implements HooksEval.IFrameHandler {
                     // We have to do a lookup.
                     Object lFunCandidate = lCtx.getBinding((String) lName);
                     if (!(lFunCandidate instanceof Lambda))
-                        throw new CommandException(String.format("Function \"%s\" was not found in the context.", lName), aStack);
+                        throw new CommandException(String.format(ERR070, lName), aStack);
                     lFun = (Lambda) lFunCandidate;
                 }
                 else {
                     // Trouble.
                     // We found something in the beginning of the list that does not evaluate to a lambda name or a lambda itself.
                     if (lName == null)
-                        throw new CommandException("The first argument in the 'funcall' form should evaluate to a string or a lambda, but we received 'null'.", aStack);
-                    throw new CommandException(String.format("The first argument in the 'funcall' form should evaluate to a string or a lambda.%n Received an instance of class '%s'.", lName.getClass().getCanonicalName()), aStack);
+                        throw new CommandException(ERR080, aStack);
+                    throw new CommandException(String.format(ERR090, lName.getClass().getCanonicalName()), aStack);
                 }
 
                 // Context that binds the parameters to the arguments in addition to the lexical context.
@@ -727,7 +765,7 @@ class StandardHandler implements HooksEval.IFrameHandler {
                 catch (CommandException e) {
                     // This type of error will be handled by our general mechanism.
                     // It does not need special handling here.
-                    HooksEval.EvalStack lNestedStack = e.getStack();
+                    ModularEval.EvalStack lNestedStack = e.getStack();
                     e.setStack(aStack.merge(lNestedStack));
                     throw e;
                 }
@@ -747,7 +785,7 @@ class StandardHandler implements HooksEval.IFrameHandler {
                     }
 
                     // Re-throw the exception with more information.
-                    throw new CommandException(String.format("Command '%s' failed.%n%s", lCmdName, lMsg), e, aStack);
+                    throw new CommandException(String.format(ERR100, lCmdName, lMsg), e, aStack);
                 }
             }
             else if (lCtx.isBound(lCmdName) && lCtx.getBinding(lCmdName) instanceof Lambda) {
@@ -757,7 +795,7 @@ class StandardHandler implements HooksEval.IFrameHandler {
                 aStack.push(lFun.getExpr(), lFunCtx);
             }
             else {
-                throw new CommandException(String.format("Command or form '%s' does not exist.", lCmdName), aStack);
+                throw new CommandException(String.format(ERR110, lCmdName), aStack);
             }
         }
         else if (lCmdCandidate instanceof Lambda) {
@@ -769,16 +807,18 @@ class StandardHandler implements HooksEval.IFrameHandler {
         else {
             // Error, name of the command should be a string or a lambda.
             if (lCmdCandidate == null)
-                throw new CommandException(String.format("The command name should evaluate to a string or a lambda. Found null."), aStack);
+                throw new CommandException(String.format(ERR120), aStack);
             else
-                throw new CommandException(String.format("The command name should evaluate to a string or a lambda.%nFound an instance '%s' of class \"%s\", which cannot be interpreted as a function.", lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
+                throw new CommandException(String.format(ERR130, lCmdCandidate.toString(), lCmdCandidate.getClass().getName()), aStack);
         }
     }
 }
 
-class QuoteHandler
-        implements HooksEval.IFrameHandler {
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+class QuoteHandler implements ModularEval.FrameHandler {
+
+    private static final String ERR010 = "QuoteHandler/010: Form 'quote' should have format (quote <expr>).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
@@ -787,10 +827,10 @@ class QuoteHandler
         // In this way you can use lists as data structures and not as a function call.
         // It is a special form because it influences the way the expression is (not) evaluated, it is non-standard.
         if (lLstSize != 2)
-            throw new CommandException("The 'quote' form should have the format (quote <expr>).", aStack);
+            throw new CommandException(ERR010, aStack);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
 
@@ -799,22 +839,24 @@ class QuoteHandler
     }
 }
 
-class IfHandler
-        implements HooksEval.IFrameHandler {
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+class IfHandler implements ModularEval.FrameHandler {
+
+    private static final String ERR010 = "IfHandler/010: Form 'if' should have format (if <bool-expr> <then-expr> [<else-expr>]).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
         if (lLstSize < 3 || lLstSize > 4)
-            throw new CommandException("The 'if' form should have the format (if <bool-expr> <then-expr> [<else-expr>]).", aStack);
+            throw new CommandException(ERR010, aStack);
 
         // Allocate frame space.
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because only one of the then or else part is evaluated depending on the outcome of the test.
         // It shortcuts evaluation of the other branch.
@@ -832,7 +874,7 @@ class IfHandler
             case 1:
                 // If the boolean expression evaluates positive we push the then-part
                 // on the stack, otherwise the else part.
-                if (HooksEval.boolEval(lData[0])) aStack.push(lLstExpr.get(2), lCtx);
+                if (ModularEval.boolEval(lData[0])) aStack.push(lLstExpr.get(2), lCtx);
                     // The else is optional.
                 else if (lLstSize == 4) aStack.push(lLstExpr.get(3), lCtx);
                     // The result is null if there is no else part.
@@ -845,23 +887,24 @@ class IfHandler
     }
 }
 
-class WhileHandler
-        implements HooksEval.IFrameHandler {
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+class WhileHandler implements ModularEval.FrameHandler {
+
+    private static final String ERR010 = "WhileHandler/010: Form 'while' should have format (while <bool-expr> [<expr>]).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
         if (lLstSize < 2 || lLstSize > 3)
-            throw new CommandException("The 'while' form should have the format (while <bool-expr> [<expr>]).", aStack);
+            throw new CommandException(ERR010, aStack);
 
         // Allocate frame space. One location for the conditional expression and one for the body evaluation.
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-    throws CommandException {
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
         // It is a special form because the test is evaluated again and again.
 
         final List lLstExpr = (List) aFrame.getExpr();
@@ -876,7 +919,7 @@ class WhileHandler
                 return;
             case 1:
                 // If the boolean expression evaluates positive we push the body on the stack.
-                if (HooksEval.boolEval(lData[0])) {
+                if (ModularEval.boolEval(lData[0])) {
                     if (lLstSize == 3) {
                         // We evaluate the body.
                         aStack.push(lLstExpr.get(2), lCtx);
@@ -904,22 +947,23 @@ class WhileHandler
     }
 }
 
-class AndHandler implements HooksEval.IFrameHandler {
+class AndHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static final String ERR010 = "AndHandler/010: Form'and' should have format (and <bool-expr>+).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
         if (lLstSize <= 1)
-            throw new CommandException("The 'and' form should have the format (and <bool-expr>+).", aStack);
+            throw new CommandException(ERR010, aStack);
 
         //Allocate frame space. We allocate enough space to evaluate all arguments.
         aFrame.allocateData(lLstSize - 1);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-    throws CommandException {
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
         // It is a special form because it shortcuts evaluation if it encounters a
         // false value.
 
@@ -933,7 +977,7 @@ class AndHandler implements HooksEval.IFrameHandler {
             aStack.push(lLstExpr.get(1), lCtx);
         }
         else {// Check the result of the last parameter.
-            if (!HooksEval.boolEval(lData[lDataPtr - 1])) {
+            if (!ModularEval.boolEval(lData[lDataPtr - 1])) {
                 // We shortcut the evaluation if we find a false value.
                 // We can stop on the first false value we encounter.
                 aFrame.setResult(Boolean.FALSE);
@@ -954,22 +998,23 @@ class AndHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class OrHandler implements HooksEval.IFrameHandler {
+class OrHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static final String ERR010 = "OrHandler/010: Form 'or' should have format (and <bool-expr>+).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
         if (lLstSize <= 1)
-            throw new CommandException("The 'or' form should have the format (and <bool-expr>+).", aStack);
+            throw new CommandException(ERR010, aStack);
 
         // Allocate frame space. We allocate enough space to evaluate all arguments.
         aFrame.allocateData(lLstSize - 1);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-    throws CommandException {
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
 
         // It is a special form because it shortcuts evaluation when a single true value
         // was found
@@ -984,7 +1029,7 @@ class OrHandler implements HooksEval.IFrameHandler {
             aStack.push(lLstExpr.get(1), lCtx);
         }
         else {// Check the result of the last parameter.
-            if (HooksEval.boolEval(lData[lDataPtr - 1])) {
+            if (ModularEval.boolEval(lData[lDataPtr - 1])) {
                 // We shortcut the evaluation if we find a true value.
                 // We can stop on the first true value we encounter.
                 aFrame.setResult(Boolean.TRUE);
@@ -1005,22 +1050,23 @@ class OrHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class NotHandler implements HooksEval.IFrameHandler {
+class NotHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static final String ERR010 = "NotHandler/010: Form 'not' should have format (not <bool-expr>).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
         if (lLstSize != 2)
-            throw new CommandException("The 'not' form should have the format (not <bool-expr>).", aStack);
+            throw new CommandException(ERR010, aStack);
         // We allocate enough space to evaluate our expression.
         aFrame.allocateData(1);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-    throws CommandException {
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
         final Object[] lData = aFrame.getData();
@@ -1029,17 +1075,23 @@ class NotHandler implements HooksEval.IFrameHandler {
             aStack.push(lLstExpr.get(1), lCtx);
         }
         else {
-            if (HooksEval.boolEval(lData[0])) aFrame.setResult(Boolean.FALSE);
+            if (ModularEval.boolEval(lData[0])) aFrame.setResult(Boolean.FALSE);
             else aFrame.setResult(Boolean.TRUE);
         }
     }
 }
 
-class SetHandler implements HooksEval.IFrameHandler {
+class SetHandler implements ModularEval.FrameHandler {
 
-    private static class PairHandler implements HooksEval.IFrameHandler {
+    private static final String ERR010 = "SetHandler/010: Form'%s' should have format (%s name value).";
 
-        public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static class PairHandler implements ModularEval.FrameHandler {
+
+        public static final String ERR010 = "PairHandler/010: Form '%s' should have format (%s name value).";
+        public static final String ERR020 = "PairHandler/020: Form '%s' should have format (%s name value).";
+        public static final String ERR030 = "PairHandler/030: First argument in form '%s' should evaluate to a string.";
+
+        public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
         throws CommandException {
 
             final List lstExpr = (List) aFrame.getExpr();
@@ -1051,21 +1103,21 @@ class SetHandler implements HooksEval.IFrameHandler {
                 case 0:
                     Object lPairCand = lstExpr.get(1);
                     if (!(lPairCand instanceof Pair))
-                        throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lstExpr.get(0), lstExpr.get(0)), aStack);
+                        throw new CommandException(String.format(ERR010, lstExpr.get(0), lstExpr.get(0)), aStack);
                     Pair lPair = (Pair) lPairCand;
                     aStack.push(lPair.getLeft(), ctx);
                     return;
                 case 1:
                     lPairCand = lstExpr.get(1);
                     if (!(lPairCand instanceof Pair))
-                        throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lstExpr.get(0), lstExpr.get(0)), aStack);
+                        throw new CommandException(String.format(ERR020, lstExpr.get(0), lstExpr.get(0)), aStack);
                     lPair = (Pair) lPairCand;
                     aStack.push(lPair.getRight(), ctx);
                     return;
                 default:
                     // Check the type of the name.
                     if (!(data[0] instanceof String))
-                        throw new CommandException(String.format("The first argument in the '%s' form should evaluate to a string.", lstExpr.get(0)), aStack);
+                        throw new CommandException(String.format(ERR030, lstExpr.get(0)), aStack);
                     final String lNameRepr = (String) data[0];
 
                     if ("set".equals(lstExpr.get(0))) ctx.setBinding(lNameRepr, data[1]);
@@ -1075,14 +1127,15 @@ class SetHandler implements HooksEval.IFrameHandler {
             }
         }
 
-        public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-        throws CommandException {
+        public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
         }
     }
 
-    private static class CoupleHandler implements HooksEval.IFrameHandler {
+    private static class CoupleHandler implements ModularEval.FrameHandler {
 
-        public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+        public static final String ERR010 = "CoupleHandler/010: First argument in form '%s' should evaluate to a string.";
+
+        public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
         throws CommandException {
             final List lLstExpr = (List) aFrame.getExpr();
             final Context lCtx = aFrame.getCtx();
@@ -1099,7 +1152,7 @@ class SetHandler implements HooksEval.IFrameHandler {
                 default:
                     // Check the type of the name.
                     if (!(lData[0] instanceof String))
-                        throw new CommandException(String.format("The first argument in the '%s' form should evaluate to a string.", lLstExpr.get(0)), aStack);
+                        throw new CommandException(String.format(ERR010, lLstExpr.get(0)), aStack);
                     final String lNameRepr = (String) lData[0];
 
                     if ("set".equals(lLstExpr.get(0))) lCtx.setBinding(lNameRepr, lData[1]);
@@ -1109,15 +1162,14 @@ class SetHandler implements HooksEval.IFrameHandler {
             }
         }
 
-        public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-        throws CommandException {
+        public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
         }
     }
 
-    private static final HooksEval.IFrameHandler PAIR_HANDLER = new PairHandler();
-    private static final HooksEval.IFrameHandler COUPLE_HANDLER = new CoupleHandler();
+    private static final ModularEval.FrameHandler PAIR_HANDLER = new PairHandler();
+    private static final ModularEval.FrameHandler COUPLE_HANDLER = new CoupleHandler();
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         // Allocate enpough space to evaluate the left and right side of the assignment.
         aFrame.allocateData(2);
@@ -1135,32 +1187,35 @@ class SetHandler implements HooksEval.IFrameHandler {
             aFrame.setHandler(COUPLE_HANDLER);
         }
         else {
-            throw new CommandException(String.format("The '%s' form should have the format (%s name value).", lLstExpr.get(0), lLstExpr.get(0)), aStack);
+            throw new CommandException(String.format(ERR010, lLstExpr.get(0), lLstExpr.get(0)), aStack);
         }
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-    throws CommandException {
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
         // This handler will never be called, by now the frame handler will be replaced
         // by a more specific handler.
     }
 }
 
-class LetHandler implements HooksEval.IFrameHandler {
+class LetHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static final String ERR010 = "LetHandler/010: Form'%s' should have format (%s ((name val)...) expr).";
+    private static final String ERR020 = "LetHandler/020: Form'%s' should have format (%s ((name val)...) expr).%n" +
+            "First parameter should be a list of bindings and encountered an instance of type '%s'.";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
         final Context lCtx = aFrame.getCtx();
 
         if (lLstSize != 3)
-            throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).", lLstExpr.get(0), lLstExpr.get(0)), aStack);
+            throw new CommandException(String.format(ERR010, lLstExpr.get(0), lLstExpr.get(0)), aStack);
         final Object lBindings = lLstExpr.get(1);
 
         // Check the type of the list of bindings.
         if (!(lBindings instanceof List))
-            throw new CommandException(String.format("The '%s' form should have the format (%s ((name val)...) expr).%nThe first parameter should be a list of bindings but encountered an instance of type '%s'.", lLstExpr.get(0), lLstExpr.get(0), lBindings == null ? "null" : lBindings.getClass().getCanonicalName()), aStack);
+            throw new CommandException(String.format(ERR020, lLstExpr.get(0), lLstExpr.get(0), lBindings == null ? "null" : lBindings.getClass().getCanonicalName()), aStack);
 
         // Allocate space for all new bindings and also the expression.
         aFrame.allocateData(((List) lBindings).size() + 1);
@@ -1169,7 +1224,7 @@ class LetHandler implements HooksEval.IFrameHandler {
         aFrame.setCtx(new CompositeContext(new BasicContext(), lCtx));
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1242,20 +1297,23 @@ class LetHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class GetHandler implements HooksEval.IFrameHandler {
+class GetHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static final String ERR010 = "GetHandler/010: Form 'get' should have format (get name).";
+    private static final String ERR020 = "GetHandler/020: First argument in form 'get' should evaluate to a string.";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
-        if (lLstSize != 2) throw new CommandException("The 'get' form should have the format (get name).", aStack);
+        if (lLstSize != 2) throw new CommandException(ERR010, aStack);
         // Allocate one.
         aFrame.allocateData(1);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1270,19 +1328,27 @@ class GetHandler implements HooksEval.IFrameHandler {
             // Pick up the result.
             // Check the type of the name.
             if (!(lData[0] instanceof String))
-                throw new CommandException("The first argument in the 'get' form should evaluate to a string.", aStack);
+                throw new CommandException(ERR020, aStack);
             aFrame.setResult(lCtx.getBinding((String) lData[0]));
         }
     }
 }
 
-class LambdaHandler implements HooksEval.IFrameHandler {
+class LambdaHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-    throws CommandException {
+    private static final String ERR010 =
+            "LambdaHandler/010: Form 'lambda' should have format (lambda (<params>) <expr>).";
+    private static final String ERR020 =
+            "LambdaHandler/020: First argument in form 'lambda' should evaluate to a list of parameters.";
+    private static final String ERR030 =
+            "LambdaHandler/030: First argument in form 'lambda', the parameter list, should evaluate to a list of strings.";
+    private static final String ERR040 =
+            "LambdaHandler/040: Second argument in form 'lambda' should be an expression.";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because the parameter list nor the function body
         // should be evaluated at this point.
@@ -1294,20 +1360,20 @@ class LambdaHandler implements HooksEval.IFrameHandler {
 
         //Quick test on the number of arguments.
         if (lLstSize != 3)
-            throw new CommandException("The 'lambda' form should have the format (lambda (<params>) <expr>).", aStack);
+            throw new CommandException(ERR010, aStack);
         // Parameters are *not* evaluated ...
         final Object lParams = lLstExpr.get(1);
         final Object lBody = lLstExpr.get(2);
 
         // Do some checking.
         if (!(lParams instanceof List))
-            throw new CommandException("The first argument in the 'lambda' form should evaluate to a list of parameters.", aStack);
+            throw new CommandException(ERR020, aStack);
         List lParamList = (List) lParams;
         for (Object lParam : lParamList)
             if (!(lParam instanceof String))
-                throw new CommandException("The first argument in the 'lambda' form, the parameter list,  should evaluate to a list of strings.", aStack);
+                throw new CommandException(ERR030, aStack);
         if (lBody == null)
-            throw new CommandException("The second argument in the 'lambda' form should be an expression.", aStack);
+            throw new CommandException(ERR040, aStack);
 
         // Construct the lambda.
         final String[] lStrArgs = new String[lParamList.size()];
@@ -1317,22 +1383,24 @@ class LambdaHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class DefunHandler implements HooksEval.IFrameHandler {
+class DefunHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static final String ERR010 = "DefunHandler/010: Form 'defun' should have format (defun name (<params>) <expr>).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
         // Quick test on the number of arguments.
         if (lLstSize != 4)
-            throw new CommandException("The 'defun' form should have the format (defun name (<params>) <expr>).", aStack);
+            throw new CommandException(ERR010, aStack);
 
         // One location to evaluate our lambda macro.
         aFrame.allocateData(1);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         // It is a special form because the parameter list nor the function body
         // should be evaluated at this point.
@@ -1377,21 +1445,22 @@ class DefunHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class TimerHandler implements HooksEval.IFrameHandler {
+class TimerHandler implements ModularEval.FrameHandler {
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    private static final String ERR010 = "TimerHandler/010: form 'timer' should have format (timer expr).";
+
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final int lLstSize = lLstExpr.size();
 
-        if (lLstSize != 2) throw new CommandException("The 'timer' form should have the format (timer expr).", aStack);
+        if (lLstSize != 2) throw new CommandException(ERR010, aStack);
 
         // Allocate a single slot for the expression we have to time and another slot for the start time.
         aFrame.allocateData(2);
     }
 
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
-    throws CommandException {
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame) {
 
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1411,7 +1480,9 @@ class TimerHandler implements HooksEval.IFrameHandler {
     }
 }
 
-class MacroHandler implements HooksEval.IFrameHandler {
+class MacroHandler implements ModularEval.FrameHandler {
+
+    private static final String ERR010 = "MacroHandler/010: Macro '%s' failed.%n%s";
 
     private CommandRepository macros = new CommandRepository();
 
@@ -1430,14 +1501,14 @@ class MacroHandler implements HooksEval.IFrameHandler {
         return macros.hasCommand(aName);
     }
 
-    public void init(HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void init(ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         // Allocate a single slot for the evaluation of the macro expansion.
         aFrame.allocateData(1);
     }
 
     @SuppressWarnings("unchecked")
-    public void handleFrame(Eval aEval, HooksEval.EvalStack aStack, HooksEval.StackFrame aFrame)
+    public void handleFrame(Eval aEval, ModularEval.EvalStack aStack, ModularEval.StackFrame aFrame)
     throws CommandException {
         final List lLstExpr = (List) aFrame.getExpr();
         final Context lCtx = aFrame.getCtx();
@@ -1453,13 +1524,13 @@ class MacroHandler implements HooksEval.IFrameHandler {
                 aStack.push(lMacro.execute(aEval, lCtx, lArgs.toArray()), lCtx);
             }
             catch (CommandException e) {
-                HooksEval.EvalStack lNestedStack = e.getStack();
+                ModularEval.EvalStack lNestedStack = e.getStack();
                 e.setStack(aStack.merge(lNestedStack));
                 throw e;
             }
             catch (Exception e) {
                 // A non-CommandException is converted into a command exception here.
-                throw new CommandException(String.format("Macro '%s' failed.%n%s", lLstExpr.get(0), e.getMessage()), aStack);
+                throw new CommandException(String.format(ERR010, lLstExpr.get(0), e.getMessage()), aStack);
             }
         }
         else {

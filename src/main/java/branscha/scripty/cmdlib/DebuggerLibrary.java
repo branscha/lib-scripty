@@ -173,7 +173,7 @@ public class DebuggerLibrary {
         if (trace != null) trace.terminate();
 
         // Now create a new one.
-        final HooksEval dbgEval = new HooksEval();
+        final ModularEval dbgEval = new ModularEval();
         dbgEval.setCommandRepo(currentEval.getCommandRepo());
         dbgEval.setMacroRepo(currentEval.getMacroRepo());
         dbgEval.setContext(context);
@@ -329,11 +329,11 @@ public class DebuggerLibrary {
     //
     @ScriptyCommand(name = "dbg-stack")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
-    public HooksEval.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
-                                        @ScriptyParam("quiet") boolean isQuiet)
+    public ModularEval.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
+                                          @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
-        final HooksEval.EvalStack stack = trace.getStack();
+        final ModularEval.EvalStack stack = trace.getStack();
         if (!isQuiet) {
             if (stack != null) writer.print(stack.toString());
             else {
@@ -357,7 +357,7 @@ public class DebuggerLibrary {
                           @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         checkTrace();
-        final HooksEval.EvalStack lStack = trace.getStack();
+        final ModularEval.EvalStack lStack = trace.getStack();
         if (lStack == null) throw new CommandException(ERR040);
         final Context lCtx = lStack.top().getCtx();
         if (!isQuiet) writer.print(lCtx.toString());
@@ -426,9 +426,9 @@ public class DebuggerLibrary {
     public Object dbgEval(@ScriptyParam("arg") Object aArg, Eval aEval)
     throws CommandException {
         checkTrace();
-        HooksEval.EvalStack lStack = trace.getStack();
+        ModularEval.EvalStack lStack = trace.getStack();
         if (lStack == null) throw new CommandException(ERR040);
-        HooksEval.StackFrame lFrame = lStack.top();
+        ModularEval.StackFrame lFrame = lStack.top();
         if (lFrame == null) throw new CommandException(ERR050);
         final Context lCtx = lFrame.getCtx();
         return aEval.eval(aArg, lCtx);

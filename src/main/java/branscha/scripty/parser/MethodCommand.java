@@ -36,7 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * A scripty extension implemented by a Java method.
+ * Scripty extension implemented by a Java method.
  */
 public class MethodCommand implements Command {
 

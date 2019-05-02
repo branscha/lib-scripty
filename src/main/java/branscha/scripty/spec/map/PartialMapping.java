@@ -36,6 +36,8 @@ import java.util.Arrays;
  */
 public class PartialMapping implements ArgMapping {
 
+    public static final String ERR010 = "PartialMapping/010: Error fetching arguments sublist from %d length %d.";
+
     private int from;
     private int length;
 
@@ -50,7 +52,9 @@ public class PartialMapping implements ArgMapping {
         this.length = length;
     }
 
-    public Object map(Eval eval, Context ctx, Object args) {
+    public Object map(Eval eval, Context ctx, Object args)
+    throws ArgMappingException {
+
         Object[] argsArray = (Object[]) args;
         int effectiveLength = 0;
         if (length < 0) {
@@ -60,6 +64,12 @@ public class PartialMapping implements ArgMapping {
         else {
             effectiveLength = length;
         }
-        return Arrays.copyOfRange(argsArray, from, from + effectiveLength);
+
+        try {
+            return Arrays.copyOfRange(argsArray, from, from + effectiveLength);
+        }
+        catch (Exception e) {
+            throw new ArgMappingException(String.format(ERR010, from, effectiveLength));
+        }
     }
 }

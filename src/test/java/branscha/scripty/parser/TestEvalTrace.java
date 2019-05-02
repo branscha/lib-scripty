@@ -51,13 +51,13 @@ public class TestEvalTrace {
             "(fac 10):2! ~ [fac, 10]";
 
     private Parser parser;
-    private HooksEval eval;
+    private ModularEval eval;
 
     @Before
     public void setup()
     throws ExtensionException {
         parser = new Parser();
-        eval = new HooksEval();
+        eval = new ModularEval();
 
         ExtensionRepositoryBuilder extBldr = new ExtensionRepositoryBuilder();
         extBldr.addLibraryClasses(MathLibrary.class);
