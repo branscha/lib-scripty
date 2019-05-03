@@ -34,7 +34,8 @@ import java.lang.annotation.Target;
 /**
  * Command annotation. Mark a method as a command. You can register the commands individually using
  * {@link branscha.scripty.ScriptyCapable#addCommand(String, Command)} or group the commands in a
- * {@link ScriptyLibrary} to manage them together.
+ * {@link ScriptyLibrary} to manage them together. The Scripty engine will help validating and converting arguments
+ * if the command is decorated with an {@link ScriptyStdArgList} or a {@link ScriptyVarArgList}.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

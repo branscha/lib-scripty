@@ -30,11 +30,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use a {@link ScriptyStdArgList} or a {@link ScriptyVarArgList} that was defined earlier or in a
+ * Command annotation. Use a {@link ScriptyStdArgList} or a {@link ScriptyVarArgList} that was defined earlier or in a
  * {@link ScriptyNamedArgLists} declaration.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyRefArgList {
+    /**
+     * The argument list name that is applicable to the annotated command.
+     */
     String ref() default "";
 }

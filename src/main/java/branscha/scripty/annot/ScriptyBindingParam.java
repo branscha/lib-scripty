@@ -30,19 +30,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Command parameter annotation. Bind a Scripty context variable to a Java parameter.
+ * Command parameter annotation. Bind a Scripty context value to a command parameter.
  * The context parameter will be bound to the parameter of the method implementing the command.
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyBindingParam {
     /**
-     * The name of the Scripty context variable that should be bound to the parameter.
+     * The binding name of the Scripty context value that should be bound to the parameter.
      */
     String value();
 
     /**
-     * The binding behavior if there is no context variable with specified name.
+     * The behavior if there is no context variable with specified name. If the flag is set the
+     * Scripty engine will throw an exception when the context does not contain a value with
+     * specified binding name.
      */
     boolean unboundException() default false;
 }

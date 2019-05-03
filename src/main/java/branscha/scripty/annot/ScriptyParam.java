@@ -31,10 +31,13 @@ import java.lang.annotation.Target;
 
 /**
  * Command parameter annotation. Bind a {@link ScriptyArg}  from a {@link ScriptyStdArgList} or {@link ScriptyVarArgList}
- * to the java parameter. The argument will be bound to the parameter of the method implementing the command.
+ * to the command parameter. The argument will be assigned to the parameter of the method implementing the command.
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyParam {
+    /**
+     * The name of the argument that should be assigned to the annotated command parameter.
+     */
     String value();
 }

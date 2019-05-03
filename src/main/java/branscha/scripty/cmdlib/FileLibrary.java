@@ -217,7 +217,7 @@ public class FileLibrary {
     }
 
     // Rename a file.
-    // It does not use wildcards sinds the implementation is based on the Java File class which
+    // It does not use wildcards since the implementation is based on the Java File class which
     // does not accept wildcards.
     //
     @ScriptyCommand(name = "mv")

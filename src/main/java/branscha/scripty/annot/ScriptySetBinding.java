@@ -30,7 +30,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The result of the {@link ScriptyCommand} will be modified in the Scripty context (global storage).
+ * Command annotation. The result of the {@link ScriptyCommand} will be modified in the Scripty context (global storage).
  * A binding must first be defined using {@link ScriptyDefBinding} commands, after that the binding can be modified.
  */
 @Target(ElementType.METHOD)

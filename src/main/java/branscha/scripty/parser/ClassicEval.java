@@ -201,6 +201,11 @@ public class ClassicEval extends AbstractEval {
     private CommandRepository commands;
     private CommandRepository macros;
 
+    // Limit the total exception message length.
+    private static final int TOTAL_MSG_LIMIT = 1000;
+    // Limit a single exception entry within the composite exception.
+    private static final int ENTRY_MSG_LIMIT = 80;
+
     public ClassicEval() {
         this(new BasicContext());
     }
@@ -246,7 +251,9 @@ public class ClassicEval extends AbstractEval {
         try {
             // Stop evaluation if the current evaluation thread got a signal to
             // stop processing the expression.
-            if (Thread.interrupted()) throw new CommandException(ERR020);
+            if (Thread.interrupted()) {
+                throw new CommandException(ERR020);
+            }
 
             if (!(expr instanceof List)) {
                 // I. Atomic expressions
@@ -258,16 +265,15 @@ public class ClassicEval extends AbstractEval {
                 }
                 else if (expr instanceof Pair) {
                     // Pairs are meant to make key/value pairs easier.
-                    final Pair lPair = (Pair) expr;
-                    final Object lEvaluatedLeft = eval(lPair.getLeft(), ctx);
-                    final Object lEvaluatedRight = eval(lPair.getRight(), ctx);
-                    return new Pair(lEvaluatedLeft, lEvaluatedRight);
+                    final Pair pair = (Pair) expr;
+                    final Object evaluatedLeft = eval(pair.getLeft(), ctx);
+                    final Object evaluatedRight = eval(pair.getRight(), ctx);
+                    return new Pair(evaluatedLeft, evaluatedRight);
                 }
                 else {
-                    // All other values except lists evaluate to
-                    // themselves! This is quite different from the original LISP.
-                    // Our goal is to have a handy and flexible REPL that can handle model objects or "handles"
-                    // that do not have a list representation.
+                    // All other values except lists evaluate to themselves! This is quite different from the
+                    // original LISP. Our goal is to have a handy and flexible REPL that can handle model objects
+                    // or "handles" that do not have a list representation.
                     ////////////////////////////////////////////
                     return expr;
                 }
@@ -280,10 +286,11 @@ public class ClassicEval extends AbstractEval {
                 final List<Object> exprList = (List<Object>) expr;
                 final int exprListSize = exprList.size();
 
-                // An empty list is never evaluated, but we must
-                // return a new empty list as a result in order to prevent
-                // modification to the expresson itself.
-                if (exprListSize == 0) return new ArrayList();
+                // An empty list is never evaluated, but we must return a new empty list as a result in order to prevent
+                // modification to the expression itself.
+                if (exprListSize == 0) {
+                    return new ArrayList();
+                }
                 Object cmdCandidate = exprList.get(0);
 
                 // 1. Special forms are not evaluated as a normal form.
@@ -295,19 +302,31 @@ public class ClassicEval extends AbstractEval {
                     // If it is a quoted list, we don't evaluate its elements, the result is again, the list.
                     // In this way you can use lists as data structures and not as a function call.
                     // It is a special form because it influences the way the expression is (not) evaluated, it is non-standard.
-                    if (exprListSize == 2) return exprList.get(1);
-                    else throw new CommandException(ERR030);
+                    if (exprListSize == 2) {
+                        return exprList.get(1);
+                    }
+                    else {
+                        throw new CommandException(ERR030);
+                    }
                 }
                 else if ("if".equals(cmdCandidate)) {
                     // It is a special form because only one of the then or else part is evaluated depending on the outcome of the test.
                     // It shortcuts evaluation of the other branch.
 
                     // Quick test on the number of arguments.
-                    if (exprListSize < 3 || exprListSize > 4)
+                    if (exprListSize < 3 || exprListSize > 4) {
                         throw new CommandException(ERR040);
-                    if (boolEval(eval(exprList.get(1), ctx))) return eval(exprList.get(2), ctx);
-                    else if (exprListSize == 4) return eval(exprList.get(3), ctx);
-                    else return null;
+                    }
+
+                    if (boolEval(eval(exprList.get(1), ctx))) {
+                        return eval(exprList.get(2), ctx);
+                    }
+                    else if (exprListSize == 4) {
+                        return eval(exprList.get(3), ctx);
+                    }
+                    else {
+                        return null;
+                    }
                 }
                 else if ("while".equals(cmdCandidate)) {
                     // It is a special form because the test is evaluated again and again.
@@ -325,15 +344,17 @@ public class ClassicEval extends AbstractEval {
                     // false value.
 
                     // Quick test on the number of arguments.
-                    if (exprListSize <= 1)
+                    if (exprListSize <= 1) {
                         throw new CommandException(ERR060);
-                    Iterator<Object> lIter = exprList.iterator();
+                    }
+
+                    Iterator<Object> iter = exprList.iterator();
                     // Skip the "and"
-                    lIter.next();
+                    iter.next();
                     // We evaluate the arguments until we encounter a false one.
                     // We don't evaluate the arguments after the false one.
-                    while (lIter.hasNext()) {
-                        final Object lArg = lIter.next();
+                    while (iter.hasNext()) {
+                        final Object lArg = iter.next();
                         if (!boolEval(eval(lArg, ctx))) return Boolean.FALSE;
                     }
                     return Boolean.TRUE;
@@ -733,19 +754,15 @@ public class ClassicEval extends AbstractEval {
         //   Nevertheless, we catch this and turn it into our own CommandException.
         //   After this, it will participate in the stack-unwinding-info as well.
         catch (CommandException e) {
-            // There are limits to our helpfulness ...
-            final int lTotalMsgLim = 1000;
-            final int lEntryMsgLim = 80;
-
             String lMsg = e.getMessage();
             // If the message becomes too large, we will stop augmenting it in order
             // not to crash our little evaluator.
-            if (lMsg.length() >= lTotalMsgLim) {
+            if (lMsg.length() >= TOTAL_MSG_LIMIT) {
                 if (!lMsg.endsWith("-> ..."))
                     lMsg = lMsg + "\n-> ...";
             }
             // We augment the exception with information so that the user can pinpoint the error.
-            else lMsg = String.format("%s%n-> %s", e.getMessage(), limitMsg(Printer.print(expr, false), lEntryMsgLim));
+            else lMsg = String.format("%s%n-> %s", e.getMessage(), limitMsg(Printer.print(expr, false)));
             throw new CommandException(lMsg);
         }
         catch (Exception e) {
@@ -766,10 +783,10 @@ public class ClassicEval extends AbstractEval {
         return lBuilder.toString();
     }
 
-    private String limitMsg(Object aObj, int aLen) {
+    private String limitMsg(Object aObj) {
         if (aObj == null) return "";
         String lMsg = aObj.toString();
-        if (lMsg.length() > aLen) return lMsg.substring(0, aLen - 5) + " ...";
+        if (lMsg.length() > ENTRY_MSG_LIMIT) return lMsg.substring(0, ENTRY_MSG_LIMIT - 5) + " ...";
         else return lMsg;
     }
 

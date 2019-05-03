@@ -37,13 +37,14 @@ package branscha.scripty.annot;
  */
 public @interface ScriptyArg {
     /**
-     * The name of the argument. It can be used to map the description to a command parameter using the
+     * The name of the argument. It can be used to map the argument to a command parameter using the
      * {@link ScriptyParam} annotation.
      */
     String name();
 
     /**
-     * The type of the argument, the description is in the type DSL (written in Scripty).
+     * The type of the argument, the description is in the type DSL (written in Scripty). The Scripty engine will
+     * verify the argument type and will try to convert the argument before handing it over to the command.
      */
     String type();
 

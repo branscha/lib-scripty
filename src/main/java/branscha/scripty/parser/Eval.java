@@ -46,7 +46,6 @@ public interface Eval {
      *
      * @param expr An expression.
      * @return The result of evaluation.
-     * @throws CommandException
      */
     Object eval(Object expr)
     throws CommandException;
@@ -58,32 +57,27 @@ public interface Eval {
      * @param expr    An expression.
      * @param ctx An evaluation context.
      * @return The result of evaluation.
-     * @throws CommandException
      */
     Object eval(Object expr, Context ctx)
     throws CommandException;
 
     /**
      * Provide the command repository. These commands can then be used in the Scripty expressions.
-     * @param cmdRepository
      */
-    public void setCommandRepo(CommandRepository cmdRepository);
+    void setCommandRepo(CommandRepository cmdRepository);
 
     /**
      * Retrieve the command repository.
-     * @return
      */
     CommandRepository getCommandRepo();
 
     /**
      * Provide the macro repository. These macro's can then be used in the Scripty expressions.
-     * @param macroRepository
      */
-    public void setMacroRepo(CommandRepository macroRepository);
+    void setMacroRepo(CommandRepository macroRepository);
 
     /**
      * Retrieve the macro's.
-     * @return
      */
     CommandRepository getMacroRepo();
 }
