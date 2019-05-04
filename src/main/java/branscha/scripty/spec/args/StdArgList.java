@@ -28,6 +28,7 @@ import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -116,5 +117,21 @@ public class StdArgList extends AbstractArgList {
             optional.add(arg);
             return this;
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("StdArgList{");
+        if (fixedArgs != null && fixedArgs.length > 0) {
+            sb.append("\n").append("   ").append("fixed=").append(Arrays.asList(fixedArgs).toString());
+        }
+        if (optArgs != null && optArgs.length > 0) {
+            sb.append("\n").append("   ").append("optional=").append(Arrays.asList(optArgs).toString());
+        }
+        if (namedArgs != null && namedArgs.length > 0) {
+            sb.append("\n").append("   ").append("named=").append(Arrays.asList(namedArgs).toString());
+        }
+        sb.append('}');
+        return sb.toString();
     }
 }

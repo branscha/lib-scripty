@@ -188,7 +188,7 @@ public class LoadLibrary {
     public static class LoaderType implements TypeSpec {
 
         public String getSpecName() {
-            return "loader";
+            return "Loader";
         }
 
         public Object guard(Object arg, Context ctx)

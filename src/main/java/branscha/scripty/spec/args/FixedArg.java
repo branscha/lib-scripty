@@ -42,7 +42,7 @@ public class FixedArg implements ArgSpec {
 
     public FixedArg(TypeSpec spec) {
         this.spec = spec;
-        specName = "fixed: " + this.spec.getSpecName();
+        specName = this.spec.getSpecName();
     }
 
     public String getSpecName() {
@@ -62,5 +62,13 @@ public class FixedArg implements ArgSpec {
         catch (TypeSpecException e) {
             throw new ArgSpecException(String.format(ERR020, pos, e.getMessage()));
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Arg{");
+        sb.append("type=\"").append(specName).append("\"");
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -28,6 +28,7 @@ import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -135,5 +136,25 @@ public class VarArgList extends AbstractArgList {
             this.maxOccurs = maxOccurs;
             return this;
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("VarArgList{");
+        if(fixedArgs != null && fixedArgs.length > 0){
+            sb.append("\n").append("    ").append("fixed=").append(Arrays.asList(fixedArgs).toString());
+        }
+        sb.append("\n").append("   ").append("var=").append(varArg);
+        if(min > 0) {
+            sb.append(", #min=").append(min);
+        }
+        if(max > 0) {
+            sb.append(", #max=").append(max);
+        }
+        if(namedArgs != null && namedArgs.length > 0) {
+            sb.append("\n").append("    ").append("named=").append(namedArgs == null ? "null" : Arrays.asList(namedArgs).toString());
+        }
+        sb.append('}');
+        return sb.toString();
     }
 }

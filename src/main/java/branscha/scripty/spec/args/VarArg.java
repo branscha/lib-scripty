@@ -36,7 +36,7 @@ public class VarArg implements ArgSpec {
 
     public VarArg(TypeSpec aSpec) {
         spec = aSpec;
-        specName = "var: " + spec.getSpecName();
+        specName = spec.getSpecName();
     }
 
     public String getSpecName() {
@@ -53,5 +53,13 @@ public class VarArg implements ArgSpec {
         catch (TypeSpecException e) {
             throw new ArgSpecException(String.format("Var argument at position %d: %s", pos, e.getMessage()));
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Arg{");
+        sb.append("type=\"").append(specName).append("\"");
+        sb.append('}');
+        return sb.toString();
     }
 }

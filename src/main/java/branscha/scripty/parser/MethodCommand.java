@@ -51,6 +51,7 @@ public class MethodCommand implements Command {
     private CmdMethodInjector cmdMethodInjector;
     private ResultMapping resultMapping;
     private Method method;
+    private String description;
 
     public MethodCommand(Method aMethod) {
         argList = null;
@@ -58,14 +59,16 @@ public class MethodCommand implements Command {
         instance = null;
         cmdMethodInjector = null;
         resultMapping = null;
+        description = "";
     }
 
-    public MethodCommand(Object instance, Method method, ArgList argList, CmdMethodInjector cmdMethodInjector, ResultMapping resultMapping) {
+    public MethodCommand(Object instance, Method method, ArgList argList, CmdMethodInjector cmdMethodInjector, ResultMapping resultMapping, String description) {
         this.argList = argList;
         this.method = method;
         this.instance = instance;
         this.cmdMethodInjector = cmdMethodInjector;
         this.resultMapping = resultMapping;
+        this.description = description;
     }
 
     public Object execute(Eval eval, Context ctx, Object[] args)
@@ -117,5 +120,13 @@ public class MethodCommand implements Command {
         catch (ResultMappingException e) {
             throw new CommandException(String.format(ERR050, args[0], CmdUtil.concatExceptionMessages(e)));
         }
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public ArgList getArgList() {
+        return argList;
     }
 }

@@ -41,4 +41,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScriptyCommand {
     String name() default "";
+    String description() default "";
 }

@@ -89,7 +89,8 @@ extends ScriptyCapable {
                 LoadLibrary.class,
                 BeanLibrary.class,
                 FileDialogLibrary.class,
-                FileLibrary.class);
+                FileLibrary.class,
+                HelpLibrary.class);
 
         // Load debugger macro's.
         repl.getReplEngine().exec("(load cp:/dbgutil.lsp)");

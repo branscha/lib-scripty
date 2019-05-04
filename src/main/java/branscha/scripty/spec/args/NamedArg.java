@@ -45,8 +45,7 @@ public class NamedArg implements ArgSpec {
         value = aValue;
         valueSpec = aValSpec;
         optional = aOptional;
-
-        specName = paramName + "=" + valueSpec.getSpecName();
+        specName = valueSpec.getSpecName();
     }
 
     public String getSpecName() {
@@ -86,5 +85,16 @@ public class NamedArg implements ArgSpec {
 
     public String getName() {
         return paramName;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Arg{");
+        sb.append("name='").append(paramName).append('\'');
+        sb.append(", type=\"").append(specName).append("\"");
+        sb.append(", default=\"").append(value).append("\"");
+        sb.append(", optional=").append(optional);
+        sb.append('}');
+        return sb.toString();
     }
 }

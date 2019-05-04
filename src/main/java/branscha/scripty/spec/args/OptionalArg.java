@@ -50,7 +50,7 @@ public class OptionalArg implements ArgSpec {
     public OptionalArg(TypeSpec aSpec, Object aVal) {
         spec = aSpec;
         defaultVal = aVal;
-        specName = "opt: " + spec.getSpecName();
+        specName = spec.getSpecName();
     }
 
     public String getSpecName() {
@@ -73,5 +73,14 @@ public class OptionalArg implements ArgSpec {
         catch (TypeSpecException e) {
             throw new ArgSpecException(String.format(ERR010, aPos, e.getMessage()));
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Arg{");
+        sb.append("type=\"").append(specName).append("\"");
+        sb.append(", default=\"").append(defaultVal).append("\"");
+        sb.append('}');
+        return sb.toString();
     }
 }

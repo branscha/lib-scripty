@@ -117,7 +117,7 @@ public class ClassicEval extends AbstractEval {
     private static final String ERR060 =
             "ClassicEval/060: Form 'and' should have format (and <bool-expr>+).";
     private static final String ERR070 =
-            "ClassicEval/070: Form 'or' should have format (and <bool-expr>+).";
+            "ClassicEval/070: Form 'or' should have format (or <bool-expr>+).";
     private static final String ERR080 =
             "ClassicEval/080: Form 'not' should have format (not <bool-expr>).";
     private static final String ERR090 =
@@ -127,19 +127,19 @@ public class ClassicEval extends AbstractEval {
     private static final String ERR110 =
             "ClassicEval/110: First argument in form '%s' should evaluate to a string.";
     private static final String ERR120 =
-            "ClassicEval/120: Form '%s' should have format (%s ((name val)...) expr).";
+            "ClassicEval/120: Form '%s' should have format (%s ((name val)...) <expr>).";
     private static final String ERR130 =
-            "ClassicEval/130: Form '%s' should have format (%s ((name val)...) expr).%nFirst parameter should be a list " +
+            "ClassicEval/130: Form '%s' should have format (%s ((name val)...) <expr>).%nFirst parameter should be a list " +
                     "of bindings and encountered an instance of type '%s'.";
     private static final String ERR140 =
-            "ClassicEval/140: Form '%s' should have format (%s ((name val) | name=val ...) expr).%nEach binding should " +
+            "ClassicEval/140: Form '%s' should have format (%s ((name val) | name=val ...) <expr>).%nEach binding should " +
                     "be a list of length 2 of format (var val).";
     private static final String ERR150 =
-            "ClassicEval/150: Special '%s' should have format (%s ((name val) | name=val ...) expr).%nEach binding " +
+            "ClassicEval/150: Special '%s' should have format (%s ((name val) | name=val ...) <expr>).%nEach binding " +
                     "should be a list  of format (var val).%nFirst element should be a string but encountered an " +
                     "instance of type '%s'.";
     private static final String ERR160 =
-            "ClassicEval/160: Form '%s' should have format (%s ((name val) | name=val ...) expr).%nEach binding should " +
+            "ClassicEval/160: Form '%s' should have format (%s ((name val) | name=val ...) <expr>).%nEach binding should " +
                     "be a list or a string or a pair but encountered an instance of type '%s'.";
     private static final String ERR170 =
             "ClassicEval/170: Form 'get' should have format (get name).";
@@ -150,7 +150,7 @@ public class ClassicEval extends AbstractEval {
     private static final String ERR200 =
             "ClassicEval/200: First argument in form 'lambda' should evaluate to a list of parameters.";
     private static final String ERR210 =
-            "ClassicEval/210: First argument in form 'lambda', the parameter list,  should evaluate to a list of strings.";
+            "ClassicEval/210: First argument in form 'lambda', the parameter list, should evaluate to a list of strings.";
     private static final String ERR220 =
             "ClassicEval/220: Second argument in form 'lambda' should be an expression.";
     private static final String ERR230 =
@@ -164,7 +164,7 @@ public class ClassicEval extends AbstractEval {
     private static final String ERR270 =
             "ClassicEval/270: Third argument in form 'defun' should be an expression.";
     private static final String ERR280 =
-            "ClassicEval/280: Form 'timer' should have format (timer expr).";
+            "ClassicEval/280: Form 'timer' should have format (timer <expr>).";
     private static final String ERR290 =
             "ClassicEval/290: Form 'eval' should have a single argument.";
     private static final String ERR300 =
@@ -196,7 +196,8 @@ public class ClassicEval extends AbstractEval {
     private static final String ERR410 =
             "ClassicEval/410: Command name should evaluate to a string or a lambda.%nFound an instance '%s' of " +
                     "class \"%s\", which cannot be interpreted as a function.";
-
+    private static final String ERR420 =
+            "ClassicEval/420: Macro '%s' failed.%n%s";
 
     private CommandRepository commands;
     private CommandRepository macros;
@@ -583,7 +584,7 @@ public class ClassicEval extends AbstractEval {
                     }
                     catch (Exception e) {
                         // A non-CommandException is converted into a command exception here.
-                        throw new CommandException(String.format("Macro '%s' failed.%n%s", cmdCandidate, concatExceptionMessages(e)));
+                        throw new CommandException(String.format(ERR420, cmdCandidate, concatExceptionMessages(e)));
                     }
                 }
 
