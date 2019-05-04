@@ -28,6 +28,9 @@ import branscha.scripty.parser.Command;
 import branscha.scripty.parser.Context;
 import branscha.scripty.repl.ReplEngine;
 
+/**
+ * An embedding component that has a Scripty {@link ReplEngine} on board.
+ */
 public abstract class ScriptyCapable
 implements ExtensionManager, ContextHolder {
 

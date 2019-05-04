@@ -1,4 +1,4 @@
-# File System Commands
+# File Commands
 
 If you want to give the user of the embedding application the possibilities of navigating the local file system you can activate this command library. 
 

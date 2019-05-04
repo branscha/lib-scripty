@@ -1,12 +1,12 @@
 # Scripty Command Language
 ## Description
 
-Scripty is an interpreter that can be used to provide a simple script language that can be embedded inside an application. Situations where Scripty might be useful:
+Scripty is an embeddable interpreter that provides an extensible command language. Situations where Scripty might be useful:
 
-* Command line parsing during startup of the embedding application.
+* Command line parsing during startup of the application.
 * Application configuration scripts.
-* Provide a command line GUI (graphical or text based) to the embedding application.
-* Add automation facilities to the embedding application so that the user can write scripts against your application model.
+* Command line GUI (graphical or text based) to the embedding application.
+* Add automation facilities to the embedding application to enable the user to write scripts against the application model.
 * Add scripts to Java annotations to make them more powerful.
 * Create builder DSL's.
 
@@ -14,19 +14,24 @@ Furthermore, you have full control over the power of Scripty. By default only th
 
 ## Example - Create a read-eval-print loop
 
-This is only one of the possible ways to embed Scripty in an application. We will use Scripty as the top level REPL, other ways to embed Scripty are described in [xxx][1]
+This is only one of the possible ways to embed Scripty in an application. We will use Scripty as the top level REPL, other ways to embed Scripty are described in "[Embedding Scripty](docs/man-embedding-scripty.md)".
 
 This wil create a read-eval-print loop that automatically detects if the application is running on a graphical system or not. If the application is started on a text-only system, a text read-eval-print loop is started, if the application is started in a windowing system a graphical command editing application is started.
 
 ```Java
-public static void main(String[] aArgs)
-throws ExtensionException
-{
-    ScriptyAutoRepl lRepl = new ScriptyAutoRepl();
-    lRepl.addLibraryClasses(PrintLibrary.class, MathLibrary.class);
-    lRepl.startLoop();
+// Create a new REPL application.
+public class MyRepl {
+    public static void main(String[] args)
+    throws ExtensionException {
+        // Create the REPL.
+        ScriptyAutoRepl repl = new ScriptyAutoRepl();
+        // Add the necessary command libraries (or add your own).
+        repl.addLibraryClasses(PrintLibrary.class, MathLibrary.class);
+        // Start the REPL.
+        repl.startLoop();
+    }
 }
-````
+```
 
 Use `./gradlew run` comman to start the minimalistic GUI.
 
@@ -36,11 +41,9 @@ In order to create your own commands that access the business logic you have to 
 
 ```Java
 @ScriptyLibrary(name="MyLib", type=ScriptyLibraryType.STATIC)
-public class PrintLibrary
-{
+public class PrintLibrary {
     @ScriptyCommand(name="hi")
-    public void method123()
-    {
+    public void method123() {
         System.out.println("Hi there!");
     }
 }
@@ -64,7 +67,7 @@ And the text mode repl:
 
 ## Available Libraries
 
-The scripty component contains a number of pre-defined command libraries that are at your disposal.
+The scripty component comes with a number of pre-defined command libraries that are at your disposal.
 
 ### Essential
 

@@ -32,10 +32,9 @@ import java.io.*;
 import java.util.List;
 
 /**
- * The Repl understands a simplified lisp syntax, only strings and lists can be expressed on the command line. Command
- * evaluation can have any kind of Java object as a result.
+ * The Repl understands the Scripty command language.
  * <p>
- * Outermost parenthesis should be omitted so that the user is not set back by the lisp syntax.
+ * Outermost parenthesis should be omitted so that the user is not set back by the Lisp syntax.
  * <p>
  * Explicitly lacking: data structures, data structure manipulation. It should be done using Java commands and an
  * underlying Java model. The language on top should help to manipulate the underlying Java model.
@@ -70,69 +69,50 @@ implements ExtensionManager {
     private boolean interactiveMode = true;
     private Object lastResult = null;
 
+    /**
+     * An empty implementation of {@link Writer} that does nothing.
+     * Instances are used as default parameters if no streams are provided.
+     */
     private static class NullWriter extends Writer {
-        private Writer parentWriter;
-
-        public NullWriter() {
+        NullWriter() {
             super();
         }
 
-        public NullWriter(Object lock) {
-            super(lock);
+        public void write(int c) {
         }
 
-        public NullWriter(Writer parentWriter) {
-            super();
-            this.parentWriter = parentWriter;
+        public void write(char[] cbuf) {
         }
 
-        public Writer getParentWriter() {
-            return parentWriter;
+        public void write(String str) {
         }
 
-        public void write(int c)
-        throws IOException {
+        public void write(String str, int off, int len) {
         }
 
-        public void write(char cbuf[])
-        throws IOException {
-        }
-
-        public void write(String str)
-        throws IOException {
-        }
-
-        public void write(String str, int off, int len)
-        throws IOException {
-        }
-
-        public Writer append(CharSequence csq)
-        throws IOException {
+        public Writer append(CharSequence csq) {
             return this;
         }
 
-        public Writer append(CharSequence csq, int start, int end)
-        throws IOException {
+        public Writer append(CharSequence csq, int start, int end) {
             return this;
         }
 
-        public Writer append(char c)
-        throws IOException {
+        public Writer append(char c) {
             return this;
         }
 
-        public void write(char cbuf[], int off, int len)
-        throws IOException {
+        public void write(char[] cbuf, int off, int len) {
         }
 
-        public void flush()
-        throws IOException {
+        public void flush() {
         }
 
-        public void close()
-        throws IOException {
+        public void close() {
         }
     }
+
+    private static final Writer NULLWRITER = new NullWriter();
 
     public ReplEngine() {
         context = new BasicContext();
@@ -173,7 +153,7 @@ implements ExtensionManager {
         if (aLine.endsWith("\\") && aLine.length() >= 2) {
             // Line that ends with backslash, we will not attempt
             // to parse the command.
-            currCmd.append(aLine.substring(0, aLine.length() - 1));
+            currCmd.append(aLine, 0, aLine.length() - 1);
             // Command not compete.
             setPrompt(PROMPT_CONTINUE);
         }
@@ -269,7 +249,7 @@ implements ExtensionManager {
 
     public Object startNonInteractive(String aExpr)
     throws ReplEngineException {
-        return this.startNonInteractive(new StringReader(aExpr), new NullWriter(), new NullWriter());
+        return this.startNonInteractive(new StringReader(aExpr), NULLWRITER, NULLWRITER);
     }
 
     public Object startNonInteractive(InputStream aIn, OutputStream aOut, OutputStream aErr)
@@ -279,12 +259,12 @@ implements ExtensionManager {
 
     public Object startNonInteractive(InputStream aIn)
     throws ReplEngineException {
-        return this.startNonInteractive(new InputStreamReader(aIn), new NullWriter(), new NullWriter());
+        return this.startNonInteractive(new InputStreamReader(aIn), NULLWRITER, NULLWRITER);
     }
 
     public Object startNonInteractive(Reader aIn)
     throws ReplEngineException {
-        return startNonInteractive(aIn, new NullWriter(), new NullWriter());
+        return startNonInteractive(aIn, NULLWRITER, NULLWRITER);
     }
 
     public Object startNonInteractive(Reader aIn, Writer aOut, Writer aErr)
@@ -328,7 +308,7 @@ implements ExtensionManager {
             // rest will be available in the buffer. We don't want to
             // write a prompt in this case.
             if (interactiveMode && !input.ready()) {
-                write(prompt);
+                write(getPrompt());
             }
             return input.readLine();
         }
@@ -348,8 +328,8 @@ implements ExtensionManager {
 //        error.flush();
 //    }
 
-    private void writeLine(String aLine) {
-        output.println(aLine);
+    private void writeLine(String line) {
+        output.println(line);
         output.flush();
     }
 
@@ -384,13 +364,11 @@ implements ExtensionManager {
         eval.setContext(context);
     }
 
-    public void addCommand(String aName, Command command)
-    throws ExtensionException {
+    public void addCommand(String aName, Command command) {
         extensions.addCommand(aName, command);
     }
 
-    public void addMacro(String aName, Command macro)
-    throws ExtensionException {
+    public void addMacro(String aName, Command macro) {
         extensions.addMacro(aName, macro);
     }
 

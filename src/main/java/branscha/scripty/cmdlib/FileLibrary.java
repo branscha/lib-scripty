@@ -48,51 +48,63 @@ import java.util.regex.Pattern;
 //
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(std = {
-        @ScriptyStdArgList(name = "noarg + quiet", named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
-        @ScriptyStdArgList(name = "file + quiet", optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")}, named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
-        @ScriptyStdArgList(name = "2files + quiet", fixed = {@ScriptyArg(name = "arg1", type = "OneOf (String) (Instance java.io.File)", value = "null"), @ScriptyArg(name = "arg2", type = "OneOf (String) (Instance java.io.File)", value = "null")}, named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)})
+        @ScriptyStdArgList(name = "noarg + quiet",
+                named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
+        @ScriptyStdArgList(name = "file + quiet",
+                optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")},
+                named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
+        @ScriptyStdArgList(name = "2files + quiet",
+                fixed = {@ScriptyArg(name = "arg1", type = "OneOf (String) (Instance java.io.File)", value = "null"), @ScriptyArg(name = "arg2", type = "OneOf (String) (Instance java.io.File)", value = "null")},
+                named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)})
 })
 public class FileLibrary {
     private static final Pattern DRIVE = Pattern.compile("^\\p{Alpha}:.*$");
     private File currentDirectory;
 
-    // Always quit. The option is allowed but does not have any effect.
+    // Always quiet. The option is allowed but does not have any effect.
     //
     @ScriptyCommand(name = "cd")
     @ScriptyStdArgList(
-            optional = {
-                    @ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")},
-            named = {
-                    @ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)
-            })
-    public File cd(
-            @ScriptyParam("file") Object aFileRepr)
+            optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = "~")},
+            named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)})
+    public File cd(@ScriptyParam("file") Object aFileRepr)
     throws CommandException {
-        File lFile;
-        if (aFileRepr instanceof File) lFile = (File) aFileRepr;
-        else lFile = resolveFile((String) aFileRepr);
-        if (!lFile.isDirectory())
-            throw new CommandException(String.format("Cannot go to '%s', it is not a directory.", lFile));
-        else currentDirectory = lFile;
-        return lFile;
+        File file;
+
+        if (aFileRepr instanceof File) {
+            file = (File) aFileRepr;
+        }
+        else {
+            String fileName = (String) aFileRepr;
+            if ("~".equals(fileName)) fileName = System.getProperty("user.home");
+            file = resolveFile((String) fileName);
+        }
+
+        if (!file.isDirectory()) {
+            throw new CommandException(String.format("Cannot go to '%s', it is not a directory.", file));
+        }
+        else {
+            currentDirectory = file;
+        }
+        return file;
     }
 
-    // Print the currrent directory and return the File object.
+    // Print the current directory and return the File object.
     //
     @ScriptyCommand(name = "pwd")
     @ScriptyRefArgList(ref = "noarg + quiet")
-    public File pwd(@ScriptyParam("quiet") boolean aQuiet, @ScriptyBindingParam("*output") PrintWriter aWriter)
+    public File pwd(@ScriptyParam("quiet") boolean isQuiet, @ScriptyBindingParam("*output") PrintWriter writer)
     throws CommandException {
-        final File lCurDir = getCurrentDirectory();
-
+        final File currDir = getCurrentDirectory();
         try {
-            if (!aQuiet) aWriter.println(lCurDir.getCanonicalPath());
-            return lCurDir;
+            if (!isQuiet) {
+                writer.println(currDir.getCanonicalPath());
+            }
+            return currDir;
         }
         catch (IOException e) {
-            throw new CommandException(String.format("Cannot calculate the canonical name for '%s'.", lCurDir), e);
+            throw new CommandException(String.format("Cannot calculate the canonical name for '%s'.", currDir), e);
         }
-
     }
 
     // Print a listing of the current directory and return it als an array.
@@ -157,7 +169,7 @@ public class FileLibrary {
                                 // Remember if we want dirs.
                                 if (aDirs && lPattern.matcher(lXFile.getCanonicalPath()).matches())
                                     lResultList.add(lXFile);
-                                // Add to the worklist if recursive.
+                                // Add to the work list if recursive.
                                 if (aRecursive) lWorkList.add(lXFile);
                             }
                             else if (lXFile.isFile()) {
@@ -175,14 +187,14 @@ public class FileLibrary {
 
                 if (!aQuiet) {
                     // Get basic file info.
-                    String lDirFlag = lEntry.isDirectory() ? "d" : " ";
-                    String lReadFlag = lEntry.canRead() ? "r" : " ";
-                    String lWriteFlag = lEntry.canWrite() ? "w" : " ";
-                    String lHiddenFlag = lEntry.isHidden() ? "h" : " ";
+                    String lDirFlag = lEntry.isDirectory() ? "d" : "-";
+                    String lReadFlag = lEntry.canRead() ? "r" : "-";
+                    String lWriteFlag = lEntry.canWrite() ? "w" : "-";
+                    String lHiddenFlag = lEntry.isHidden() ? "h" : "-";
                     long lLastModified = lEntry.lastModified();
                     // Print the info.
                     if (aWriter != null)
-                        aWriter.println(String.format("%s%s%s%s  %5$tF %5$tR  %6$s", lDirFlag, lReadFlag, lWriteFlag, lHiddenFlag, lLastModified, lEntry.getCanonicalFile()));
+                        aWriter.println(String.format("%1s%1s%1s%1s\t%5$tF %5$tR  %6$s", lDirFlag, lReadFlag, lWriteFlag, lHiddenFlag, lLastModified, lEntry.getCanonicalFile()));
                 }
             }
             return lResultList.toArray();
@@ -271,7 +283,6 @@ public class FileLibrary {
         if (currentDirectory == null)
             currentDirectory = new File(".");
     }
-
 
     private File getCurrentDirectory()
     throws CommandException {

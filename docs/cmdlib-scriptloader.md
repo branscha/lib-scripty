@@ -1,4 +1,6 @@
-Load and reload external scripts into the environment.
+# Load Script Command
+
+Load and reload script files into the environment.
 
 **load**
 

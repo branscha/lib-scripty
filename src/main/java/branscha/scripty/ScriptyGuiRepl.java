@@ -33,12 +33,11 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 
 /**
- * A minimalistic GUI to demonstrate how Scripty could be embedded in a more elaborate GUI. The scripty library wants
+ * A GUI to demonstrate how Scripty could be embedded in a more elaborate GUI. The scripty library wants
  * to be independent of a GUI framework that is why the example is kept simple on purpose. A more elaborate GUI
  * will first have to make a decision on which GUI library to use.
  */
-public class ScriptyGuiRepl
-extends ScriptyCapable {
+public class ScriptyGuiRepl extends ScriptyCapable {
 
     private JFrame frame;
     private String title = "Scripty";
@@ -84,7 +83,7 @@ extends ScriptyCapable {
         frame.add(scriptyPanel);
     }
 
-    public void startLoop() {
+    void startLoop() {
         buildGuiConsole();
         if (frame != null) frame.setVisible(true);
     }

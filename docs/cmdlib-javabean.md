@@ -1,4 +1,4 @@
-#### JavaBean Library
+## JavaBean Library
 
 Access JavaBeans as a nested directory structure. This command library provides a number of commands to manipulate the 
 JavaBeans in the context. It has a Naked Objects flavor. There is a current JavaBean like there is a current directory, 

@@ -1,10 +1,9 @@
-    @ScriptyCommand(name="rec-edit")
-    @ScriptyStdArgList(fixed={@ScriptyArg(name="fields", type ="ListOf(String)"), @ScriptyArg(name="values", type="ListOf(Any)")})
-    public static List recEdit(@ScriptyParam("fields") List<String> aPropNames, @ScriptyParam("values") List<Object> aPropVals)
-    throws CommandException
+# Edit Record (GUI)
 
-<h2><a name="edit-rec" id="edit-rec">edit-rec</a></h2>
+**rec-edit**
 
-<p>Open a GUI editor for name/value pairs.</p>
+Open a GUI editor for name/value pairs.
 
-<p><code>(edit-rec '(&lt;fields&gt;) '(values))</code></p>
+```
+(rec-edit '(<fields>) '(<values>))
+```

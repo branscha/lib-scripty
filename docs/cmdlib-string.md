@@ -1,4 +1,4 @@
-String manipulation commands.
+# String Commands
 
 **str?**
 
@@ -19,7 +19,8 @@ It has the same behaviour as the Java version.
 
 **str-match**
 
-Do a single match, the result is a list of matched groups. Even is there is no group in the pattern, the global match is always available.
+Do a single match, the result is a list of matched groups. Even is there is no group in the pattern, the global match 
+is always available.
 
 ```
 > print (str-match "rosa\S*\b" "rosa rosam rosas")
@@ -28,7 +29,8 @@ Do a single match, the result is a list of matched groups. Even is there is no g
 
 **str-match***
 
-Repeatedly match the pattern. The result is a list of lists of matches. It is the same as str-match but it is applied repeatedly to the string.
+Repeatedly match the pattern. The result is a list of lists of matches. It is the same as str-match but it is applied 
+repeatedly to the string.
 
 ```
 > print (str-match* "rosa\S*\b" "rosa rosam rosas")
@@ -38,6 +40,3 @@ Repeatedly match the pattern. The result is a list of lists of matches. It is th
 **str-match?**
 
 Check if a string complies to a pattern. The result is a boolean.
-
-
-s

@@ -25,6 +25,7 @@
 package branscha.scripty;
 
 import branscha.scripty.cmdlib.*;
+import branscha.scripty.cmdlib.gui.FileDialogLibrary;
 import branscha.scripty.parser.CommandException;
 
 import java.awt.*;
@@ -78,9 +79,22 @@ extends ScriptyCapable {
     throws ExtensionException, CommandException {
         String mode = System.getProperty("mode", "gui");
         ScriptyAutoRepl repl = new ScriptyAutoRepl();
+
+        // Load some of the command libraries.
         repl.setForceTextMode("text".equalsIgnoreCase(mode));
-        repl.addLibraryClasses(PrintLibrary.class, MathLibrary.class, DebuggerLibrary.class, LoadLibrary.class, BeanLibrary.class);
+        repl.addLibraryClasses(
+                PrintLibrary.class,
+                MathLibrary.class,
+                DebuggerLibrary.class,
+                LoadLibrary.class,
+                BeanLibrary.class,
+                FileDialogLibrary.class,
+                FileLibrary.class);
+
+        // Load debugger macro's.
         repl.getReplEngine().exec("(load cp:/dbgutil.lsp)");
+
+        // Start the interactive loop.
         repl.startLoop();
     }
 }
