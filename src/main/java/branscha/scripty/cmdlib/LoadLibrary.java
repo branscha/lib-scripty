@@ -45,9 +45,21 @@ import java.util.List;
  * </ul>
  */
 public class LoadLibrary {
+    
+    private static final String ERR010 = "LoadLibrary/010: While loading '%s'.%n%s";
+    private static final String ERR020 = "LoadLibrary/020: The file does not exist: '%s'.";
+    private static final String ERR030 = "LoadLibrary/030: The file is not readable: '%s'.";
+    private static final String ERR040 = "LoadLibrary/040: Exception while opening the file: '%s'.%n%s";
+    private static final String ERR050 = "LoadLibrary/050: The resource does not exist: '%s'.";
+    private static final String ERR060 = "LoadLibrary/060: The resource cannot be opened: '%s'.%n%s";
+    private static final String ERR070 = "LoadLibrary/070: The resource '%s' is not available, it the contents cannot be accessed.";
+    
     private List<Loader> loaders = new ArrayList<Loader>();
 
-    @ScriptyCommand(name = "load")
+    @ScriptyCommand(name = "load", description =
+            "(load <file> | classpath:/<resource> | cp:/<resource> ...)\n" +
+                    "Load one or more scripts from files or resources.\n" +
+                    "Also see: reload.")
     @ScriptyVarArgList(vararg = @ScriptyArg(name = "loaders", type = "Custom branscha.scripty.cmdlib.LoadLibrary$LoaderType"))
     public void load(@ScriptyParam("loaders") Object[] aLoaders, Context aCtx, Eval aEval)
     throws CommandException {
@@ -58,7 +70,10 @@ public class LoadLibrary {
         internalLoad(lLoaders, aEval, aCtx);
     }
 
-    @ScriptyCommand(name = "reload")
+    @ScriptyCommand(name = "reload", description =
+            "(reload)\n" +
+                    "Reload all the scripts that have been loaded with the 'load' command.\n" +
+                    "Also see: load.")
     @ScriptyStdArgList()
     public void reload(Context aContext, Eval aEval)
     throws CommandException {
@@ -88,7 +103,7 @@ public class LoadLibrary {
                     lEngine.startNonInteractive(lIn);
                 }
                 catch (ReplEngineException e) {
-                    final String lMsg = String.format("While loading '%s'.%n%s", lLoader.toString(), e.getMessage());
+                    final String lMsg = String.format(ERR010, lLoader.toString(), e.getMessage());
                     throw new CommandException(lMsg);
                 }
                 finally {
@@ -118,8 +133,8 @@ public class LoadLibrary {
         throws CommandException;
     }
 
-    public static class FileLoader
-            implements Loader {
+    public static class FileLoader implements Loader {
+
         private File file;
 
         public FileLoader(File aFile) {
@@ -133,9 +148,9 @@ public class LoadLibrary {
         public void checkValidity()
         throws CommandException {
             if (!file.exists() || !file.isFile())
-                throw new CommandException(String.format("The file does not exist: \"%s\".", file.getAbsolutePath()));
+                throw new CommandException(String.format(ERR020, file.getAbsolutePath()));
             if (!file.canRead())
-                throw new CommandException(String.format("The file is not readable: \"%s\".", file.getAbsolutePath()));
+                throw new CommandException(String.format(ERR030, file.getAbsolutePath()));
         }
 
         public InputStream getStream()
@@ -144,7 +159,7 @@ public class LoadLibrary {
                 return new FileInputStream(file);
             }
             catch (FileNotFoundException e) {
-                throw new CommandException(String.format("Exception while opening the file: '%s'.%n%s", file.getAbsolutePath(), e.getMessage()), e);
+                throw new CommandException(String.format(ERR040, file.getAbsolutePath(), e.getMessage()), e);
             }
         }
 
@@ -154,8 +169,8 @@ public class LoadLibrary {
         }
     }
 
-    public static class ClasspathLoader
-            implements Loader {
+    public static class ClasspathLoader implements Loader {
+
         String resource;
 
         public ClasspathLoader(String aResource) {
@@ -166,10 +181,10 @@ public class LoadLibrary {
         throws CommandException {
             try (InputStream resourceStream = this.getClass().getResourceAsStream(resource)) {
                 if (resourceStream == null)
-                    throw new CommandException(String.format("The resource does not exist: \"%s\".", resource));
+                    throw new CommandException(String.format(ERR050, resource));
             }
             catch (IOException e) {
-                throw new CommandException(String.format("The resource cannot be opened: \"%s\". %s", resource, e.getMessage()));
+                throw new CommandException(String.format(ERR060, resource, e.getMessage()));
             }
         }
 
@@ -220,7 +235,7 @@ public class LoadLibrary {
                 lCandLdr.checkValidity();
             }
             catch (CommandException e) {
-                throw new TypeSpecException(String.format("The resource '%s' is not available, it the contents cannot be accessed.", lCandLdr.toString()));
+                throw new TypeSpecException(String.format(ERR070, lCandLdr.toString()));
             }
             return lCandLdr;
         }

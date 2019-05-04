@@ -15,25 +15,25 @@ public class HelpLibrary {
     private static final Map<String, String> formRepo = new TreeMap<>();
 
     static {
-        formRepo.put("quote", "Prevent automatic evaluation of an argument and use the argument as a data structure. Format: (quote <expr>)");
-        formRepo.put("if", "Conditional form. Format: (if <bool-expr> <then-expr> [<else-expr>]).");
-        formRepo.put("while", "Loop form. Format:  (while <bool-expr> [<expr>]).");
-        formRepo.put("and", "Boolean and form, it can have many arguments. It uses short-circuit evaluation. Format (and <bool-expr>+).");
-        formRepo.put("or", "Boolean or form, it can have many arguments. It uses short-circuit evaluation. Format (or <bool-expr>+).");
-        formRepo.put("not", "Boolean not form, it can have a single argument. Format: (not <bool-expr>).");
-        formRepo.put("set", "Set a context variable, it must be defined with defvar. Format (set name value) or (set name=value).");
-        formRepo.put("let", "Parallel assignment, it creates a temporary context. Format (let ((name val) | name=val ...) <expr>).");
-        formRepo.put("let*", "Sequential assignment, it creates a temporary context. Format (let* ((name val) | name=val ...) <expr>).");
-        formRepo.put("get", "Get the value of a context variable. Format (get name)  or $name");
-        formRepo.put("lambda", "Function literal. Format (lambda (<params>) <expr>).");
-        formRepo.put("defun", "Define a function. It will be stored in the context. Format: (defun name (<params>) <expr>).");
-        formRepo.put("timer", "Time the evaluation of an expression. Format (timer <expr>)");
-        formRepo.put("eval", "Evaluate an expression. Format (eval <expr>)");
-        formRepo.put("eq", "Compare two values. The result is a boolean value. Format (eq <expr> <expr>).");
-        formRepo.put("bound?", "Verify if a binding exits with the specified name. Format (bound? name).");
-        formRepo.put("progn", "Expression sequence. Format (progn <expr-1> ... <expr-n>)");
-        formRepo.put("funcall", "Explicit function call.  Format (funcall name <args>) or (name <args>).");
-        formRepo.put("defvar", "Define a context variable. Defining a variable will overwrite a previous definition. Format (defvar name value) or (defvar name=value).");
+        formRepo.put("quote", "(quote <expr>)\nPrevent automatic evaluation of an argument and use the argument as a data structure.");
+        formRepo.put("if", "(if <bool-expr> <then-expr> [<else-expr>])\nConditional form.");
+        formRepo.put("while", "(while <bool-expr> [<expr>])\nWhile loop form.");
+        formRepo.put("and", "(and <bool-expr>+)\nBoolean and form, it can have many arguments and uses short-circuit evaluation.");
+        formRepo.put("or", "(or <bool-expr>+)\nBoolean or form, it can have many arguments and uses short-circuit evaluation.");
+        formRepo.put("not", "(not <bool-expr>)\nBoolean not form, it can have a single argument.");
+        formRepo.put("set", "(set name value) or (set name=value)\nSet a context variable, it must be defined with defvar.");
+        formRepo.put("let", "(let ((name val) | name=val ...) <expr>)\nParallel assignment, it creates a temporary context.");
+        formRepo.put("let*", "(let* ((name val) | name=val ...) <expr>)\nSequential assignment, it creates a temporary context.");
+        formRepo.put("get", "(get name)  or $name\nGet the value of a context variable.");
+        formRepo.put("lambda", "(lambda (<params>) <expr>)\nAnonymous function literal.");
+        formRepo.put("defun", "(defun name (<params>) <expr>)\nDefine a function. It will be stored in the context.");
+        formRepo.put("timer", "(timer <expr>)\nTime the evaluation of an expression.");
+        formRepo.put("eval", "(eval <expr>)\nEvaluate the expression.");
+        formRepo.put("eq", "(eq <expr> <expr>)\nCompare two expressions. The result is a boolean value.");
+        formRepo.put("bound?", "(bound? name)\nVerify if a binding exits with the specified name.");
+        formRepo.put("progn", "(progn <expr-1> ... <expr-n>)\nExpression sequence.");
+        formRepo.put("funcall", "(funcall name <args>) or (name <args>)\nExplicit function call.");
+        formRepo.put("defvar", "(defvar name value) or (defvar name=value)\nDefine a context variable. Defining a variable will overwrite a previous definition.");
     }
 
     @ScriptyCommand(name = "help", description = "Show help information about forms (built-ins), available commands and macro's.")

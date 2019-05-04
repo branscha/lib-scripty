@@ -27,7 +27,6 @@ package branscha.scripty.cmdlib;
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
 import branscha.scripty.parser.Context;
-import branscha.scripty.spec.type.BigDecimalType;
 import branscha.scripty.spec.type.TypeSpecException;
 
 import java.math.BigDecimal;
@@ -36,6 +35,7 @@ import java.math.MathContext;
 
 import static branscha.scripty.spec.type.BigDecimalType.BIGDECIMAL_TYPE;
 
+@SuppressWarnings("ALL")
 @ScriptyNamedArgLists(
         std = {
                 @ScriptyStdArgList(name = "2numbers", fixed = {@ScriptyArg(name = "arg1", type = "BigDecimal"), @ScriptyArg(name = "arg2", type = "BigDecimal")}),
@@ -48,9 +48,15 @@ import static branscha.scripty.spec.type.BigDecimalType.BIGDECIMAL_TYPE;
 )
 @ScriptyLibrary(type = ScriptyLibraryType.AUTO)
 public class MathLibrary {
+
+    private static final String ERR010 =
+            "MathLibrary/010: Expected an integer as second argument, the power has to be an integer.";
+
     private MathContext mathCtx = MathContext.DECIMAL64;
 
-    @ScriptyCommand(name = "+")
+    @ScriptyCommand(name = "+", description =
+            "(+ <number-expr>*)\n" +
+                    "Add zero or more numbers.")
     @ScriptyRefArgList(ref = "numbers*")
     public BigDecimal add(@ScriptyParam("numbers") Object[] aNumbers) {
         BigDecimal lSum = BigDecimal.ZERO;
@@ -60,7 +66,9 @@ public class MathLibrary {
         return lSum;
     }
 
-    @ScriptyCommand(name = "-")
+    @ScriptyCommand(name = "-", description =
+            "(- <number-expr>+)\n" +
+                    "Subtract one or more numbers.")
     @ScriptyRefArgList(ref = "numbers+")
     public BigDecimal sub(@ScriptyParam("numbers") Object[] aNumbers) {
         BigDecimal lSum = (BigDecimal) aNumbers[0];
@@ -70,7 +78,9 @@ public class MathLibrary {
         return lSum;
     }
 
-    @ScriptyCommand(name = "/")
+    @ScriptyCommand(name = "/", description =
+            "(/ <number-expr>+)\n" +
+                    "Divide one or more numbers.")
     @ScriptyRefArgList(ref = "numbers+")
     public BigDecimal div(@ScriptyParam("numbers") Object[] aNumbers) {
         BigDecimal lResult = (BigDecimal) aNumbers[0];
@@ -80,7 +90,9 @@ public class MathLibrary {
         return lResult;
     }
 
-    @ScriptyCommand(name = "*")
+    @ScriptyCommand(name = "*", description =
+            "(* <number-expr>+)\n" +
+                    "Multiply one or more numbers.")
     @ScriptyRefArgList(ref = "numbers+")
     public BigDecimal mult(@ScriptyParam("numbers") Object[] aNumbers) {
         BigDecimal lResult = (BigDecimal) aNumbers[0];
@@ -90,7 +102,8 @@ public class MathLibrary {
         return lResult;
     }
 
-    @ScriptyCommand(name = "^")
+    @ScriptyCommand(name = "^", description = "(^ number-1 integer-2)\n" +
+            "Raise number-1 to the power of integer-2.")
     @ScriptyRefArgList(ref = "2numbers")
     public BigDecimal pow(@ScriptyParam("arg1") BigDecimal aNr, @ScriptyParam("arg2") BigDecimal aPow)
     throws CommandException {
@@ -98,18 +111,22 @@ public class MathLibrary {
             return aNr.pow(aPow.intValueExact(), mathCtx);
         }
         catch (ArithmeticException e) {
-            throw new CommandException("Expected an integer as second argument, the power has to be an integer.");
+            throw new CommandException(ERR010);
         }
     }
 
-    @ScriptyCommand(name = "rem")
+    @ScriptyCommand(name = "rem", description =
+            "(rem number-1 number-2)\n" +
+                    "Remainder of the division of number-1 by number-2.")
     @ScriptyRefArgList(ref = "2numbers")
     public BigDecimal rem(@ScriptyParam("arg1") BigDecimal aNr, @ScriptyParam("arg2") BigDecimal aRem)
     throws CommandException {
         return aNr.remainder(aRem, mathCtx);
     }
 
-    @ScriptyCommand(name = "number?")
+    @ScriptyCommand(name = "number?", description =
+            "(number? <expr>)\n" +
+            "Verify if the expr can be converted to a number.")
     @ScriptyRefArgList(ref = "1object")
     public boolean isNumber(@ScriptyParam("arg") Object aArg, Context aCtx) {
         try {
@@ -121,55 +138,73 @@ public class MathLibrary {
         return true;
     }
 
-    @ScriptyCommand(name = "abs")
+    @ScriptyCommand(name = "abs", description =
+            "(abs number-1)\n" +
+                    "Absolute value of number-1.")
     @ScriptyRefArgList(ref = "1number")
     public BigDecimal abs(@ScriptyParam("arg") BigDecimal aArg) {
         return aArg.abs();
     }
 
-    @ScriptyCommand(name = "fin")
+    @ScriptyCommand(name = "fin", description =
+            "(fin number-1)\n" +
+                    "Format arg as financial number with two decimal places.")
     @ScriptyRefArgList(ref = "1number")
     public BigDecimal fin(@ScriptyParam("arg") BigDecimal aArg) {
         return aArg.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
-    @ScriptyCommand(name = "float->int")
+    @ScriptyCommand(name = "float->int", description =
+            "(float->int number-1)\n" +
+                    "Convert number-1 to an integer.")
     @ScriptyRefArgList(ref = "1number")
     public BigInteger toInt(@ScriptyParam("arg") BigDecimal aArg) {
         return aArg.toBigInteger();
     }
 
-    @ScriptyCommand(name = "zero?")
+    @ScriptyCommand(name = "zero?", description =
+            "(zero? number-1)\n" +
+                    "Verify if number-1 is zero.")
     @ScriptyRefArgList(ref = "1number")
     public boolean isZero(@ScriptyParam("arg") BigDecimal aArg) {
         return BigDecimal.ZERO.equals(aArg);
     }
 
-    @ScriptyCommand(name = "<")
+    @ScriptyCommand(name = "<", description =
+            "(< number-1 number-2)\n" +
+                    "Less than.")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isLT(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) < 0;
     }
 
-    @ScriptyCommand(name = "<=")
+    @ScriptyCommand(name = "<=", description =
+            "(<= number-1 number-2)\n" +
+                    "Less than or equal.")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isLE(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) <= 0;
     }
 
-    @ScriptyCommand(name = ">")
+    @ScriptyCommand(name = ">", description =
+            "(> number-1 number-2)\n" +
+                    "Greater than.")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isGT(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) > 0;
     }
 
-    @ScriptyCommand(name = ">=")
+    @ScriptyCommand(name = ">=", description =
+            "(>= number-1 number-2)\n" +
+                    "Greater than or equal.")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isGE(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) >= 0;
     }
 
-    @ScriptyCommand(name = "=")
+    @ScriptyCommand(name = "=", description =
+            "(= number-1 number-2)\n" +
+                    "Numerical comparison.")
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isEQ(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) == 0;
