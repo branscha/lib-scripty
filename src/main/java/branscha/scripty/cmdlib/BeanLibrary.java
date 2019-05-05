@@ -134,11 +134,11 @@ public class BeanLibrary {
     // It is what the other commands do automatically. This command is in fact the
     // link between other command libraries and this one.
     //
-    @ScriptyCommand(name = "bean-rslv", description =
-            "(bean-rslv <path> [<base-bean>])\n" +
+    @ScriptyCommand(name = "bean-get", description =
+            "(bean-get <path> [<base-bean>])\n" +
                     "Get the value of the property specified by the property path. The effect is the same as a quiet bean-cat.\n" +
-                    "Provide a base bean to resolve the path relative to the base and not to the current path." +
-                    "Also see: bean-cat.")
+                    "Provide a base bean to resolve the path relative to the base and not to the current path.\n" +
+                    "Also see: bean-cat, bean-set, bean-call.")
     @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")}, optional = {@ScriptyArg(name = "bean", type = "Any")})
     public Object beanRslv(
             Context aCtx,
@@ -169,7 +169,8 @@ public class BeanLibrary {
     //
     @ScriptyCommand(name = "bean-call", description =
             "(bean-call <path>|<bean> <method-name> <arg-1> ... <arg-n>)\n" +
-                    "Call a Java method on the bean specified by the property path.")
+                    "Call a Java method on the bean specified by the property path.\n" +
+                    "See also bean-get, bean-set.")
     @ScriptyRefArgList(ref = "call")
     public Object beanCall(
             Context ctx,
@@ -210,9 +211,10 @@ public class BeanLibrary {
     // Update the properties of a bean.
     // (bean-upd BEAN prop1=val1 prop2=val2 ...)
     //
-    @ScriptyCommand(name = "bean-upd", description =
-            "(bean-upd <path>|<bean> prop-1=val-1 ... prop-n=val-n)\n" +
-                    "Update one or more properties in the bean specified by the bean path.")
+    @ScriptyCommand(name = "bean-set", description =
+            "(bean-set <path>|<bean> prop-1=val-1 ... prop-n=val-n)\n" +
+                    "Update one or more properties in the bean specified by the bean path.\n" +
+                    "See also: bean-get, bean-call.")
     public void beanUpd(Context ctx, Object[] args)
     throws CommandException {
         if(args.length < 3) {

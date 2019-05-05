@@ -34,7 +34,7 @@ the printing can be suppressed with the `quiet=true` option.
 
 * quiet = true | false*. Prevents writing output, only returns the string.
 
-**bean-rslv**
+**bean-get**
 
 Convert a pathname to the object itself. We can obtain a direct reference to the object in this way.
 This command is the bridge to other command libraries because you can pass values to other command libraries
@@ -47,6 +47,6 @@ specified by a method instance or by a name (and a lookup will occur). The argum
 directly to the method. You can use the 'rslv' command above to accomplish argument resolution as well. 
 It has the form (bean-call $bean method arg1 ... argN).
 
-**bean-upd**
+**bean-set**
 
-Set the property of a JavaBean. The argument should be a pair, a propname=value combination.
+Set the property of a JavaBean. The arguments should be a pair, a propname=value combination.

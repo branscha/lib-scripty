@@ -149,25 +149,25 @@ public class BeanLibraryTest {
         result = scripty.process("bean-cat .");
         assertEquals("tres", result);
 
-        result = scripty.process("bean-rslv /test/data");
+        result = scripty.process("bean-get /test/data");
         assertEquals("Bruno", result);
-        scripty.process("bean-upd /test data=Alexander");
-        result = scripty.process("bean-rslv /test/data");
+        scripty.process("bean-set /test data=Alexander");
+        result = scripty.process("bean-get /test/data");
         assertEquals("Alexander", result);
 
-        result = scripty.process("bean-rslv /test/intList/5");
+        result = scripty.process("bean-get /test/intList/5");
 
         assertEquals(11, result);
-        scripty.process("bean-upd /test/intList 5=(bean-rslv /test/intList/6)");
-        result = scripty.process("bean-rslv /test/intList/5");
-        Object result2 = scripty.process("bean-rslv /test/intList[5]");
+        scripty.process("bean-set /test/intList 5=(bean-get /test/intList/6)");
+        result = scripty.process("bean-get /test/intList/5");
+        Object result2 = scripty.process("bean-get /test/intList[5]");
         assertEquals(13, result);
         assertEquals(result, result2);
 
-        result = scripty.process("bean-rslv /test/strList/1");
+        result = scripty.process("bean-get /test/strList/1");
         assertEquals("duo", result);
-        scripty.process("bean-upd /test/strList 1=Ok");
-        result = scripty.process("bean-rslv /test/strList/1");
+        scripty.process("bean-set /test/strList 1=Ok");
+        result = scripty.process("bean-get /test/strList/1");
         assertEquals("Ok", result);
 
         scripty.process("bean-cd /test/map");
