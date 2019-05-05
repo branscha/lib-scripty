@@ -32,9 +32,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-@ScriptyStdArgList(name = "text and password", fixed = {@ScriptyArg(name = "text", type = "String")}, named = {@ScriptyArg(name = "password", type = "String", optional = true, value = "")})
+@ScriptyStdArgList(name = "text and password",
+        fixed = {@ScriptyArg(name = "text", type = "String")},
+        named = {@ScriptyArg(name = "password", type = "String", optional = true, value = "")})
 public class TeaLibrary {
-    @ScriptyCommand(name = "tea-encrypt")
+
+    @ScriptyCommand(name = "tea-encrypt", description =
+            "(tea-encrypt <plain-text> password=<pwd>)\n" +
+                    "Encrypt the text using the Tiny Encryption Algorithm.\n" +
+                    "See also: tea-decrypt.")
     @ScriptyRefArgList(ref = "text and password")
     public static String encrypt(@ScriptyParam("text") String aPlainText, @ScriptyParam("password") String aPassword)
     throws CommandException {
@@ -46,7 +52,10 @@ public class TeaLibrary {
         return lTea.encrypt(aPlainText);
     }
 
-    @ScriptyCommand(name = "tea-decrypt")
+    @ScriptyCommand(name = "tea-decrypt", description =
+            "(tea-decrypt <cipher-text> password=<pwd>)\n" +
+                    "Decrypt the cipher text using the Tiny Encryption Algorithm.\n" +
+                    "See also: tea-encrypt.")
     @ScriptyRefArgList(ref = "text and password")
     public static String decrypt(@ScriptyParam("text") String aCipher, @ScriptyParam("password") String aPassword)
     throws CommandException {
@@ -69,7 +78,6 @@ public class TeaLibrary {
             throw new CommandException("Cannot calculate MD5 hash.");
         }
     }
-
 }
 
 class TeaEncrypter {

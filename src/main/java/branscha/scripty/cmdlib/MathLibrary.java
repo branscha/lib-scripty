@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 
 import static branscha.scripty.spec.type.BigDecimalType.BIGDECIMAL_TYPE;
+import static java.math.BigDecimal.ROUND_HALF_UP;
 
 @SuppressWarnings("ALL")
 @ScriptyNamedArgLists(
@@ -151,7 +152,7 @@ public class MathLibrary {
                     "Format arg as financial number with two decimal places.")
     @ScriptyRefArgList(ref = "1number")
     public BigDecimal fin(@ScriptyParam("arg") BigDecimal aArg) {
-        return aArg.setScale(2, BigDecimal.ROUND_HALF_UP);
+        return aArg.setScale(2, ROUND_HALF_UP);
     }
 
     @ScriptyCommand(name = "float->int", description =
@@ -208,5 +209,89 @@ public class MathLibrary {
     @ScriptyRefArgList(ref = "2numbers")
     public boolean isEQ(@ScriptyParam("arg1") BigDecimal aArg1, @ScriptyParam("arg2") BigDecimal aArg2) {
         return aArg1.compareTo(aArg2) == 0;
+    }
+
+    @ScriptyCommand(name = "sqrt", description =
+            "(sqrt <number>)\n" +
+                    "Square root of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal sqrt(@ScriptyParam("arg") BigDecimal arg)
+    throws CommandException {
+        double doubleArg = arg.doubleValue();
+        double sqrt = Math.sqrt(doubleArg);
+        if (Double.isNaN(sqrt)) {
+            throw new CommandException(String.format("Cannot calculate sqrt of %s", arg));
+        }
+        return BigDecimal.valueOf(sqrt);
+    }
+
+    @ScriptyCommand(name = "sin", description =
+            "(sin <number>)\n" +
+                    "Sine of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal sin(@ScriptyParam("arg") BigDecimal arg) {
+        double doubleArg = arg.doubleValue();
+        double sin = Math.sin(doubleArg);
+        return BigDecimal.valueOf(sin);
+    }
+
+    @ScriptyCommand(name = "asin", description =
+            "(asin <number>)\n" +
+                    "Arcsine of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal asin(@ScriptyParam("arg") BigDecimal arg) {
+        double doubleArg = arg.doubleValue();
+        double asin = Math.asin(doubleArg);
+        return BigDecimal.valueOf(asin);
+    }
+
+    @ScriptyCommand(name = "cos", description =
+            "(cos <number>)\n" +
+                    "Cosine of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal cos(@ScriptyParam("arg") BigDecimal arg) {
+        double doubleArg = arg.doubleValue();
+        double cos = Math.cos(doubleArg);
+        return BigDecimal.valueOf(cos);
+    }
+
+    @ScriptyCommand(name = "acos", description =
+            "(acos <number>)\n" +
+                    "Arccosine of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal acos(@ScriptyParam("arg") BigDecimal arg) {
+        double doubleArg = arg.doubleValue();
+        double acos = Math.acos(doubleArg);
+        return BigDecimal.valueOf(acos);
+    }
+
+    @ScriptyCommand(name = "tan", description =
+            "(tan <number>)\n" +
+                    "Tangent of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal tan(@ScriptyParam("arg") BigDecimal arg) {
+        double doubleArg = arg.doubleValue();
+        double tan = Math.tan(doubleArg);
+        return BigDecimal.valueOf(tan);
+    }
+
+    @ScriptyCommand(name = "atan", description =
+            "(atan <number>)\n" +
+                    "Arctangent of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal atan(@ScriptyParam("arg") BigDecimal arg) {
+        double doubleArg = arg.doubleValue();
+        double atan = Math.atan(doubleArg);
+        return BigDecimal.valueOf(atan);
+    }
+
+    @ScriptyCommand(name = "exp", description =
+            "(exp <number>)\n" +
+                    "Exponential of number.")
+    @ScriptyRefArgList(ref = "1number")
+    public BigDecimal exp(@ScriptyParam("arg") BigDecimal arg) {
+        double doubleArg = arg.doubleValue();
+        double exp = Math.exp(doubleArg);
+        return BigDecimal.valueOf(exp);
     }
 }

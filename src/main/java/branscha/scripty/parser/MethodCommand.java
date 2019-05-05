@@ -52,6 +52,7 @@ public class MethodCommand implements Command {
     private ResultMapping resultMapping;
     private Method method;
     private String description;
+    private boolean hidden;
 
     public MethodCommand(Method aMethod) {
         argList = null;
@@ -62,13 +63,15 @@ public class MethodCommand implements Command {
         description = "";
     }
 
-    public MethodCommand(Object instance, Method method, ArgList argList, CmdMethodInjector cmdMethodInjector, ResultMapping resultMapping, String description) {
+    public MethodCommand(Object instance, Method method, ArgList argList, CmdMethodInjector cmdMethodInjector,
+                         ResultMapping resultMapping, String description, boolean hidden) {
         this.argList = argList;
         this.method = method;
         this.instance = instance;
         this.cmdMethodInjector = cmdMethodInjector;
         this.resultMapping = resultMapping;
         this.description = description;
+        this.hidden = hidden;
     }
 
     public Object execute(Eval eval, Context ctx, Object[] args)
@@ -128,5 +131,9 @@ public class MethodCommand implements Command {
 
     public ArgList getArgList() {
         return argList;
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 }

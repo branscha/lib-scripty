@@ -42,4 +42,5 @@ import java.lang.annotation.Target;
 public @interface ScriptyCommand {
     String name() default "";
     String description() default "";
+    boolean isHidden() default false;
 }

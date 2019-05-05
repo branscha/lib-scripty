@@ -39,4 +39,5 @@ import java.lang.annotation.Target;
 public @interface ScriptyMacro {
     String name() default "";
     String description() default "";
+    boolean isHidden() default false;
 }

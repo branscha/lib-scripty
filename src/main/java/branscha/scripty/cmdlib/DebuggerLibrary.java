@@ -124,7 +124,9 @@ public class DebuggerLibrary {
      * @return
      * @throws CommandException
      */
-    @ScriptyMacro(name = "dbg-expr")
+    @ScriptyMacro(name = "dbg-expr", description =
+            "(dbg-expr <expr>)\n" +
+                    "Start the debugger with the expression. The debugger is halted at the start of the evaluation.")
     @ScriptyRefArgList(ref = "at least one argument")
     public static List dbgExpr(Object[] aArgs)
     throws CommandException {
@@ -139,7 +141,10 @@ public class DebuggerLibrary {
     // Applies following transformation:
     // (dbg-eval <expr>) ==> (dbg-eval-x (quote <expr>))
     //
-    @ScriptyMacro(name = "dbg-eval")
+    @ScriptyMacro(name = "dbg-eval", description =
+            "(dbg-eval <expr>)\n" +
+                    "Evaluate an expression in the context of the current debugger stack frame.\n" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "at least one argument")
     public static List dbgEval(Object[] aArgs)
     throws CommandException {
@@ -156,7 +161,10 @@ public class DebuggerLibrary {
     // A macro is used to prevent evaluation of the condition.
     // In this way the user does not have to quote the conditional expression.
     //
-    @ScriptyMacro(name = "bpt-when")
+    @ScriptyMacro(name = "bpt-when", description =
+            "(bpt-when <bool-expr> [name=<breakpoint-name>])\n" +
+                    "Create a new breakpoint that breaks when the condition becomes true in the context of the current debugger frame.\n" +
+                    "See also: dbg-addbreakpoint.")
     @ScriptyRefArgList(ref = "at least one argument")
     public static List bptWhen(Object[] aArgs)
     throws CommandException {
@@ -165,7 +173,7 @@ public class DebuggerLibrary {
 
     // Internal (effective) command.
     //
-    @ScriptyCommand(name = "dbg-expr-x")
+    @ScriptyCommand(name = "dbg-expr-x", isHidden = true)
     @ScriptyRefArgList(ref = "one argument")
     public void dbgExprInternal(Eval currentEval, Context context, @ScriptyParam("arg") Object expr) {
         // Halt the previous debug session in order not
@@ -190,7 +198,10 @@ public class DebuggerLibrary {
 
     // Step into an expression, it takes the smallest step possible.
     //
-    @ScriptyCommand(name = "dbg-stepin")
+    @ScriptyCommand(name = "dbg-stepin", description =
+            "(dbg-stepin)\n" +
+                    "Take the smallest debugging step, it will dive into the nested evaluation of all sub expressions. Synonym for dbg-step.\n" +
+                    "See also: dbg-expr, dbg-step, dbg-stepout, dbg-stepover.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgStepIn(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -199,7 +210,10 @@ public class DebuggerLibrary {
 
     // Step into an expression, it takes the smallest step possible.
     //
-    @ScriptyCommand(name = "dbg-step")
+    @ScriptyCommand(name = "dbg-step", description =
+            "(dbg-step)\n" +
+                    "Take the smallest debugging step, it will dive into the nested evaluation of all sub expressions. Synonym for dbg-stepin.\n" +
+                    "See also: dbg-expr, dbg-stepin.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgStep(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -211,7 +225,10 @@ public class DebuggerLibrary {
     // It always evaluates the current frame and then goes to the previous frame.
     // This operation always reduces the stack.
     //
-    @ScriptyCommand(name = "dbg-stepout")
+    @ScriptyCommand(name = "dbg-stepout", description =
+            "(dbg-stepout)\n" +
+                    "Run until the current expression on top of the stack is evaluated and execute the return.\n" +
+                    "See also: dbg-expr, dbg-stepin, dbg-stepover.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgStepOut(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -222,7 +239,11 @@ public class DebuggerLibrary {
     // We remain positioned at the same stack level.
     // Use this if you want to evaluate each parameter in turn, without seeing the details of it.
     //
-    @ScriptyCommand(name = "dbg-stepover")
+    @ScriptyCommand(name = "dbg-stepover", description =
+            "(dbg-stepover)\n" +
+                    "Evaluate the next sub expression without diving into it and remaining on the same stack level.\n" +
+                    "Use dbg-runready to evaluate all sub expressions in the current stack frame.\n" +
+                    "See also: dbg-expr, dbg-stepin, dbg-stepout, dbg-stepback, dbg-runready.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgStepOver(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -233,7 +254,10 @@ public class DebuggerLibrary {
     // does not undo bindings, nor other side effects.
     // It could be useful to replay some sequences.
     //
-    @ScriptyCommand(name = "dbg-back")
+    @ScriptyCommand(name = "dbg-back", description =
+            "(dbg-back)\n" +
+                    "Take an evaluation step back to the previous argument without showing sub expression details, inverse of dbg-stepover.\n" +
+                    "See also: dbg-expr, dbg-stepover.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgBack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -242,7 +266,10 @@ public class DebuggerLibrary {
 
     // Keep on running until a result has been produced.
     //
-    @ScriptyCommand(name = "dbg-runresult")
+    @ScriptyCommand(name = "dbg-runresult", description =
+            "(dbg-runresult)\n" +
+                    "Keep evaluating the debugged expression until a result has been reached.\"" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgRunResult(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -253,7 +280,12 @@ public class DebuggerLibrary {
     // been evaluated, and the main expression is ready for being executed.
     // Use this if you are not interested in detailed evaluation of the parameters.
     //
-    @ScriptyCommand(name = "dbg-runready")
+    @ScriptyCommand(name = "dbg-runready", description =
+            "(dbg-runready)\n" +
+                    "Keep evaluating the top level stack expression until all arguments have been evaluated and the expression can be executed.\n" +
+                    "It will skip the evaluation of all sub expressions in the current frame.\n" +
+                    "Use dbg-stepover to go from argument evaluation to argument evaluation.\n" +
+                    "See also: dbg-expr, dbg-stepover.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgRunReady(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -262,7 +294,10 @@ public class DebuggerLibrary {
 
     // Keep on running.
     //
-    @ScriptyCommand(name = "dbg-run")
+    @ScriptyCommand(name = "dbg-run", description =
+            "(dbg-run)\n" +
+                    "Keep evaluating (until a breakpoint has been reached).\n" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean dbgRun(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer)
     throws CommandException {
@@ -327,7 +362,10 @@ public class DebuggerLibrary {
     // Optional arguments:
     // - quiet = true | false*. Prevents writing output, only returns the instance.
     //
-    @ScriptyCommand(name = "dbg-stack")
+    @ScriptyCommand(name = "dbg-stack", description =
+            "(dbg-stack [quiet=true|false*])\n" +
+                    "Print the current debugger stack on *output and return it as the result.\n" +
+                    "Also see: dbg-expr.")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
     public ModularEval.EvalStack dbgStack(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
                                           @ScriptyParam("quiet") boolean isQuiet)
@@ -351,7 +389,10 @@ public class DebuggerLibrary {
     // Optional arguments:
     // - quiet = true | false*. Prevents writing output, only returns the instance.
     //
-    @ScriptyCommand(name = "dbg-ctx")
+    @ScriptyCommand(name = "dbg-ctx", description =
+            "(dbg-ctx [quiet=true|false*])\n" +
+                    "Print the current debugger context and return it as the result.\n" +
+                    "Also see: dbg-expr, dbg-eval.")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
     public Context dbgCtx(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
                           @ScriptyParam("quiet") boolean isQuiet)
@@ -366,7 +407,10 @@ public class DebuggerLibrary {
 
     // Terminate the debugging session.
     //
-    @ScriptyCommand(name = "dbg-terminate")
+    @ScriptyCommand(name = "dbg-terminate", description =
+            "(dbg-terminate)\n" +
+                    "Terminate the debugging session that was started with dbg-expr.\n" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "no arguments")
     public void dbgTerminate()
     throws CommandException {
@@ -385,7 +429,10 @@ public class DebuggerLibrary {
     // examine the result of an exception in a certain expression.
     // - Arg: an optional message.
     //
-    @ScriptyCommand(name = "dbg-raise")
+    @ScriptyCommand(name = "dbg-raise", description=
+            "(dbg-raise <expr>)\n" +
+                    "Raise a CommandException, useful to examine expression behavior. The expr will be the exception message.\n" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "one argument")
     public void dbgRaise(Object[] aArgs)
     throws CommandException {
@@ -398,7 +445,10 @@ public class DebuggerLibrary {
     // You can restart the debugging of an expression with this.
     // Side effects will not be undone though.
     //
-    @ScriptyCommand(name = "dbg-restart")
+    @ScriptyCommand(name = "dbg-restart", description =
+            "(dbg-restart)\n" +
+                    "Reset the debugger to the start of the evaluation.\n" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "no arguments")
     public void dbgRestart()
     throws CommandException {
@@ -407,10 +457,13 @@ public class DebuggerLibrary {
         trace.reset();
     }
 
-    // Drop the toplevel stackframe.
+    // Drop the toplevel stack frame.
     // It can be useful to redo the evaluation of a subexpression.
     //
-    @ScriptyCommand(name = "dbg-dropframe")
+    @ScriptyCommand(name = "dbg-dropframe", description=
+            "(dbg-dropframe)\n" +
+                    "Drop the top level debugger stack frame. Redo the evaluation of the sub expression.\n" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "no arguments")
     public void dbgDropFrame()
     throws CommandException {
@@ -421,7 +474,7 @@ public class DebuggerLibrary {
 
     // Internal (effective) command.
     //
-    @ScriptyCommand(name = "dbg-eval-x")
+    @ScriptyCommand(name = "dbg-eval-x", isHidden = true)
     @ScriptyRefArgList(ref = "one argument")
     public Object dbgEval(@ScriptyParam("arg") Object aArg, Eval aEval)
     throws CommandException {
@@ -436,7 +489,10 @@ public class DebuggerLibrary {
 
     // Check if more steps could be executed in the current debugging session.
     //
-    @ScriptyCommand(name = "dbg-moresteps?")
+    @ScriptyCommand(name = "dbg-moresteps?", description =
+            "(dbg-moresteps?)\n" +
+                    "Verify if more steps can still be executed in the current debugging session.\n" +
+                    "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean hasMoreSteps()
     throws CommandException {
@@ -446,7 +502,10 @@ public class DebuggerLibrary {
 
     // Check if the current debugging session has reached a result.
     //
-    @ScriptyCommand(name = "dbg-result?")
+    @ScriptyCommand(name = "dbg-result?", description =
+            "(dbg-result?)\n" +
+                    "Verify if the current debugging session has already reached a result.\n" +
+                    "See also: dbg-expr, dbg-result.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean hasResult()
     throws CommandException {
@@ -459,7 +518,10 @@ public class DebuggerLibrary {
     // to maker sure if this is the result or it stands for an empty result use
     // the dbg-result? command.
     //
-    @ScriptyCommand(name = "dbg-result")
+    @ScriptyCommand(name = "dbg-result", description =
+            "(dbg-result)\n" +
+                    "Get the result of the current debugging session if one has been reached or null.\n" +
+                    "See also: dbg-expr, dbg-result?.")
     @ScriptyRefArgList(ref = "no arguments")
     public Object result()
     throws CommandException {
@@ -470,7 +532,10 @@ public class DebuggerLibrary {
     // Check if the current debugging session was halted with an exception.
     // If so, the exception will be remembered, you can get it with dbg-exception.
     //
-    @ScriptyCommand(name = "dbg-exception?")
+    @ScriptyCommand(name = "dbg-exception?", description =
+            "(dbg-exception?)\n" +
+                    "Verify whether the current debugging session was halted with an exception.\n" +
+                    "See also: dbg-expr, dbg-exception.")
     @ScriptyRefArgList(ref = "no arguments")
     public boolean hasException()
     throws CommandException {
@@ -482,7 +547,10 @@ public class DebuggerLibrary {
     // the expression under scrutiny effecively raised an exception.
     // If no exception was raised, null will be returned.
     //
-    @ScriptyCommand(name = "dbg-exception")
+    @ScriptyCommand(name = "dbg-exception", description =
+            "(dbg-exception)\n" +
+                    "Get the exception that ended the current debugging session or null.\n" +
+                    "See also: dbg-expr, dbg-exception?.")
     @ScriptyRefArgList(ref = "no arguments")
     public Exception exception()
     throws CommandException {
@@ -494,7 +562,10 @@ public class DebuggerLibrary {
     // Required argument: a breakpoint, created with bpt-func, bpt-stack, ...
     // Example: (dbg-addbreakpoint (bpt-func fac))
     //
-    @ScriptyCommand(name = "dbg-addbreakpoint")
+    @ScriptyCommand(name = "dbg-addbreakpoint", description =
+            "(dbg-addbreakpoint <breakpoint>)\n" +
+                    "Add a breakpoint to the debugger, a name is generated if none provided.\n" +
+                    "See also: bpt-when, bpt-stack, bpt-func, btp-and, bpt-or, bpt-not, dbg-removebreakpoint.")
     @ScriptyRefArgList(ref = "breakpoint")
     public EvalTrace.BreakpointSet addBreakpoint(@ScriptyParam("arg") EvalTrace.Breakpoint aBpt) {
         // If none was found, we create a new empty one.
@@ -506,7 +577,9 @@ public class DebuggerLibrary {
 
     // List the existing breakpoints known by the debugger.
     //
-    @ScriptyCommand(name = "dbg-breakpoints")
+    @ScriptyCommand(name = "dbg-breakpoints", description =
+            "(dbg-breakpoints [quiet=true|false*])\n" +
+                    "Print the debugger breakpoints on *output and return them.")
     @ScriptyRefArgList(ref = "no arguments + quiet option")
     public EvalTrace.BreakpointSet dbgBreakpoints(@ScriptyBindingParam(value = "*output", unboundException = true) PrintWriter writer,
                                                   @ScriptyParam("quiet") boolean isQuiet)
@@ -520,7 +593,10 @@ public class DebuggerLibrary {
     // Required argument: the name of the breakpoint.
     // Example (dbg-removebreakpoint bp0)
     //
-    @ScriptyCommand(name = "dbg-removebreakpoint")
+    @ScriptyCommand(name = "dbg-removebreakpoint", description =
+            "(dbg-removebreakpoint name)\n" +
+                    "Remove a breakpoint from the debugger using its name.\n" +
+                    "See also: dbg-addbreakpoint.")
     @ScriptyRefArgList(ref = "name")
     public EvalTrace.BreakpointSet dbgRemoveBreakpoint(@ScriptyParam("name") String aName)
     throws CommandException {
@@ -535,7 +611,9 @@ public class DebuggerLibrary {
     // - true | false.
     // Example: (dbg-enablebreakpoint bp0 true)
     //
-    @ScriptyCommand(name = "dbg-enablebreakpoint")
+    @ScriptyCommand(name = "dbg-enablebreakpoint", description =
+            "(dbg-enablebreakpoint name <bool-expr>)\n" +
+                    "Enable or disable the named breakpoint.")
     @ScriptyRefArgList(ref = "name + bool")
     public EvalTrace.BreakpointSet dbgEnableBreakpoint(@ScriptyParam("name") String aName, @ScriptyParam("bool") boolean aEnable)
     throws CommandException {
@@ -546,7 +624,9 @@ public class DebuggerLibrary {
 
     // Remove all breakpoints from the debugger.
     //
-    @ScriptyCommand(name = "dbg-clearbreakpoints")
+    @ScriptyCommand(name = "dbg-clearbreakpoints", description =
+            "(dbg-clearbreakpoints)\n" +
+                    "Remove all breakpoints from the debugger.")
     @ScriptyRefArgList(ref = "no arguments")
     public EvalTrace.BreakpointSet dbgClearBreakpoints()
     throws CommandException {
@@ -563,7 +643,10 @@ public class DebuggerLibrary {
     // - name: choose a name for this breakpoint, otherwise a name will be generated
     //         of the form bp<x> where <x> is an integer sequence.
     //
-    @ScriptyCommand(name = "bpt-func")
+    @ScriptyCommand(name = "bpt-func", description =
+            "(bpt-func <function-name> [name=<breakpoint-name>])\n" +
+                    "Create a breakpoint that breaks when the function with specified name appears on the stack.\n" +
+                    "See also: dbg-addbreakpoint.")
     @ScriptyRefArgList(ref = "string + name")
     public EvalTrace.Breakpoint bptFunc(@ScriptyParam("str") String aFuncName, @ScriptyParam("name") String aBtpName) {
         if (aBtpName.length() <= 0) aBtpName = "bp" + breakpointcounter++;
@@ -579,7 +662,10 @@ public class DebuggerLibrary {
     // A macro is used to prevent evaluation of the condition.
     // In this way the user does not have to quote the conditional expression.
     //
-    @ScriptyCommand(name = "bpt-stack")
+    @ScriptyCommand(name = "bpt-stack", description =
+            "(bpt-stack <integer> [name=<breakpoint-name>])\n" +
+                    "Create a breakpoint that breaks when the stack depth exceeds the specified limit.\n" +
+                    "See also: dbg-addbreakpoint.")
     @ScriptyRefArgList(ref = "posint + name")
     public EvalTrace.Breakpoint bptStackDepth(@ScriptyParam("posint") Integer aDepth, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
@@ -588,21 +674,27 @@ public class DebuggerLibrary {
 
     // Internal (effective) command.
     //
-    @ScriptyCommand(name = "bpt-when-x")
+    @ScriptyCommand(name = "bpt-when-x", isHidden = true)
     @ScriptyRefArgList(ref = "obj + name")
     public EvalTrace.Breakpoint bptWhenImpl(@ScriptyParam("obj") Object aExpr, @ScriptyParam("name") String aBptName, Eval srcEval) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointWhen(aBptName, aExpr, srcEval);
     }
 
-    @ScriptyCommand(name = "bpt-not")
+    @ScriptyCommand(name = "bpt-not", description =
+            "(bpt-not <breakpoint> [name=<breakpoint-name>])\n" +
+                    "Create a new breakpoint by inverting an existing one.\n" +
+                    "See also: dbg-addbreakpoint.")
     @ScriptyRefArgList(ref = "breakpoint + name")
     public EvalTrace.Breakpoint bptNot(@ScriptyParam("bpt") EvalTrace.Breakpoint aBtp, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
         return new EvalTrace.BreakpointNot(aBptName, aBtp);
     }
 
-    @ScriptyCommand(name = "bpt-and")
+    @ScriptyCommand(name = "bpt-and", description =
+            "(bpt-and <breakpoint-1> ... <breakpoint-n> [name=<breakpoint-name>])\n" +
+                    "Create a new breakpoint by combining a list of breakpoints.\n" +
+                    "See also: dbg-addbreakpoint, bpt-or, bpt-not.")
     @ScriptyRefArgList(ref = "breakpoint* + name")
     public EvalTrace.Breakpoint bptAnd(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
@@ -611,7 +703,10 @@ public class DebuggerLibrary {
         return new EvalTrace.BreakpointAnd(aBptName, lBpts);
     }
 
-    @ScriptyCommand(name = "bpt-or")
+    @ScriptyCommand(name = "bpt-or", description =
+            "(bpt-or <breakpoint-1> ... <breakpoint-n> [name=<breakpoint-name>])\n" +
+                    "Create a new breakpoint by combining a list of breakpoints.\n" +
+                    "See also: dbg-addbreakpoint, bpt-and, bpt-not.")
     @ScriptyRefArgList(ref = "breakpoint* + name")
     public EvalTrace.Breakpoint bptOr(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;

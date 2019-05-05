@@ -295,18 +295,24 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                     // method name as a name.
                     String lCmdName = lCmdAnnot.name();
                     String cmdDesc = lCmdAnnot.description();
+                    boolean isHiddenCmd = lCmdAnnot.isHidden();
+
                     if (lCmdName.length() == 0) {
                         lCmdName = lMethod.getName();
                     }
-                    commandRepo.registerCommand(lCmdName, new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping, cmdDesc));
+                    commandRepo.registerCommand(lCmdName,
+                            new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping, cmdDesc, isHiddenCmd));
                 }
                 else {
                     String lMacroName = lMacroAnnot.name();
                     String macroDesc = lMacroAnnot.description();
+                    boolean isHiddenMacro = lMacroAnnot.isHidden();
+
                     if (lMacroName.length() == 0) {
                         lMacroName = lMethod.getName();
                     }
-                    macroRepo.registerCommand(lMacroName, new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping, macroDesc));
+                    macroRepo.registerCommand(lMacroName,
+                            new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping, macroDesc, isHiddenMacro));
                 }
             }
         }

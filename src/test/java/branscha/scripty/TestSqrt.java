@@ -46,7 +46,8 @@ public class TestSqrt {
 
     public BigDecimal sqrt(double n)
     throws ProcessorException {
-        Object lResult = scripty.process(String.format("(sqrt %s)", n));
+        // Explicitly call our function, do not use the command from the math library.
+        Object lResult = scripty.process(String.format("(funcall sqrt %s)", n));
         return (BigDecimal) lResult;
     }
 
