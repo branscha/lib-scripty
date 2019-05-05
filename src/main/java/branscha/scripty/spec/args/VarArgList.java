@@ -140,11 +140,12 @@ public class VarArgList extends AbstractArgList {
 
     @Override
     public String toString() {
+        final String indent = "   ";
         final StringBuffer sb = new StringBuffer("VarArgList{");
         if(fixedArgs != null && fixedArgs.length > 0){
-            sb.append("\n").append("    ").append("fixed=").append(Arrays.asList(fixedArgs).toString());
+            sb.append("\n").append(indent).append("fixed=").append(Arrays.asList(fixedArgs).toString());
         }
-        sb.append("\n").append("   ").append("var=").append(varArg);
+        sb.append("\n").append(indent).append("var=").append(varArg);
         if(min > 0) {
             sb.append(", #min=").append(min);
         }
@@ -152,7 +153,7 @@ public class VarArgList extends AbstractArgList {
             sb.append(", #max=").append(max);
         }
         if(namedArgs != null && namedArgs.length > 0) {
-            sb.append("\n").append("    ").append("named=").append(namedArgs == null ? "null" : Arrays.asList(namedArgs).toString());
+            sb.append("\n").append(indent).append("named=").append(namedArgs == null ? "null" : Arrays.asList(namedArgs).toString());
         }
         sb.append('}');
         return sb.toString();

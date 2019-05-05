@@ -3,6 +3,7 @@ package branscha.scripty.spec.args;
 import branscha.scripty.parser.BasicContext;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
+import branscha.scripty.spec.type.BooleanType;
 import branscha.scripty.spec.type.StringType;
 import org.junit.Test;
 
@@ -85,9 +86,9 @@ public class StdArgListTest {
     @Test
     public void fixedOnly_BadType() {
         StdArgList fixedOnly = new StdArgList.Builder()
-                .addFixed(new FixedArg(StringType.STRING_TYPE))
+                .addFixed(new FixedArg(BooleanType.BOOLEAN_TYPE))
                 .build();
-        Object[] args = new Object[]{"cmd", 1};
+        Object[] args = new Object[]{"cmd", "no-bool"};
         Context ctx = new BasicContext();
         try {
             fixedOnly.guard(args, ctx);
@@ -95,7 +96,7 @@ public class StdArgListTest {
         }
         catch (ArgSpecException e) {
             assertThat(e.getMessage(), containsString("FixedArg/020"));
-            assertThat(e.getMessage(), containsString("TypeUtil/020"));
+            assertThat(e.getMessage(), containsString("TypeUtil/040"));
         }
     }
 
@@ -131,11 +132,11 @@ public class StdArgListTest {
     @Test
     public void optionalOnly_BadType() {
         StdArgList optOnly = new StdArgList.Builder()
-                .addOptional(new OptionalArg(StringType.STRING_TYPE, "val1"))
+                .addOptional(new OptionalArg(BooleanType.BOOLEAN_TYPE, "val1"))
                 .build();
 
         // All arguments provided.
-        Object[] args = new Object[]{"cmd", 13};
+        Object[] args = new Object[]{"cmd", "no-go"};
         Context ctx = new BasicContext();
 
         try {
@@ -144,7 +145,7 @@ public class StdArgListTest {
         }
         catch (ArgSpecException e) {
             assertThat(e.getMessage(), containsString("OptionalArg/010"));
-            assertThat(e.getMessage(), containsString("TypeUtil/020"));
+            assertThat(e.getMessage(), containsString("TypeUtil/040"));
         }
     }
 
@@ -220,11 +221,11 @@ public class StdArgListTest {
     @Test
     public void namedOnly_BadType() {
         StdArgList namedOnly = new StdArgList.Builder()
-                .addNamed(new NamedArg("a1", StringType.STRING_TYPE, "val1", true))
+                .addNamed(new NamedArg("a1", BooleanType.BOOLEAN_TYPE, "val1", true))
                 .build();
 
         // Second one is required ...
-        Object[] args = new Object[]{"cmd", new Pair("a1", 17)};
+        Object[] args = new Object[]{"cmd", new Pair("a1", "no-bool")};
         Context ctx = new BasicContext();
 
         try {
@@ -233,7 +234,7 @@ public class StdArgListTest {
         }
         catch (ArgSpecException e) {
             assertThat(e.getMessage(), containsString("NamedArg/010"));
-            assertThat(e.getMessage(), containsString("TypeUtil/020"));
+            assertThat(e.getMessage(), containsString("TypeUtil/040"));
         }
     }
 

@@ -34,4 +34,9 @@ public class StringType extends InstanceType {
     StringType() {
         super(String.class, "String", false);
     }
+
+    @Override
+    Object convertArg(Object arg) {
+        return arg.toString();
+    }
 }

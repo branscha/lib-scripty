@@ -23,11 +23,11 @@ public class StringTypeTest {
     public void guard_Bad()
     throws TypeSpecException {
         try {
-            StringType.STRING_TYPE.guard(13, new BasicContext());
+            StringType.STRING_TYPE.guard(null, new BasicContext());
             fail("Expected guard to fail.");
         }
         catch (TypeSpecException e) {
-            assertThat(e.getMessage(), containsString("TypeUtil/020"));
+            assertThat(e.getMessage(), containsString("InstanceType/010"));
         }
     }
 }

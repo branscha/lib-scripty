@@ -33,20 +33,23 @@ import java.beans.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unused")
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(
         std = {
                 @ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name = "path", type = "String", value = ".")}),
                 @ScriptyStdArgList(name = "path + quiet option",
                         named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")},
-                        optional = {@ScriptyArg(name = "path", type = "String", value = ".")})}
+                        optional = {@ScriptyArg(name = "path", type = "String", value = ".")})},
+        var = {
+                @ScriptyVarArgList(name = "call",
+                        fixed = {@ScriptyArg(name = "bean", type = "Any"), @ScriptyArg(name="methodName", type = "String")},
+                        vararg = @ScriptyArg(name = "varargs", type = "Any"))
+        }
 )
 public class BeanLibrary {
 
@@ -58,14 +61,16 @@ public class BeanLibrary {
     // - [5] arrays, lists can be indexed.
     //   xyz[5] has same semantics as xyz/5
     //
-    @ScriptyCommand(name = "bean-cd")
+    @ScriptyCommand(name = "bean-cd", description =
+            "(bean-cd / | .. | . | <property-path> | <array-property>/<index> | <array-property>[<index>] )\n" +
+                    "Traverse the properties in the context hierarchy like a directory tree.\n" +
+                    "Also see: bean-ls, bean-cat, bean-pwd.")
     @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
     public Object beanCd(@ScriptyParam("path") String aPath, Context aCtx)
     throws CommandException {
         // Follow the path to see if it leads somewhere.
         final Resolution resolution = resolve(aPath, aCtx);
         // We succeeded following the path, so it exists.
-        if (!filter(resolution)) throw new CommandException("ERROR - cannot go there.");
         // We remember the current directory.
         currentDirectory = resolution.getPath();
         return resolution.getVal();
@@ -73,7 +78,10 @@ public class BeanLibrary {
 
     // Print the current path to the repl.
     //
-    @ScriptyCommand(name = "bean-pwd")
+    @ScriptyCommand(name = "bean-pwd",
+            description = "(bean-pwd)\n" +
+                    "Write the current property path to *output and return the path as the result.\n" +
+                    "Also see: bean-ls, bean-cd, bean-cat.")
     @ScriptyStdArgList
     public Object beanPwd(@ScriptyBindingParam("*output") PrintWriter writer) {
         writer.println(currentDirectory);
@@ -83,14 +91,15 @@ public class BeanLibrary {
     // List the contents of the denoted object.
     // The action depends on the type of the object, properties, array elements are listed.
     //
-    @ScriptyCommand(name = "bean-ls")
+    @ScriptyCommand(name = "bean-ls", description =
+            "(bean-ls <property-path> [quiet=true|false*])\n" +
+                    "List the properties on the path like the contents of a folder.\n" +
+                    "Also see: bean-cd, bean-cat, bean-pwd.")
     @ScriptyRefArgList(ref = "path + quiet option")
     public Object beanLs(@ScriptyParam("path") String aPath, Context aCtx, @ScriptyBindingParam("*output") PrintWriter writer, @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         // Resolve the path.
         final Resolution resolution = resolve(aPath, aCtx);
-        if (!filter(resolution)) throw new CommandException("Cannot show filtered.");
-
         final Object value = resolution.getVal();
         String typeDescr = value == null ? "null" : value.getClass().getSimpleName();
         Directory dir = list(typeDescr, value);
@@ -104,13 +113,15 @@ public class BeanLibrary {
     // The difference between ls and cat is that ls lists the subelements while
     // cat calls the toString() method.
     //
-    @ScriptyCommand(name = "bean-cat")
+    @ScriptyCommand(name = "bean-cat", description =
+            "(bean-cat <property-path> [quiet=true|false*])\n" +
+                    "Write the contents of the property specified by the path on *output, and return the property.\n" +
+                    "Also see: bean-cd, bean-ls, bean-pwd.")
     @ScriptyRefArgList(ref = "path + quiet option")
     public Object beanCat(@ScriptyParam("path") String path, Context ctx, @ScriptyBindingParam("*output") PrintWriter writer, @ScriptyParam("quiet") boolean isQuiet)
     throws CommandException {
         // Resolve the path.
         final Resolution resolution = resolve(path, ctx);
-        if (!filter(resolution)) throw new CommandException("Cannot cat filtered.");
         final Object value = resolution.getVal();
         if(!isQuiet) {
             writer.println(value == null ? "null" : value.toString());
@@ -123,14 +134,31 @@ public class BeanLibrary {
     // It is what the other commands do automatically. This command is in fact the
     // link between other command libraries and this one.
     //
-    @ScriptyCommand(name = "bean-rslv")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")})
-    public Object beanRslv(@ScriptyParam("path") String aPath, Context aCtx)
+    @ScriptyCommand(name = "bean-rslv", description =
+            "(bean-rslv <path> [<base-bean>])\n" +
+                    "Get the value of the property specified by the property path. The effect is the same as a quiet bean-cat.\n" +
+                    "Provide a base bean to resolve the path relative to the base and not to the current path." +
+                    "Also see: bean-cat.")
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")}, optional = {@ScriptyArg(name = "bean", type = "Any")})
+    public Object beanRslv(
+            Context aCtx,
+            @ScriptyParam("path") String aPath,
+            @ScriptyParam("bean") Object bean)
     throws CommandException {
-        // Resolve the path.
-        final Resolution lRes = resolve(aPath, aCtx);
-        if (!filter(lRes)) throw new CommandException("Cannot rslv filtered.");
-        else return lRes.getVal();
+
+        if("".equals(bean) || bean == null) {
+            // Resolve the path relative to the context.
+            final Resolution resolution = resolve(aPath, aCtx);
+            return resolution.getVal();
+        }
+        else {
+            // Resolve the path relative to the bean.
+            if(aPath.startsWith("/")) {
+                aPath = aPath.substring(1);
+            }
+            List<String> pieces = canonize(aPath);
+            return resolveCanonical(pieces, 0, bean);
+        }
     }
 
     // Call java methods on an object denoted by a path.
@@ -139,33 +167,40 @@ public class BeanLibrary {
     // The arguments are not resolved, they are passed directly to the method. You can use the
     // rslv method above to accomplish argument resolution as well.
     //
-    @ScriptyCommand(name = "bean-call")
-    public Object beanCall(Object[] aArgs, Context aCtx)
+    @ScriptyCommand(name = "bean-call", description =
+            "(bean-call <path>|<bean> <method-name> <arg-1> ... <arg-n>)\n" +
+                    "Call a Java method on the bean specified by the property path.")
+    @ScriptyRefArgList(ref = "call")
+    public Object beanCall(
+            Context ctx,
+            @ScriptyParam("bean") Object targetBean,
+            @ScriptyParam("methodName") String methodName,
+            @ScriptyParam("varargs") Object[] methodArgs)
     throws CommandException {
         try {
-            final String lPath = guardStringOther(aArgs);
-            final Resolution lRes = resolve(lPath, aCtx);
-            if (!filter(lRes)) throw new CommandException("Cannot call filtered.");
-            final Object lTarget = lRes.getVal();
-
-            Object[] lArgs = new Object[aArgs.length - 3];
-            for (int i = 0; i < lArgs.length; i++) lArgs[i] = aArgs[i + 3];
-
-            Method lMeth = null;
-            if (aArgs[2] instanceof Method) {
-                lMeth = (Method) aArgs[2];
-            }
-            else if (aArgs[2] instanceof String) {
-                Class[] lClasses = new Class[lArgs.length];
-                for (int i = 0; i < lArgs.length; i++) lClasses[i] = (lArgs[i] == null) ? null : lArgs[i].getClass();
-
-                lMeth = lTarget.getClass().getMethod((String) aArgs[2], lClasses);
+            if(targetBean instanceof  String) {
+                final String propertyPath = (String) targetBean;
+                final Resolution resolution = resolve(propertyPath, ctx);
+                targetBean = resolution.getVal();
             }
 
-            if (lMeth == null)
+            // The length of an array is not available trough reflection.
+            // We simulate a method call.
+            if("length".equals(methodName) && targetBean != null && targetBean.getClass().isArray()) {
+                return ((Object[])targetBean).length;
+            }
+
+            Class[] argClasses = new Class[methodArgs.length];
+            for (int i = 0; i < methodArgs.length; i++) {
+                argClasses[i] = (methodArgs[i] == null) ? null : methodArgs[i].getClass();
+            }
+
+            Method method = targetBean.getClass().getMethod(methodName, argClasses);
+            if (method == null) {
                 throw new CommandException("Method could not be resolved.");
+            }
 
-            return lMeth.invoke(lTarget, lArgs);
+            return method.invoke(targetBean, methodArgs);
         }
         catch (Exception e) {
             throw new CommandException("Invocation failed.\n" + e.getMessage(), e);
@@ -175,34 +210,31 @@ public class BeanLibrary {
     // Update the properties of a bean.
     // (bean-upd BEAN prop1=val1 prop2=val2 ...)
     //
-    @ScriptyCommand(name = "bean-upd")
-    public void beanUpd(Object[] aArgs, Context aCtx)
+    @ScriptyCommand(name = "bean-upd", description =
+            "(bean-upd <path>|<bean> prop-1=val-1 ... prop-n=val-n)\n" +
+                    "Update one or more properties in the bean specified by the bean path.")
+    public void beanUpd(Context ctx, Object[] args)
     throws CommandException {
-        final String lPath = guardStringOther(aArgs);
-        final Resolution lRes = resolve(lPath, aCtx);
-        if (!filter(lRes)) throw new CommandException("Cannot update filtered.");
-        for (int i = 2; i < aArgs.length; i++) {
-            if (!(aArgs[i] instanceof Pair))
-                throw new CommandException("Pair expected.");
-            Pair lPair = (Pair) aArgs[i];
-            update(lRes.getVal(), lPair.getLeft(), lPair.getRight());
+        if(args.length < 3) {
+            throw new CommandException("Not enough arguments in bean-upd.");
+        }
+
+        Object targetBean = args[1];
+
+        if(targetBean instanceof  String) {
+            final String propertyPath = (String) targetBean;
+            final Resolution resolution = resolve(propertyPath, ctx);
+            targetBean = resolution.getVal();
+        }
+
+        for (int i = 2; i < args.length; i++) {
+            if (!(args[i] instanceof Pair)) {
+                throw new CommandException("Pair expected in bean-upd.");
+            }
+            Pair lPair = (Pair) args[i];
+            update(targetBean, lPair.getLeft(), lPair.getRight());
         }
     }
-
-    private String guardStringOther(Object[] aArgs)
-    throws CommandException {
-        if (aArgs.length < 3)
-            throw new CommandException("ERROR - Too few args.");
-        if (!(aArgs[1] instanceof String))
-            throw new CommandException("ERROR - expected a string as first arg.");
-        return (String) aArgs[1];
-    }
-
-    public static interface IFilter {
-        boolean filter(String aPath, Object aValue);
-    }
-
-    private IFilter[] filters = new IFilter[]{};
 
     private static Pattern PAT_FIELDNAME_BIS = Pattern.compile("^\\s*([^\\s\\[\\]]+)?\\s*(\\[\\s*([^\\s\\[\\]]+)\\s*\\])*\\s*$");
 
@@ -213,12 +245,12 @@ public class BeanLibrary {
         private Object val;
         private String path;
 
-        public Resolution(String aPath, Object aObj) {
+        Resolution(String aPath, Object aObj) {
             path = aPath;
             val = aObj;
         }
 
-        public String getPath() {
+        String getPath() {
             return path;
         }
 
@@ -227,7 +259,7 @@ public class BeanLibrary {
         }
     }
 
-    public Resolution resolve(String path, Context ctx)
+    private Resolution resolve(String path, Context ctx)
     throws CommandException {
         String absolutePath;
         if (path.startsWith("/")) {
@@ -284,10 +316,12 @@ public class BeanLibrary {
 
         if (base instanceof Context && lIdx < 0) {
             final Context lCtx = (Context) base;
-            if (lCtx.isBound(lPiece))
+            if (lCtx.isBound(lPiece)) {
                 return resolveCanonical(pathPieces, currPiece + 1, lCtx.getBinding(lPiece));
-            else
+            }
+            else {
                 throw new CommandException(String.format("Cannot find '%s' in context.", lPiece));
+            }
         }
         else if (base instanceof Map && lIdx < 0) {
             final Map lMap = (Map) base;
@@ -298,25 +332,33 @@ public class BeanLibrary {
         }
         else if (base instanceof List) {
             final List lList = (List) base;
-            if (lIdx < 0) throw new CommandException("List expects an index.");
-            if (lIdx >= lList.size()) throw new CommandException("List index out of range.");
-            else return resolveCanonical(pathPieces, currPiece + 1, lList.get(lIdx));
+            if (lIdx < 0) {
+                throw new CommandException("List expects an index.");
+            }
+            if (lIdx >= lList.size()) {
+                throw new CommandException("List index out of range.");
+            }
+            else {
+                return resolveCanonical(pathPieces, currPiece + 1, lList.get(lIdx));
+            }
         }
         else if (base != null) {
             if (base.getClass().isArray()) {
                 // Array rendering.
                 ///////////////////
-
-                if (lIdx >= 0 && lIdx < Array.getLength(base))
+                if (lIdx >= 0 && lIdx < Array.getLength(base)) {
                     return resolveCanonical(pathPieces, currPiece + 1, Array.get(base, lIdx));
-                else throw new CommandException("ERROR - index out of range/wrong index type/no index.");
+                }
+                else {
+                    throw new CommandException("ERROR - index out of range/wrong index type/no index." + lIdx + " " + base.getClass().getSimpleName());
+                }
             }
             else {
                 try {
                     // Try bean.
                     //
                     final BeanInfo lInfo = Introspector.getBeanInfo(base.getClass());
-                    final PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
+                    final PropertyDescriptor[] lProps = lInfo.getPropertyDescriptors();
                     for (PropertyDescriptor lProp : lProps) {
                         if (lProp.getName().equals(lPiece)) {
                             Method lGetter = lProp.getReadMethod();
@@ -353,19 +395,15 @@ public class BeanLibrary {
     /**
      * Convert a relative path description containing . and .. into a path without these.
      * We calculate the effect of . and ..
-     *
-     * @param beanPath
-     * @return
-     * @throws CommandException
      */
     private static List<String> canonize(String beanPath)
     throws CommandException {
         final String[] lPieces = beanPath.split("/");
-        final List<String> lResult = new ArrayList<String>(lPieces.length);
+        final List<String> lResult = new ArrayList<>(lPieces.length);
         for (String lPiece : lPieces) {
-            if (".".equals(lPiece))
-                // Just skip this.
-                continue;
+            if (".".equals(lPiece)) {
+                // Skip.
+            }
             else if ("..".equals(lPiece)) {
                 // Delete the last part and go back to the previous part.
                 int lResultSize = lResult.size();
@@ -397,7 +435,7 @@ public class BeanLibrary {
     @SuppressWarnings("unchecked")
     private void update(Object aTarget, Object aProp, Object aVal)
     throws CommandException {
-        String lPropName = "";
+        String lPropName;
         int lIdx = -1;
 
         if (aProp instanceof String) lPropName = (String) aProp;
@@ -438,7 +476,7 @@ public class BeanLibrary {
                 try {
                     // JavaBean access.
                     BeanInfo lInfo = Introspector.getBeanInfo(aTarget.getClass());
-                    PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
+                    PropertyDescriptor[] lProps = lInfo.getPropertyDescriptors();
                     for (PropertyDescriptor lProp : lProps) {
                         if (lProp.getDisplayName().equals(lPropName)) {
                             Method lMeth = lProp.getWriteMethod();
@@ -449,7 +487,7 @@ public class BeanLibrary {
                                 PropertyEditor lEditor = lProp.createPropertyEditor(aTarget);
                                 lEditor.setAsText((String) aVal);
                             }
-                            else lMeth.invoke(aTarget, new Object[]{aVal});
+                            else lMeth.invoke(aTarget, aVal);
                         }
                     }
                 }
@@ -509,11 +547,10 @@ public class BeanLibrary {
                     ///////////////////
                     dir.setSorted(true);
                     BeanInfo lInfo = Introspector.getBeanInfo(obj.getClass());
-                    PropertyDescriptor lProps[] = lInfo.getPropertyDescriptors();
+                    PropertyDescriptor[] lProps = lInfo.getPropertyDescriptors();
                     for (PropertyDescriptor lProp : lProps) {
                         Method lRead = lProp.getReadMethod();
                         Method lWrite = lProp.getWriteMethod();
-                        String lRw = "" + ((lRead != null) ? "r" : "-") + ((lWrite != null) ? "w" : "-");
                         DirectoryEntry dirEntry = new DirectoryEntry(lProp.getDisplayName(), lProp.getPropertyType().getSimpleName(), lRead != null, lWrite != null);
                         dir.addEntry(dirEntry);
                     }
@@ -527,30 +564,20 @@ public class BeanLibrary {
         return dir;
     }
 
-    private boolean filter(Resolution aRes) {
-        final String lPath = aRes.getPath();
-        final Object lVal = aRes.getVal();
-
-        for (IFilter lFilt : filters) {
-            if (!lFilt.filter(lPath, lVal)) return false;
-        }
-        return true;
-    }
-
     public static class Directory {
         private boolean isSorted = false;
         private String description;
         private List<DirectoryEntry> dir = new ArrayList<>();
 
-        public Directory(String description) {
+        Directory(String description) {
             this.description = description;
         }
 
-        public void addEntry(DirectoryEntry entry) {
+        void addEntry(DirectoryEntry entry) {
             dir.add(entry);
         }
 
-        public void setSorted(boolean sorted) {
+        void setSorted(boolean sorted) {
             isSorted = sorted;
         }
 
@@ -576,7 +603,7 @@ public class BeanLibrary {
         private boolean isReadable;
         private boolean isWritable;
 
-        public DirectoryEntry(String name, String description, boolean isReadable, boolean isWritable) {
+        DirectoryEntry(String name, String description, boolean isReadable, boolean isWritable) {
             this.name = name;
             this.description = description;
             this.isReadable = isReadable;
