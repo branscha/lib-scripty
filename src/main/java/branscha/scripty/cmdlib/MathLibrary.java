@@ -47,7 +47,7 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
                 @ScriptyVarArgList(name = "numbers*", fixed = {}, named = {}, vararg = @ScriptyArg(name = "numbers", type = "BigDecimal")),
                 @ScriptyVarArgList(name = "numbers+", fixed = {}, named = {}, vararg = @ScriptyArg(name = "numbers", type = "BigDecimal"), minLength = 1)}
 )
-@ScriptyLibrary(type = ScriptyLibraryType.AUTO)
+@ScriptyLibrary(name = "Math", type = ScriptyLibraryType.AUTO)
 public class MathLibrary {
 
     private static final String ERR010 =
@@ -60,11 +60,11 @@ public class MathLibrary {
                     "Add zero or more numbers.")
     @ScriptyRefArgList(ref = "numbers*")
     public BigDecimal add(@ScriptyParam("numbers") Object[] aNumbers) {
-        BigDecimal lSum = BigDecimal.ZERO;
+        BigDecimal sum = BigDecimal.ZERO;
         for (Object lDec : aNumbers) {
-            lSum = lSum.add((BigDecimal) lDec, mathCtx);
+            sum = sum.add((BigDecimal) lDec, mathCtx);
         }
-        return lSum;
+        return sum;
     }
 
     @ScriptyCommand(name = "-", description =
@@ -72,11 +72,11 @@ public class MathLibrary {
                     "Subtract one or more numbers.")
     @ScriptyRefArgList(ref = "numbers+")
     public BigDecimal sub(@ScriptyParam("numbers") Object[] aNumbers) {
-        BigDecimal lSum = (BigDecimal) aNumbers[0];
+        BigDecimal sum = (BigDecimal) aNumbers[0];
         for (int i = 1; i < aNumbers.length; i++) {
-            lSum = lSum.subtract((BigDecimal) aNumbers[i], mathCtx);
+            sum = sum.subtract((BigDecimal) aNumbers[i], mathCtx);
         }
-        return lSum;
+        return sum;
     }
 
     @ScriptyCommand(name = "/", description =
@@ -84,11 +84,11 @@ public class MathLibrary {
                     "Divide one or more numbers.")
     @ScriptyRefArgList(ref = "numbers+")
     public BigDecimal div(@ScriptyParam("numbers") Object[] aNumbers) {
-        BigDecimal lResult = (BigDecimal) aNumbers[0];
+        BigDecimal result = (BigDecimal) aNumbers[0];
         for (int i = 1; i < aNumbers.length; i++) {
-            lResult = lResult.divide((BigDecimal) aNumbers[i], mathCtx);
+            result = result.divide((BigDecimal) aNumbers[i], mathCtx);
         }
-        return lResult;
+        return result;
     }
 
     @ScriptyCommand(name = "*", description =
@@ -148,8 +148,8 @@ public class MathLibrary {
     }
 
     @ScriptyCommand(name = "fin", description =
-            "(fin number-1)\n" +
-                    "Format arg as financial number with two decimal places.")
+            "(fin number)\n" +
+                    "Format mumber as financial amount with two decimal places.")
     @ScriptyRefArgList(ref = "1number")
     public BigDecimal fin(@ScriptyParam("arg") BigDecimal aArg) {
         return aArg.setScale(2, ROUND_HALF_UP);

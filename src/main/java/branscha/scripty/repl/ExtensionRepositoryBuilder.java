@@ -43,6 +43,22 @@ import java.util.Map;
 
 public class ExtensionRepositoryBuilder implements ExtensionManager {
 
+    private static final String ERR010 = "ExtensionRepositoryBuilder/010: Library '%s' was marked as type INSTANCE, but it was impossible to create an instance.%nMaybe you should create an instance manually and provide the instance.";
+    private static final String ERR020 = "ExtensionRepositoryBuilder/020: Class '%s' contains an unnamed standard argument list. An argument list associated with a command library must be named.";
+    private static final String ERR030 = "ExtensionRepositoryBuilder/030: Class '%s' contains a standard argument list '%s' with errors.%n%s";
+    private static final String ERR040 = "ExtensionRepositoryBuilder/040: Class '%s' contains an unnamed variable argument list. An argument list associated with a command library must be named.";
+    private static final String ERR050 = "ExtensionRepositoryBuilder/050: Class '%s' contains a variable argument list '%s' with errors.%n%s";
+    private static final String ERR060 = "ExtensionRepositoryBuilder/060: Class '%s' contains more than one argument list. Use @ScriptyNamedArgLists to associate multiple argument list specifications with a single class.";
+    private static final String ERR070 = "ExtensionRepositoryBuilder/070: Class '%s' has a macro/command method '%s' is annotated with both def/set binding of the result to the context.";
+    private static final String ERR080 = "ExtensionRepositoryBuilder/080: Class '%s' has a macro/command method '%s' with more than one argument list.";
+    private static final String ERR090 = "ExtensionRepositoryBuilder/090: Class '%s' has a macro/command method '%s' with a reference to a named argument list '%s' which does not exist.";
+    private static final String ERR100 = "ExtensionRepositoryBuilder/100: While processing a standard argument list for class '%s' on method '%s'.%n%s";
+    private static final String ERR110 = "ExtensionRepositoryBuilder/110: While processing a variable argument list for class '%s' on method '%s'.%n%s";
+    private static final String ERR120 = "ExtensionRepositoryBuilder/120: Method '%s' in class '%s' is annotated as command and as a macro simultaneously.";
+    private static final String ERR130 = "ExtensionRepositoryBuilder/130: Method '%s' in class '%s' is not static, and there is no library instance.";
+    private static final String ERR140 = "ExtensionRepositoryBuilder/140: While constructing the argument mapping for class '%s' on method '%s'.%n%s";
+    private static final String ERR150 = "ExtensionRepositoryBuilder/150: Class '%s' is marked as a static library and an instance was added.";
+
     private CommandRepository commandRepo;
     private CommandRepository macroRepo;
 
@@ -73,23 +89,22 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
 
             // Try to instantiate the class in order to be able to use non static 
             // methods as well. 
-            Object lLibInstance = null;
+            Object libInstance = null;
             if (lLibraryType != ScriptyLibraryType.STATIC) {
                 try {
-                    lLibInstance = lClass.newInstance();
+                    libInstance = lClass.newInstance();
                 }
                 catch (Exception e) {
                     // Nope we could not instantiate the library, so we 
                     // will only be able to add the static methods.
-                    lLibInstance = null;
                 }
             }
 
-            if (lLibInstance == null && lLibraryType == ScriptyLibraryType.INSTANCE) {
-                throw new ExtensionException(String.format("Library '%s' was marked as being of type INSTANCE, but it was impossible to create an instance.%nMaybe you should create an instance manually and provide the instance.", lClass.getName()));
+            if (libInstance == null && lLibraryType == ScriptyLibraryType.INSTANCE) {
+                throw new ExtensionException(String.format(ERR010, lClass.getName()));
             }
 
-            addLibrary(lLibraryName, lLibInstance, lClass);
+            addLibrary(lLibraryName, libInstance, lClass);
         }
     }
 
@@ -97,7 +112,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
     throws ExtensionException {
         final String lName = aStdLst.name();
         if (lName.length() == 0) {
-            final String lMsg = String.format("Class '%s' contains an unnamed standard argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
+            final String lMsg = String.format(ERR020, aClass.getName());
             throw new ExtensionException(lMsg);
         }
 
@@ -108,7 +123,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             aNamedLists.put(lName, lTuple);
         }
         catch (ArgSpecException e) {
-            final String lMsg = String.format("Class '%s' contains a standard argument list specification '%s' with errors.%n%s", aClass.getName(), aStdLst.name(), e.getMessage());
+            final String lMsg = String.format(ERR030, aClass.getName(), aStdLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
@@ -117,7 +132,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
     throws ExtensionException {
         final String lName = aVarLst.name();
         if (lName.length() == 0) {
-            final String lMsg = String.format("Class '%s' contains an unnamed variable argument list specification. An argument list specification associated with a command library should always have a name.", aClass.getName());
+            final String lMsg = String.format(ERR040, aClass.getName());
             throw new ExtensionException(lMsg);
         }
 
@@ -128,12 +143,12 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             aNamedLists.put(lName, lTuple);
         }
         catch (ArgSpecException e) {
-            final String lMsg = String.format("Class '%s' contains a variable argument list specification '%s' with errors.%n%s", aClass.getName(), aVarLst.name(), e.getMessage());
+            final String lMsg = String.format(ERR050, aClass.getName(), aVarLst.name(), e.getMessage());
             throw new ExtensionException(lMsg, e);
         }
     }
 
-    private void addLibrary(String aLibName, Object aLibInstance, Class aClass)
+    private void addLibrary(String libName, Object libInstance, Class clazz)
     throws ExtensionException {
         // We keep track of the named arglists in this datastructure. 
         Map<String, RuntimeArgList> lNamedArgLists = new HashMap<String, RuntimeArgList>();
@@ -141,42 +156,42 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
         // Library (Class) annotations.
         ///////////////////////////////
 
-        ScriptyStdArgList lStdArgListClassAnnot = (ScriptyStdArgList) aClass.getAnnotation(ScriptyStdArgList.class);
-        ScriptyVarArgList lVarArgListClassAnnot = (ScriptyVarArgList) aClass.getAnnotation(ScriptyVarArgList.class);
-        ScriptyNamedArgLists lNamedArgListsAnnot = (ScriptyNamedArgLists) aClass.getAnnotation(ScriptyNamedArgLists.class);
+        ScriptyStdArgList lStdArgListClassAnnot = (ScriptyStdArgList) clazz.getAnnotation(ScriptyStdArgList.class);
+        ScriptyVarArgList lVarArgListClassAnnot = (ScriptyVarArgList) clazz.getAnnotation(ScriptyVarArgList.class);
+        ScriptyNamedArgLists lNamedArgListsAnnot = (ScriptyNamedArgLists) clazz.getAnnotation(ScriptyNamedArgLists.class);
 
         int lClassAnnotCounter = 0;
         if (lStdArgListClassAnnot != null) lClassAnnotCounter++;
         if (lVarArgListClassAnnot != null) lClassAnnotCounter++;
         if (lNamedArgListsAnnot != null) lClassAnnotCounter++;
         if (lClassAnnotCounter > 1) {
-            final String lMsg = String.format("Class '%s' contains more than one argument list spefification. Use @ScriptyNamedArgLists to associate multiple argument list specifications with a single class.", aClass.getName());
+            final String lMsg = String.format(ERR060, clazz.getName());
             throw new ExtensionException(lMsg);
         }
 
         if (lVarArgListClassAnnot != null) {
-            registerClassArgList(aClass, lVarArgListClassAnnot, lNamedArgLists);
+            registerClassArgList(clazz, lVarArgListClassAnnot, lNamedArgLists);
         }
         else if (lStdArgListClassAnnot != null) {
-            registerClassArgList(aClass, lStdArgListClassAnnot, lNamedArgLists);
+            registerClassArgList(clazz, lStdArgListClassAnnot, lNamedArgLists);
         }
         else if (lNamedArgListsAnnot != null) {
             ScriptyStdArgList[] lStdLists = lNamedArgListsAnnot.std();
             ScriptyVarArgList[] lVarLists = lNamedArgListsAnnot.var();
 
             for (ScriptyStdArgList lStd : lStdLists) {
-                registerClassArgList(aClass, lStd, lNamedArgLists);
+                registerClassArgList(clazz, lStd, lNamedArgLists);
             }
 
             for (ScriptyVarArgList lVar : lVarLists) {
-                registerClassArgList(aClass, lVar, lNamedArgLists);
+                registerClassArgList(clazz, lVar, lNamedArgLists);
             }
         }
 
         // Find command/macro methods.
         //////////////////////////////
 
-        final Method[] lMethods = aClass.getMethods();
+        final Method[] lMethods = clazz.getMethods();
 
         for (Method lMethod : lMethods) {
             // Result binding
@@ -186,7 +201,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             ScriptySetBinding lSetBinding = lMethod.getAnnotation(ScriptySetBinding.class);
             ScriptyDefBinding lDefBinding = lMethod.getAnnotation(ScriptyDefBinding.class);
             if (lSetBinding != null && lDefBinding != null) {
-                final String lMsg = String.format("Class '%s' has a macro/command method '%s' is annotated with both def/set binding of the result to the context.", aClass.getName(), lMethod.getName());
+                final String lMsg = String.format(ERR070, clazz.getName(), lMethod.getName());
                 throw new ExtensionException(lMsg);
             }
 
@@ -213,7 +228,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             if (lVarArgListAnnot != null) lArgListCounter++;
             if (lRefArgListAnnot != null) lArgListCounter++;
             if (lArgListCounter > 1) {
-                final String lMsg = String.format("Class '%s' has a macro/command method '%s' with more than one argument list specification.", aClass.getName(), lMethod.getName());
+                final String lMsg = String.format(ERR080, clazz.getName(), lMethod.getName());
                 throw new ExtensionException(lMsg);
             }
 
@@ -225,7 +240,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                     lMappings = lTuple.getArgMappings();
                 }
                 else {
-                    final String lMsg = String.format("Class '%s' has a macro/command method '%s' with a reference to a named argument list '%s' which does not exist.", aClass, lMethod.getName(), lRef);
+                    final String lMsg = String.format(ERR090, clazz, lMethod.getName(), lRef);
                     throw new ExtensionException(lMsg);
                 }
             }
@@ -241,7 +256,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                     lMappings = lTuple.getArgMappings();
                 }
                 catch (ArgSpecException e) {
-                    final String lMsg = String.format("While processing a standard argument list specification for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                    final String lMsg = String.format(ERR100, clazz.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
             }
@@ -257,7 +272,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                     lMappings = lTuple.getArgMappings();
                 }
                 catch (ArgSpecException e) {
-                    final String lMsg = String.format("While processing a variable argument list specification for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                    final String lMsg = String.format(ERR110, clazz.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
             }
@@ -271,22 +286,22 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             if (lCmdAnnot != null && lMacroAnnot != null) {
                 // The method is annotated as a command AND macro.
                 // A method can be a command or a macro, but not both things at the same time.
-                throw new ExtensionException(String.format("Method '%s' in class '%s' is annotated as command and as a macro simultaneously.", lMethod.getName(), aClass.getSimpleName()));
+                throw new ExtensionException(String.format(ERR120, lMethod.getName(), clazz.getSimpleName()));
             }
             else if (!(lCmdAnnot == null && lMacroAnnot == null)) {
                 int lMethodModifiers = lMethod.getModifiers();
                 boolean lIsStaticMethod = Modifier.isStatic(lMethodModifiers);
-                if (!lIsStaticMethod && aLibInstance == null) {
-                    throw new ExtensionException(String.format("Method '%s' in class '%s' is not static, and there is no library instance.", lMethod.getName(), aClass.getSimpleName()));
+                if (!lIsStaticMethod && libInstance == null) {
+                    throw new ExtensionException(String.format(ERR130, lMethod.getName(), clazz.getSimpleName()));
                 }
 
                 // Construct the argument injector.
-                CmdMethodInjector cmdInjector = null;
+                CmdMethodInjector cmdInjector;
                 try {
                     cmdInjector = CmdMethodInjectorBuilder.buildCmdMethodInjector(lMethod, lMappings);
                 }
                 catch (ArgMappingException e) {
-                    final String lMsg = String.format("While constructing the argument mapping for class '%s' on method '%s'.%n%s", aClass.getName(), lMethod.getName(), e.getMessage());
+                    final String lMsg = String.format(ERR140, clazz.getName(), lMethod.getName(), e.getMessage());
                     throw new ExtensionException(lMsg, e);
                 }
 
@@ -301,7 +316,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                         lCmdName = lMethod.getName();
                     }
                     commandRepo.registerCommand(lCmdName,
-                            new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping, cmdDesc, isHiddenCmd));
+                            new MethodCommand(libName, libInstance, lMethod, lArgList, cmdInjector, lResultMapping, cmdDesc, isHiddenCmd));
                 }
                 else {
                     String lMacroName = lMacroAnnot.name();
@@ -312,7 +327,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
                         lMacroName = lMethod.getName();
                     }
                     macroRepo.registerCommand(lMacroName,
-                            new MethodCommand(aLibInstance, lMethod, lArgList, cmdInjector, lResultMapping, macroDesc, isHiddenMacro));
+                            new MethodCommand(libName, libInstance, lMethod, lArgList, cmdInjector, lResultMapping, macroDesc, isHiddenMacro));
                 }
             }
         }
@@ -331,7 +346,7 @@ public class ExtensionRepositoryBuilder implements ExtensionManager {
             }
 
             if (lLibraryType == ScriptyLibraryType.STATIC)
-                throw new ExtensionException(String.format("Class '%s' is marked as a static library, but an instance was added.", lLib.getClass().getName()));
+                throw new ExtensionException(String.format(ERR150, lLib.getClass().getName()));
 
             addLibrary(lLibraryName, lLib, lLib.getClass());
         }

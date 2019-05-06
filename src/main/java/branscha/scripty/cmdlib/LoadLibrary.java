@@ -44,6 +44,7 @@ import java.util.List;
  * <li><b><code>reload</code></b> Reload previously loaded files. A file is remembered if it existed and was readable. <code>(reload)</code></li>
  * </ul>
  */
+@ScriptyLibrary(name="Load")
 public class LoadLibrary {
     
     private static final String ERR010 = "LoadLibrary/010: While loading '%s'.%n%s";

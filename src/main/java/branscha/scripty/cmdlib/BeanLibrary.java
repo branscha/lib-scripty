@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
-@ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
+@ScriptyLibrary(name = "JavaBean", type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(
         std = {
                 @ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name = "path", type = "String", value = ".")}),
@@ -186,9 +186,9 @@ public class BeanLibrary {
             }
 
             // The length of an array is not available trough reflection.
-            // We simulate a method call.
+            // We simulate a method call of length().
             if("length".equals(methodName) && targetBean != null && targetBean.getClass().isArray()) {
-                return ((Object[])targetBean).length;
+                return Array.getLength(targetBean);
             }
 
             Class[] argClasses = new Class[methodArgs.length];

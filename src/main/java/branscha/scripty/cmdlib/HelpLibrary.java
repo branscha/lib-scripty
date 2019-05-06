@@ -6,12 +6,11 @@ import branscha.scripty.spec.args.ArgList;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
+@ScriptyLibrary(name="Help")
 public class HelpLibrary {
 
     private static final Map<String, String> formRepo = new TreeMap<>();
@@ -55,12 +54,19 @@ public class HelpLibrary {
         copyNonHiddenMethodCommands(cmdDump, cmdAndMacros);
         copyNonHiddenMethodCommands(macroDump, cmdAndMacros);
 
+        // Collect the library names from the commands.
+        List<String> libraryNames = cmdAndMacros.values().stream()
+                .map(MethodCommand::getLibName)
+                .map((name)->"".equals(name)?"Anonymous":name)
+                .distinct()
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toList());
+
         if (search.length() == 0) {
             // There is no search argument, we will print all the forms, commands and macro's.
-
             final StringBuilder builder = new StringBuilder();
             builder
-                    .append("Forms: ")
+                    .append("[Forms]")
                     .append("\n")
                     .append(formRepo.keySet().stream().sorted().collect(Collectors.joining(", ")))
                     .append("\n")
@@ -68,22 +74,52 @@ public class HelpLibrary {
 
             if (cmdDump.size() > 0) {
                 builder
-                        .append("Commands & Macro's: ")
+                        .append("[Commands & Macro's]")
                         .append("\n")
                         .append(cmdAndMacros.keySet().stream().sorted().collect(Collectors.joining(", ")))
                         .append("\n")
                         .append("\n");
             }
+
+            builder.append("[Libraries]")
+                    .append("\n")
+                    .append(libraryNames.stream().collect(Collectors.joining(", ")))
+                    .append("\n");
+
             writer.write(builder.toString());
             writer.flush();
         }
         else {
             boolean found = false;
+            // Check built-ins first.
             if (formRepo.containsKey(search)) {
                 writer.write(formRepo.get(search) + "\n");
                 found = true;
             }
+
+            // Search the commands & macros.
             found = helpInfo(writer, search, cmdAndMacros, found);
+
+            // Search the library names.
+            if(libraryNames.contains(search)) {
+
+                if("Anonymous".equals(search)) {
+                    search="";
+                }
+                final String fixedSearch = search;
+                StringBuilder builder = new StringBuilder();
+                builder.append(
+                        cmdAndMacros
+                                .entrySet().stream()
+                                .filter((e) -> fixedSearch.equals(e.getValue().getLibName()))
+                                .map(Map.Entry::getKey)
+                                .sorted()
+                                .collect(Collectors.joining(", ")));
+                builder.append("\n");
+                writer.write(builder.toString());
+                found = true;
+            }
+
             if (!found) {
                 writer.write(String.format("No help about '%s'.%n", search));
             }

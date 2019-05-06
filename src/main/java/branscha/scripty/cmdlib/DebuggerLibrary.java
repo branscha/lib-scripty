@@ -51,6 +51,7 @@ import java.util.List;
                 @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
         }
 )
+@ScriptyLibrary(name="Debugger")
 public class DebuggerLibrary {
 
     private static final String ERR010 = "DebuggerLibrary/010: Exception while debugging:%n%s";

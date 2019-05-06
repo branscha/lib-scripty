@@ -53,6 +53,7 @@ public class MethodCommand implements Command {
     private Method method;
     private String description;
     private boolean hidden;
+    private String libName;
 
     public MethodCommand(Method aMethod) {
         argList = null;
@@ -61,9 +62,10 @@ public class MethodCommand implements Command {
         cmdMethodInjector = null;
         resultMapping = null;
         description = "";
+        libName = "";
     }
 
-    public MethodCommand(Object instance, Method method, ArgList argList, CmdMethodInjector cmdMethodInjector,
+    public MethodCommand(String libName, Object instance, Method method, ArgList argList, CmdMethodInjector cmdMethodInjector,
                          ResultMapping resultMapping, String description, boolean hidden) {
         this.argList = argList;
         this.method = method;
@@ -72,6 +74,7 @@ public class MethodCommand implements Command {
         this.resultMapping = resultMapping;
         this.description = description;
         this.hidden = hidden;
+        this.libName = libName;
     }
 
     public Object execute(Eval eval, Context ctx, Object[] args)
@@ -135,5 +138,9 @@ public class MethodCommand implements Command {
 
     public boolean isHidden() {
         return hidden;
+    }
+
+    public String getLibName() {
+        return libName;
     }
 }
