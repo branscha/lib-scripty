@@ -93,6 +93,7 @@ public class BeanLibraryTest {
                 "    *error               PrintWriter                RW\n" +
                 "    *input               LineNumberReader           RW\n" +
                 "    *output              PrintWriter                RW\n" +
+                "    _                    String                     RW\n" +
                 "    test                 MyBean                     RW\n" +
                 "}", result.toString());
 

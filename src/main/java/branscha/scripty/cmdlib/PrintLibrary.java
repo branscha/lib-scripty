@@ -37,14 +37,14 @@ public class PrintLibrary {
     public static String print(Object[] aArgs, @ScriptyBindingParam("*output") PrintWriter aWriter) {
         final String lResult = buildString(aArgs);
         if (aWriter != null) aWriter.print(lResult);
-        return lResult;
+        return null;
     }
 
     @ScriptyCommand
     public static String println(Object[] aArgs, @ScriptyBindingParam("*output") PrintWriter aWriter) {
         final String lResult = buildString(aArgs);
         if (aWriter != null) aWriter.println(lResult);
-        return lResult;
+        return null;
     }
 
     private static String buildString(Object[] aArgs) {

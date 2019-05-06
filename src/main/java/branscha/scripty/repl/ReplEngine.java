@@ -175,9 +175,13 @@ implements ExtensionManager {
             Object lAst = parser.parseExpression(lCmd);
             if (lAst instanceof List) {
                 recover();
-                // Time for evaluation.
                 try {
+                    // Time for evaluation!
                     lastResult = eval.eval(lAst);
+                    // Save the last result in the context if not null.
+                    if(lastResult != null) {
+                        context.defBinding("_", lastResult);
+                    }
                 }
                 catch (CommandException e) {
                     // Normal command error.
