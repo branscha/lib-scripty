@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 //    command provides a lookup facility.
 //  * Delete was not implemented for safety reasons.
 //
+@SuppressWarnings("unused")
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(std = {
         @ScriptyStdArgList(name = "noarg + quiet",
@@ -77,7 +78,7 @@ public class FileLibrary {
         else {
             String fileName = (String) aFileRepr;
             if ("~".equals(fileName)) fileName = System.getProperty("user.home");
-            file = resolveFile((String) fileName);
+            file = resolveFile(fileName);
         }
 
         if (!file.isDirectory()) {
@@ -149,8 +150,8 @@ public class FileLibrary {
             // Calculate the grep pattern.
             Pattern lPattern = Pattern.compile(aGrep);
             // The worklist handles recursion.
-            List<File> lWorkList = new LinkedList<File>();
-            List<File> lResultList = new LinkedList<File>();
+            List<File> lWorkList = new LinkedList<>();
+            List<File> lResultList = new LinkedList<>();
             // Push our starting point on the directory worklist.
             lWorkList.add(lFile);
 
@@ -220,8 +221,7 @@ public class FileLibrary {
     //
     @ScriptyCommand(name = "rslv")
     @ScriptyRefArgList(ref = "file + quiet")
-    public File rslv(@ScriptyParam("file") Object aFileRepr)
-    throws CommandException {
+    public File rslv(@ScriptyParam("file") Object aFileRepr) {
         File lFile;
         if (aFileRepr instanceof File) lFile = (File) aFileRepr;
         else lFile = resolveFile((String) aFileRepr);
@@ -259,8 +259,7 @@ public class FileLibrary {
         return lMacro;
     }
 
-    private File resolveFile(String aPath)
-    throws CommandException {
+    private File resolveFile(String aPath) {
         // Check the setup. Other command libraries
         // might invoke this method directly, and in that case
         // this is the first initialization point.
@@ -278,14 +277,12 @@ public class FileLibrary {
         return lFile;
     }
 
-    private void initCurrDir()
-    throws CommandException {
+    private void initCurrDir() {
         if (currentDirectory == null)
             currentDirectory = new File(".");
     }
 
-    private File getCurrentDirectory()
-    throws CommandException {
+    private File getCurrentDirectory() {
         // Check the setup. Other command libraries
         // might invoke this method directly, and in that case
         // this is the first initialization point.

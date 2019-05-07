@@ -69,21 +69,19 @@ public class HelpLibrary {
                     .append("[Forms]")
                     .append("\n")
                     .append(formRepo.keySet().stream().sorted().collect(Collectors.joining(", ")))
-                    .append("\n")
-                    .append("\n");
+                    .append("\n\n");
 
             if (cmdDump.size() > 0) {
                 builder
                         .append("[Commands & Macro's]")
                         .append("\n")
                         .append(cmdAndMacros.keySet().stream().sorted().collect(Collectors.joining(", ")))
-                        .append("\n")
-                        .append("\n");
+                        .append("\n\n");
             }
 
             builder.append("[Libraries]")
                     .append("\n")
-                    .append(libraryNames.stream().collect(Collectors.joining(", ")))
+                    .append(String.join(", ", libraryNames))
                     .append("\n");
 
             writer.write(builder.toString());
@@ -107,16 +105,14 @@ public class HelpLibrary {
                     search="";
                 }
                 final String fixedSearch = search;
-                StringBuilder builder = new StringBuilder();
-                builder.append(
-                        cmdAndMacros
-                                .entrySet().stream()
-                                .filter((e) -> fixedSearch.equals(e.getValue().getLibName()))
-                                .map(Map.Entry::getKey)
-                                .sorted()
-                                .collect(Collectors.joining(", ")));
-                builder.append("\n");
-                writer.write(builder.toString());
+                String builder = cmdAndMacros
+                        .entrySet().stream()
+                        .filter((e) -> fixedSearch.equals(e.getValue().getLibName()))
+                        .map(Map.Entry::getKey)
+                        .sorted()
+                        .collect(Collectors.joining(", ")) +
+                        "\n";
+                writer.write(builder);
                 found = true;
             }
 

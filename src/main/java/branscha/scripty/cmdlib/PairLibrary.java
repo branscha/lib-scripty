@@ -38,6 +38,7 @@ import branscha.scripty.parser.Pair;
  * <li><b><code>pair-right</code></b> Get the right part of a pair.<code>(pair-right p)</code></li>
  * </ul>
  */
+@SuppressWarnings("unused")
 @ScriptyLibrary(type = ScriptyLibraryType.STATIC)
 public class PairLibrary {
     @ScriptyCommand(name = "pair?")

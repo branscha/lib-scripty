@@ -55,6 +55,7 @@ import java.util.List;
  * <li><b>null?</b> A test to see if the argument is null.</li>
  * </ul>
  */
+@SuppressWarnings("unused")
 @ScriptyLibrary(name = "Lisp", type = ScriptyLibraryType.STATIC)
 @ScriptyNamedArgLists(
         std = {

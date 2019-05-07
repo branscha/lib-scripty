@@ -29,20 +29,25 @@ import branscha.scripty.annot.*;
 import javax.swing.*;
 import java.awt.*;
 
+import static java.awt.GraphicsEnvironment.*;
+
+@SuppressWarnings("unused")
 @ScriptyLibrary(name = "System", type = ScriptyLibraryType.STATIC)
 public class ExitLibrary {
-    @ScriptyCommand
-    @ScriptyStdArgList(optional = {@ScriptyArg(name = "code", type = "Integer", value = "0")})
-    public static void exit(@ScriptyParam("code") Integer exitCode) {
-        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        final boolean isHeadless = ge.isHeadless();
+    @ScriptyCommand(name="exit", description =
+            "(exit [<exit-status>])\n" +
+                    "Exit the application with optional exit status (0 by default).")
+    @ScriptyStdArgList(optional = {@ScriptyArg(name = "status", type = "Integer", value = "0")})
+    public static void exit(@ScriptyParam("status") Integer exitStatus) {
+        final GraphicsEnvironment ge = getLocalGraphicsEnvironment();
+        final boolean isHeadless = isHeadless();
         if (!isHeadless) {
             // We have to close all frames. Closing our main frame is not enough,
             // since the help system for instance creates other frames that have to be disposed as well.
             for (Frame frame : JFrame.getFrames()) frame.dispose();
         }
         else {
-            System.exit(exitCode);
+            System.exit(exitStatus);
         }
     }
 }

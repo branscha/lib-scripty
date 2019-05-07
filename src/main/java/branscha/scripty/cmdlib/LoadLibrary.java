@@ -44,6 +44,7 @@ import java.util.List;
  * <li><b><code>reload</code></b> Reload previously loaded files. A file is remembered if it existed and was readable. <code>(reload)</code></li>
  * </ul>
  */
+@SuppressWarnings("unused")
 @ScriptyLibrary(name="Load")
 public class LoadLibrary {
     
@@ -55,7 +56,7 @@ public class LoadLibrary {
     private static final String ERR060 = "LoadLibrary/060: The resource cannot be opened: '%s'.%n%s";
     private static final String ERR070 = "LoadLibrary/070: The resource '%s' is not available, it the contents cannot be accessed.";
     
-    private List<Loader> loaders = new ArrayList<Loader>();
+    private List<Loader> loaders = new ArrayList<>();
 
     @ScriptyCommand(name = "load", description =
             "(load <file> | classpath:/<resource> | cp:/<resource> ...)\n" +
@@ -64,7 +65,7 @@ public class LoadLibrary {
     @ScriptyVarArgList(vararg = @ScriptyArg(name = "loaders", type = "Custom branscha.scripty.cmdlib.LoadLibrary$LoaderType"))
     public void load(@ScriptyParam("loaders") Object[] aLoaders, Context aCtx, Eval aEval)
     throws CommandException {
-        List<Loader> lLoaders = new ArrayList<Loader>();
+        List<Loader> lLoaders = new ArrayList<>();
         for (Object lLoader : aLoaders) {
             lLoaders.add((Loader) lLoader);
         }
@@ -78,8 +79,7 @@ public class LoadLibrary {
     @ScriptyStdArgList()
     public void reload(Context aContext, Eval aEval)
     throws CommandException {
-        List<Loader> lLoaders = new ArrayList<Loader>();
-        lLoaders.addAll(loaders);
+        List<Loader> lLoaders = new ArrayList<>(loaders);
         internalLoad(lLoaders, aEval, aContext);
     }
 
@@ -126,7 +126,7 @@ public class LoadLibrary {
         }
     }
 
-    public static interface Loader {
+    public interface Loader {
         InputStream getStream()
         throws CommandException;
 
@@ -189,8 +189,7 @@ public class LoadLibrary {
             }
         }
 
-        public InputStream getStream()
-        throws CommandException {
+        public InputStream getStream() {
             return this.getClass().getResourceAsStream(resource);
         }
 

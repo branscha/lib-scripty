@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 @ScriptyNamedArgLists(
         std = {
                 @ScriptyStdArgList(name = "one argument", fixed = {@ScriptyArg(name = "arg", type = "Any")}),
@@ -41,14 +42,14 @@ import java.util.List;
                 @ScriptyStdArgList(name = "breakpoint", fixed = {@ScriptyArg(name = "arg", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint")}),
                 @ScriptyStdArgList(name = "name", fixed = {@ScriptyArg(name = "name", type = "String")}),
                 @ScriptyStdArgList(name = "name + bool", fixed = {@ScriptyArg(name = "name", type = "String"), @ScriptyArg(name = "bool", type = "Boolean")}),
-                @ScriptyStdArgList(name = "string + name", fixed = {@ScriptyArg(name = "str", type = "String")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "posint + name", fixed = {@ScriptyArg(name = "posint", type = "IntegerRange min=0")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "obj + name", fixed = {@ScriptyArg(name = "obj", type = "Any")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")}),
-                @ScriptyStdArgList(name = "breakpoint + name", fixed = {@ScriptyArg(name = "bpt", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint")}, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
+                @ScriptyStdArgList(name = "string + name", fixed = {@ScriptyArg(name = "str", type = "String")}, named = {@ScriptyArg(name = "name", type = "String", optional = true)}),
+                @ScriptyStdArgList(name = "posint + name", fixed = {@ScriptyArg(name = "posint", type = "IntegerRange min=0")}, named = {@ScriptyArg(name = "name", type = "String", optional = true)}),
+                @ScriptyStdArgList(name = "obj + name", fixed = {@ScriptyArg(name = "obj", type = "Any")}, named = {@ScriptyArg(name = "name", type = "String", optional = true)}),
+                @ScriptyStdArgList(name = "breakpoint + name", fixed = {@ScriptyArg(name = "bpt", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint")}, named = {@ScriptyArg(name = "name", type = "String", optional = true)})
         },
         var = {
                 @ScriptyVarArgList(name = "at least one argument", vararg = @ScriptyArg(name = "arg", type = "Any"), minLength = 1),
-                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true, value = "")})
+                @ScriptyVarArgList(name = "breakpoint* + name", vararg = @ScriptyArg(name = "bpts", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint"), minLength = 1, named = {@ScriptyArg(name = "name", type = "String", optional = true)})
         }
 )
 @ScriptyLibrary(name="Debugger")
@@ -66,9 +67,8 @@ public class DebuggerLibrary {
     private static final String MSG_EMPTYSTACK = "Empty expression stack.";
 
     /**
-     * The evaluation state for the expression being debugged.
-     * In the current implementation there is only one such instance so only one expression
-     * can be degugged at a time.
+     * The evaluation state for the expression being debugged. In the current implementation there is only one such
+     * instance so only one expression can be debugged at a time. Multiple threads would need multiple traces.
      */
     private EvalTrace trace = null;
     private EvalTrace.BreakpointSet breakpoints = null;
@@ -82,18 +82,16 @@ public class DebuggerLibrary {
      * @param newCmdName The replacement command name.
      * @param expr The complete original expression.
      * @return An S-expression with the new command and quoted argument list.
-     * @throws CommandException
      */
-    private static List renameAndQuoteArgs(String newCmdName, List<Object> expr)
-    throws CommandException {
+    private static List renameAndQuoteArgs(String newCmdName, List<Object> expr) {
 
         // Construct the quoted argument list.
-        List<? super Object> quotedArgs = new ArrayList<Object>();
+        List<? super Object> quotedArgs = new ArrayList<>();
         quotedArgs.add("quote");
         quotedArgs.add(expr.get(1));
 
         // Construct the replacement expression.
-        final List<? super Object> macro = new ArrayList<Object>();
+        final List<? super Object> macro = new ArrayList<>();
         macro.add(newCmdName);
         macro.add(quotedArgs);
 
@@ -120,17 +118,12 @@ public class DebuggerLibrary {
      * Applies following transformation:
      * <br>
      * <code>(dbg-expr &lt;expr>) ==> (dbg-expr-x (quote &lt;expr>))</code>
-     *
-     * @param aArgs
-     * @return
-     * @throws CommandException
      */
     @ScriptyMacro(name = "dbg-expr", description =
             "(dbg-expr <expr>)\n" +
                     "Start the debugger with the expression. The debugger is halted at the start of the evaluation.")
     @ScriptyRefArgList(ref = "at least one argument")
-    public static List dbgExpr(Object[] aArgs)
-    throws CommandException {
+    public static List dbgExpr(Object[] aArgs) {
         return renameAndQuoteArgs("dbg-expr-x", Arrays.asList(aArgs));
     }
 
@@ -147,8 +140,7 @@ public class DebuggerLibrary {
                     "Evaluate an expression in the context of the current debugger stack frame.\n" +
                     "See also: dbg-expr.")
     @ScriptyRefArgList(ref = "at least one argument")
-    public static List dbgEval(Object[] aArgs)
-    throws CommandException {
+    public static List dbgEval(Object[] aArgs) {
         return renameAndQuoteArgs("dbg-eval-x", Arrays.asList(aArgs));
     }
 
@@ -167,8 +159,7 @@ public class DebuggerLibrary {
                     "Create a new breakpoint that breaks when the condition becomes true in the context of the current debugger frame.\n" +
                     "See also: dbg-addbreakpoint.")
     @ScriptyRefArgList(ref = "at least one argument")
-    public static List bptWhen(Object[] aArgs)
-    throws CommandException {
+    public static List bptWhen(Object[] aArgs) {
         return renameAndQuoteArgs("bpt-when-x", Arrays.asList(aArgs));
     }
 
@@ -195,7 +186,7 @@ public class DebuggerLibrary {
         else trace.setBreakpoints(breakpoints);
     }
 
-    private static enum StepType {STEPIN, STEPOVER, STEPOUT, RUN, RUNTORESULT, RUNTOREADY, BACKSTEP}
+    private enum StepType {STEPIN, STEPOVER, STEPOUT, RUN, RUNTORESULT, RUNTOREADY, BACKSTEP}
 
     // Step into an expression, it takes the smallest step possible.
     //
@@ -699,7 +690,7 @@ public class DebuggerLibrary {
     @ScriptyRefArgList(ref = "breakpoint* + name")
     public EvalTrace.Breakpoint bptAnd(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
-        List<EvalTrace.Breakpoint> lBpts = new LinkedList<EvalTrace.Breakpoint>();
+        List<EvalTrace.Breakpoint> lBpts = new LinkedList<>();
         for (final Object aBpt : aBpts) lBpts.add((EvalTrace.Breakpoint) aBpt);
         return new EvalTrace.BreakpointAnd(aBptName, lBpts);
     }
@@ -711,7 +702,7 @@ public class DebuggerLibrary {
     @ScriptyRefArgList(ref = "breakpoint* + name")
     public EvalTrace.Breakpoint bptOr(@ScriptyParam("bpts") Object[] aBpts, @ScriptyParam("name") String aBptName) {
         if (aBptName.length() <= 0) aBptName = "bp" + breakpointcounter++;
-        List<EvalTrace.Breakpoint> lBpts = new LinkedList<EvalTrace.Breakpoint>();
+        List<EvalTrace.Breakpoint> lBpts = new LinkedList<>();
         for (final Object aBpt : aBpts) lBpts.add((EvalTrace.Breakpoint) aBpt);
         return new EvalTrace.BreakpointOr(aBptName, lBpts);
     }

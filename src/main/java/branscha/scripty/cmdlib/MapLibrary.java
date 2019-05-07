@@ -48,6 +48,7 @@ import java.util.Set;
  * <li><b><code>map-size</code></b> Get the number of entries in the map. <code>(map-size m)</code></li>
  * </ul>
  */
+@SuppressWarnings("unused")
 @ScriptyNamedArgLists(
         std = {
                 @ScriptyStdArgList(name = "single map", fixed = {@ScriptyArg(name = "arg", type = "Instance java.util.Map nullAllowed=false")})
@@ -58,7 +59,7 @@ public class MapLibrary {
     public static Map mapCreate(Object[] aArgs)
     throws CommandException {
         {
-            Map<Object, Object> lMap = new HashMap<Object, Object>();
+            Map<Object, Object> lMap = new HashMap<>();
             for (int i = 1; i < aArgs.length; i++) {
                 if (aArgs[i] instanceof String) {
                     lMap.put(aArgs[i], null);

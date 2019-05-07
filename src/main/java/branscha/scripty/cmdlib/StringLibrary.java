@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unused")
 @ScriptyLibrary(name = "String", type = ScriptyLibraryType.STATIC)
 @ScriptyNamedArgLists(
         std = {
@@ -66,7 +67,7 @@ public class StringLibrary {
     public static List<String> match(@ScriptyParam("arg1") String aPattern, @ScriptyParam("arg2") String aArg) {
         final Pattern lRegexp = Pattern.compile(aPattern);
         final Matcher lMatcher = lRegexp.matcher(aArg);
-        final List<String> lRes = new ArrayList<String>();
+        final List<String> lRes = new ArrayList<>();
         if (lMatcher.find()) {
             // Note: there is one more group then the count indicates.
             // This is because of group 0 which matches the complete string.
@@ -81,9 +82,9 @@ public class StringLibrary {
     public static List<List<String>> matchRepeat(@ScriptyParam("arg1") String aPattern, @ScriptyParam("arg2") String aArg) {
         final Pattern lRegexp = Pattern.compile(aPattern);
         final Matcher lMatcher = lRegexp.matcher(aArg);
-        final List<List<String>> lRes = new ArrayList<List<String>>();
+        final List<List<String>> lRes = new ArrayList<>();
         while (lMatcher.find()) {
-            final List<String> lMatch = new ArrayList<String>();
+            final List<String> lMatch = new ArrayList<>();
             // Note: there is one more group then the count indicates.
             // This is because of group 0 which matches the complete string.
             int lCount = lMatcher.groupCount();
