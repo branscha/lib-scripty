@@ -24,6 +24,8 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
+import java.util.Arrays;
+
 /**
  * String type, a non nullable type.
  */
@@ -37,6 +39,7 @@ public class StringType extends InstanceType {
 
     @Override
     Object convertArg(Object arg) {
+        if(arg.getClass().isArray()) return Arrays.toString((Object[])arg);
         return arg.toString();
     }
 }

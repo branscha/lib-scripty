@@ -24,38 +24,61 @@
  ******************************************************************************/
 package branscha.scripty.cmdlib;
 
-import branscha.scripty.annot.ScriptyBindingParam;
-import branscha.scripty.annot.ScriptyCommand;
-import branscha.scripty.annot.ScriptyLibrary;
-import branscha.scripty.annot.ScriptyLibraryType;
+import branscha.scripty.annot.*;
 
 import java.io.PrintWriter;
 
+@ScriptyNamedArgLists(
+        var = {@ScriptyVarArgList(name = "string*",
+                vararg = @ScriptyArg(name = "args", type = "String"),
+                named = {@ScriptyArg(name = "delimiter", type = "String", optional = true, value = " "),
+                        @ScriptyArg(name = "prefix", type = "String", optional = true, value = ""),
+                        @ScriptyArg(name = "suffix", type = "String", optional = true, value = "")})}
+)
 @ScriptyLibrary(name = "System", type = ScriptyLibraryType.STATIC)
 public class PrintLibrary {
-    @ScriptyCommand
-    public static String print(Object[] aArgs, @ScriptyBindingParam("*output") PrintWriter aWriter) {
-        final String lResult = buildString(aArgs);
-        if (aWriter != null) aWriter.print(lResult);
+
+    @ScriptyRefArgList(ref = "string*")
+    @ScriptyCommand(name = "print", description =
+            "(print str-1 ... str-n)\n" +
+                    "Write the strings to *output, no return value.")
+    public static String print(
+            @ScriptyParam("args") Object[] args,
+            @ScriptyBindingParam("*output") PrintWriter writer,
+            @ScriptyParam("delimiter") String delimiter,
+            @ScriptyParam("prefix") String prefix,
+            @ScriptyParam("suffix") String suffix) {
+
+        final String lResult = buildString(args, delimiter, prefix, suffix);
+        if (writer != null) writer.print(lResult);
         return null;
     }
 
-    @ScriptyCommand
-    public static String println(Object[] aArgs, @ScriptyBindingParam("*output") PrintWriter aWriter) {
-        final String lResult = buildString(aArgs);
-        if (aWriter != null) aWriter.println(lResult);
+    @ScriptyRefArgList(ref = "string*")
+    @ScriptyCommand(name = "println", description = "(println str-1 ... str-n)\n" +
+            "Write the strings to *output followed by a new line, no return value.")
+    public static String println(
+            @ScriptyParam("args") Object[] args,
+            @ScriptyBindingParam("*output") PrintWriter writer,
+            @ScriptyParam("delimiter") String delimiter,
+            @ScriptyParam("prefix") String prefix,
+            @ScriptyParam("suffix") String suffix) {
+
+        final String lResult = buildString(args, delimiter, prefix, suffix);
+        if (writer != null) writer.println(lResult);
         return null;
     }
 
-    private static String buildString(Object[] aArgs) {
-        final StringBuilder lBuilder = new StringBuilder();
-        for (int i = 1; i < aArgs.length; i++) {
+    private static String buildString(Object[] aArgs, String delimiter, String prefix, String suffix) {
+        final StringBuilder builder = new StringBuilder(prefix);
+        for (int i = 0; i < aArgs.length; i++) {
             final Object lObj = aArgs[i];
             if (lObj != null) {
-                lBuilder.append(lObj.toString());
-                if (i < aArgs.length - 1) lBuilder.append(" ");
+                builder.append(lObj.toString());
+                if (i < aArgs.length - 1) builder.append(delimiter);
             }
         }
-        return lBuilder.toString();
+        builder.append(suffix);
+        return builder.toString();
     }
 }

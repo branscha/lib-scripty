@@ -136,7 +136,7 @@ public class BeanLibrary {
     //
     @ScriptyCommand(name = "bean-get", description =
             "(bean-get <path> [<base-bean>])\n" +
-                    "Get the value of the property specified by the property path. The effect is the same as a quiet bean-cat.\n" +
+                    "Get the property specified by the property path. The effect is the same as a quiet bean-cat.\n" +
                     "Provide a base bean to resolve the path relative to the base and not to the current path.\n" +
                     "Also see: bean-cat, bean-set, bean-call.")
     @ScriptyStdArgList(fixed = {@ScriptyArg(name = "path", type = "String")}, optional = {@ScriptyArg(name = "bean", type = "Any")})
@@ -213,7 +213,7 @@ public class BeanLibrary {
     //
     @ScriptyCommand(name = "bean-set", description =
             "(bean-set <path>|<bean> prop-1=val-1 ... prop-n=val-n)\n" +
-                    "Update one or more properties in the bean specified by the bean path.\n" +
+                    "Set the properties of the bean specified by the bean or its path.\n" +
                     "See also: bean-get, bean-call.")
     public void beanUpd(Context ctx, Object[] args)
     throws CommandException {
