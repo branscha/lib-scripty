@@ -41,7 +41,8 @@ public class PrintLibrary {
     @ScriptyRefArgList(ref = "string*")
     @ScriptyCommand(name = "print", description =
             "(print str-1 ... str-n)\n" +
-                    "Write the strings to *output, no return value.")
+                    "Convert the arguments to strings and write them to *output.\n" +
+                    "Returns: nothing.")
     public static String print(
             @ScriptyParam("args") Object[] args,
             @ScriptyBindingParam("*output") PrintWriter writer,
@@ -49,14 +50,17 @@ public class PrintLibrary {
             @ScriptyParam("prefix") String prefix,
             @ScriptyParam("suffix") String suffix) {
 
-        final String lResult = buildString(args, delimiter, prefix, suffix);
-        if (writer != null) writer.print(lResult);
+        final String result = buildString(args, delimiter, prefix, suffix);
+        if (writer != null) {
+            writer.print(result);
+        }
         return null;
     }
 
     @ScriptyRefArgList(ref = "string*")
     @ScriptyCommand(name = "println", description = "(println str-1 ... str-n)\n" +
-            "Write the strings to *output followed by a new line, no return value.")
+            "Convert the arguments to strings and write them to *output followed by a new line.\n" +
+            "Returns: nothing.")
     public static String println(
             @ScriptyParam("args") Object[] args,
             @ScriptyBindingParam("*output") PrintWriter writer,
@@ -64,18 +68,20 @@ public class PrintLibrary {
             @ScriptyParam("prefix") String prefix,
             @ScriptyParam("suffix") String suffix) {
 
-        final String lResult = buildString(args, delimiter, prefix, suffix);
-        if (writer != null) writer.println(lResult);
+        final String result = buildString(args, delimiter, prefix, suffix);
+        if (writer != null) {
+            writer.println(result);
+        }
         return null;
     }
 
-    private static String buildString(Object[] aArgs, String delimiter, String prefix, String suffix) {
+    private static String buildString(Object[] args, String delimiter, String prefix, String suffix) {
         final StringBuilder builder = new StringBuilder(prefix);
-        for (int i = 0; i < aArgs.length; i++) {
-            final Object lObj = aArgs[i];
-            if (lObj != null) {
-                builder.append(lObj.toString());
-                if (i < aArgs.length - 1) builder.append(delimiter);
+        for (int i = 0; i < args.length; i++) {
+            final Object obj = args[i];
+            if (obj != null) {
+                builder.append(obj.toString());
+                if (i < args.length - 1) builder.append(delimiter);
             }
         }
         builder.append(suffix);
