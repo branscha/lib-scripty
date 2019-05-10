@@ -37,12 +37,12 @@ public class FixedArg implements ArgSpec {
     private static final String ERR010 = "FixedArg/010: The required argument at position %d, type %s missing.";
     private static final String ERR020 = "FixedArg/020: The required argument at position %d: %s";
 
-    private TypeSpec spec;
+    private TypeSpec type;
     private String specName;
 
     public FixedArg(TypeSpec spec) {
-        this.spec = spec;
-        specName = this.spec.getSpecName();
+        this.type = spec;
+        specName = this.type.getSpecName();
     }
 
     public String getSpecName() {
@@ -53,10 +53,11 @@ public class FixedArg implements ArgSpec {
     throws ArgSpecException {
         try {
             if (pos < 0 || pos >= args.length) {
-                throw new ArgSpecException(String.format(ERR010, pos, spec.getSpecName()));
+                throw new ArgSpecException(String.format(ERR010, pos, type.getSpecName()));
             }
             else {
-                return spec.guard(args[pos], ctx);
+                // Coerce and check type.
+                return type.guard(args[pos], ctx);
             }
         }
         catch (TypeSpecException e) {

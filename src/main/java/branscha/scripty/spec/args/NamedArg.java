@@ -35,33 +35,42 @@ public class NamedArg implements ArgSpec {
     private static final String ERR020 = "NamedArg/020: Missing named argument '%s'.";
 
     private String paramName;
-    private Object value;
-    private TypeSpec valueSpec;
+    private Object defaultValue;
+    private TypeSpec type;
     private boolean optional = true;
     private String specName;
 
-    public NamedArg(String aName, TypeSpec aValSpec, Object aValue, boolean aOptional) {
-        paramName = aName;
-        value = aValue;
-        valueSpec = aValSpec;
-        optional = aOptional;
-        specName = valueSpec.getSpecName();
+    public NamedArg(String name, TypeSpec type, Object defaultValue, boolean optional) {
+        paramName = name;
+        this.defaultValue = defaultValue;
+        this.type = type;
+        this.optional = optional;
+        specName = this.type.getSpecName();
     }
 
     public String getSpecName() {
         return specName;
     }
 
-    public Object guard(Object[] aArgs, int aPos, Context aCtx)
+    public Object guard(Object[] args, int pos, Context ctx)
     throws ArgSpecException {
-        for (int i = aPos; i < aArgs.length; i++) {
-            if (aArgs[i] instanceof Pair) {
-                Pair lPair = (Pair) aArgs[i];
-                if (paramName.equals(lPair.getLeft())) {
+        // A named argument does not really have a position, the pos in this case indicates the starting
+        // position after which the named argument might occur somewhere. We have to search the
+        // arguments to find the named argument.
+        for (int i = pos; i < args.length; i++) {
+            // We found a pair, this is the first requirement since all named arguments
+            // take the form of a pair.
+            if (args[i] instanceof Pair) {
+                final Pair named = (Pair) args[i];
+                // theck if the name of the pair equals our argument name.
+                if (paramName.equals(named.getLeft())) {
                     try {
-                        Pair lNewPair = new Pair(paramName, valueSpec.guard(lPair.getRight(), aCtx));
-                        aArgs[i] = lNewPair;
-                        return lNewPair.getRight();
+                        // Success, we found the named argument. Create a new pair where the
+                        // defaultValue is the verified and coerced argument from the original pair.
+                        final Pair newPair = new Pair(paramName, type.guard(named.getRight(), ctx));
+                        // Substitute the new pair in the old argument list.
+                        args[i] = newPair;
+                        return newPair.getRight();
                     }
                     catch (TypeSpecException e) {
                         throw new ArgSpecException(String.format(ERR010, paramName, e.getMessage()));
@@ -72,7 +81,7 @@ public class NamedArg implements ArgSpec {
 
         try {
             if (optional) {
-                return valueSpec.guard(value, aCtx);
+                return type.guard(defaultValue, ctx);
             }
             else {
                 throw new ArgSpecException(String.format(ERR020, paramName));
@@ -92,7 +101,7 @@ public class NamedArg implements ArgSpec {
         final StringBuffer sb = new StringBuffer("Arg{");
         sb.append("name='").append(paramName).append('\'');
         sb.append(", type=\"").append(specName).append("\"");
-        sb.append(", default=\"").append(value).append("\"");
+        sb.append(", default=\"").append(defaultValue).append("\"");
         sb.append(", optional=").append(optional);
         sb.append('}');
         return sb.toString();

@@ -38,7 +38,7 @@ package branscha.scripty.annot;
 public @interface ScriptyArg {
     /**
      * The name of the argument. It can be used to map the argument to a command parameter using the
-     * {@link ScriptyParam} annotation.
+     * {@link ScriptyParam} annotation. For named parameters it is the name to use in the argument list.
      */
     String name();
 
@@ -49,12 +49,13 @@ public @interface ScriptyArg {
     String type();
 
     /**
-     * The default value of the argument.
+     * The default value of the argument for named and optional parameters.
      */
     String value() default "";
 
     /**
-     * Flag to indicate if the  argument is optional or not.
+     * Indicate if the  argument is optional or not for named parameters. Fixed parameters are obligatory, optional
+     * parameters are optional by default and for named parameters you have a choice.
      */
     boolean optional() default false;
 }

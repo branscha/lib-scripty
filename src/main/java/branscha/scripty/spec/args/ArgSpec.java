@@ -39,13 +39,13 @@ public interface ArgSpec<T> {
 
     /**
      * Verify the argument at that specified position.
-     * @param aArgs The complete argument list.
-     * @param aPos The index of the argument that should be verified.
-     * @param aCtx The eval context.
+     * @param args The complete argument list.
+     * @param pos The index of the argument that should be verified.
+     * @param ctx The eval context.
      * @return The effective argument (which could be converted)
      * @throws ArgSpecException
      */
-    T guard(Object[] aArgs, int aPos, Context aCtx)
+    T guard(Object[] args, int pos, Context ctx)
     throws ArgSpecException;
 
     String getSpecName();

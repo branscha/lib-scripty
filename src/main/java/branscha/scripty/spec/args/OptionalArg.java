@@ -47,9 +47,9 @@ public class OptionalArg implements ArgSpec {
     private String specName;
     private Object defaultVal;
 
-    public OptionalArg(TypeSpec aSpec, Object aVal) {
-        spec = aSpec;
-        defaultVal = aVal;
+    public OptionalArg(TypeSpec type, Object defaultValue) {
+        spec = type;
+        defaultVal = defaultValue;
         specName = spec.getSpecName();
     }
 
@@ -57,21 +57,26 @@ public class OptionalArg implements ArgSpec {
         return specName;
     }
 
-    public Object guard(Object[] aArgs, int aPos, Context aCtx)
+    public Object guard(Object[] args, int pos, Context ctx)
     throws ArgSpecException {
         try {
-            if (aPos < 0 || aPos >= aArgs.length) {
-                return spec.guard(defaultVal, aCtx);
+            if (pos < 0 || pos >= args.length) {
+                // Not enough arguments were provided, it can never contain the optional argument we are looking for.
+                // Use the default value (after type coercion).
+                return spec.guard(defaultVal, ctx);
             }
-            else if (aArgs[aPos] instanceof Pair) {
-                return spec.guard(defaultVal, aCtx);
+            else if (args[pos] instanceof Pair) {
+                // Use the default value (after type coercion).
+                // A pair is the start of the named arguments so we did not find the argument are looking for.
+                return spec.guard(defaultVal, ctx);
             }
             else {
-                return spec.guard(aArgs[aPos], aCtx);
+                // Coerce and check type.
+                return spec.guard(args[pos], ctx);
             }
         }
         catch (TypeSpecException e) {
-            throw new ArgSpecException(String.format(ERR010, aPos, e.getMessage()));
+            throw new ArgSpecException(String.format(ERR010, pos, e.getMessage()));
         }
     }
 
