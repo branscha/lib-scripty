@@ -46,14 +46,13 @@ import java.util.Map;
  */
 public class ArgListBuilder {
 
-    private static ReplEngine typeProcessor = new ReplEngine();
-
-    private static final String ERR010 = "ArgListBuilder/010: Internal Scripty error, could not initialize the internal type system.";
+    private static final String ERR010 = "ArgListBuilder/010: Internal Scripty error, could not initialize the argument type compiler.";
     private static final String ERR020 = "ArgListBuilder/020: Badly formed type expression '%s' encountered.%n%s";
 
+    private static ReplEngine typeCompiler = new ReplEngine();
     static {
         try {
-            typeProcessor.addLibraryClasses(TypeLanguageLib.class);
+            typeCompiler.addLibraryClasses(TypeLanguageLib.class);
         }
         catch (ExtensionException e) {
             throw new Error(ERR010);
@@ -72,55 +71,30 @@ public class ArgListBuilder {
     throws ArgSpecException {
 
         /*
-         * We collect the argument mappings  for the arguments we encounter. The key is the argument spec name, the value is
+         * We collect the argument mappings  for the arguments we encounter. The key is the argument name, the value is
          * a mapper that can fetch the argument value and eventually we can inject that value in an annotated
          * method parameter. We must collect them so that we can provide what the parameter annotations ask for later on.
          * We create and collect the mappers here because we know the index where we will store the argument.
          */
-        Map<String, ArgMapping> argMappings = new HashMap<>();
+        final Map<String, ArgMapping> argMappings = new HashMap<>();
 
-        ScriptyArg[] fixedArgAnnotations = stdArgListAnnotation.fixed();
-        FixedArg[] fixedArgSpecs = new FixedArg[fixedArgAnnotations.length];
+        final ScriptyArg[] fixedArgAnnotations = stdArgListAnnotation.fixed();
+        final FixedArg[] fixedArgs = new FixedArg[fixedArgAnnotations.length];
 
-        ScriptyArg[] optArgAnnotations = stdArgListAnnotation.optional();
-        OptionalArg[] optArgSpecs = new OptionalArg[optArgAnnotations.length];
+        final ScriptyArg[] optArgAnnotations = stdArgListAnnotation.optional();
+        final OptionalArg[] optArgs = new OptionalArg[optArgAnnotations.length];
 
-        ScriptyArg[] namedArgAnnotations = stdArgListAnnotation.named();
-        NamedArg[] namedArgSpecs = new NamedArg[namedArgAnnotations.length];
+        final ScriptyArg[] namedArgAnnotations = stdArgListAnnotation.named();
+        final NamedArg[] namedArgs = new NamedArg[namedArgAnnotations.length];
 
         // The index tracks the last argument spec in the argument list we are currently composing.
-        int argIndex = compileFixedArgs(argMappings, fixedArgAnnotations, fixedArgSpecs);
+        int argIndex = 0;
+        argIndex = compileFixedArgs(argMappings, fixedArgAnnotations, fixedArgs, argIndex);
+        argIndex = compileOptArgs(argMappings, optArgAnnotations, optArgs, argIndex);
+        compileNamedArgs(argMappings, namedArgAnnotations, namedArgs, argIndex);
 
-        int j = 0;
-
-        for (ScriptyArg optArgAnnotation : optArgAnnotations) {
-
-            String argName = optArgAnnotation.name();
-            String argType = optArgAnnotation.type();
-            String argValue = optArgAnnotation.value();
-            // Optional flag is not needed, optional args are always optional.
-
-            if ("{null}".equals(argValue)) argValue = null;
-
-            try {
-
-                TypeSpec lTypeSpec = (TypeSpec) typeProcessor.startNonInteractive(argType);
-                optArgSpecs[j] = new OptionalArg(lTypeSpec, argValue);
-                // Offset with 1, the mappings should skip element 0 which is the name of the command.
-                argMappings.put(argName, new ArrayIndexMapping(argIndex + 1));
-
-                argIndex++;
-                j++;
-            }
-            catch (ReplEngineException e) {
-                throw new ArgSpecException(String.format(ERR020, argType, e.getMessage()));
-            }
-        }
-
-        compileNamedArgs(argMappings, namedArgAnnotations, namedArgSpecs, argIndex);
-
-        ArgList lStdArgList = new StdArgList(fixedArgSpecs, optArgSpecs, namedArgSpecs);
-        return new RuntimeArgList(lStdArgList, argMappings);
+        final ArgList stdArgList = new StdArgList(fixedArgs, optArgs, namedArgs);
+        return new RuntimeArgList(stdArgList, argMappings);
     }
 
     /**
@@ -128,69 +102,99 @@ public class ArgListBuilder {
      * verifications and mapping when the associated command is invoked in Scripty. It translates the declarative
      * argument lists into a data structure that does the actual processing.
      *
-     * @param varArgList The annotation that describes the argument list in a declarative way.
+     * @param varArgListAnnotation The annotation that describes the argument list in a declarative way.
      * @return The compiled argument list information.
      */
-    public static RuntimeArgList buildArgList(ScriptyVarArgList varArgList)
+    public static RuntimeArgList buildArgList(ScriptyVarArgList varArgListAnnotation)
     throws ArgSpecException {
-        // We will collect the mappings we encounter in this argument list.
-        // If we encounter a named argument, we will remember the piece of code that fetches
-        // that argument from the guarded argument list.
-        Map<String, ArgMapping> argMappings = new HashMap<>();
 
-        ScriptyArg[] lFixedArgs = varArgList.fixed();
-        FixedArg[] lFixedSpecs = new FixedArg[lFixedArgs.length];
+        /*
+         * We collect the argument mappings  for the arguments we encounter. The key is the argument name, the value is
+         * a mapper that can fetch the argument value and eventually we can inject that value in an annotated
+         * method parameter. We must collect them so that we can provide what the parameter annotations ask for later on.
+         * We create and collect the mappers here because we know the index where we will store the argument.
+         */
+        final Map<String, ArgMapping> argMappings = new HashMap<>();
 
-        ScriptyArg[] lNamedArgs = varArgList.named();
-        NamedArg[] lNamedSpecs = new NamedArg[lNamedArgs.length];
+        final ScriptyArg[] fixedAnnotations = varArgListAnnotation.fixed();
+        final FixedArg[] fixedArgs = new FixedArg[fixedAnnotations.length];
 
-        ScriptyArg varArg = varArgList.vararg();
-        VarArg varArgSpec;
-        int varArgMinLength = varArgList.minLength();
-        int varArgMaxLength = varArgList.maxLength();
+        final ScriptyArg[] namedAnnotations = varArgListAnnotation.named();
+        final NamedArg[] namedArgs = new NamedArg[namedAnnotations.length];
 
-        int argIdx = compileFixedArgs(argMappings, lFixedArgs, lFixedSpecs);
-        argIdx = compileNamedArgs(argMappings, lNamedArgs, lNamedSpecs, argIdx);
+        final ScriptyArg varArgAnnotation = varArgListAnnotation.vararg();
 
-        String argName = varArg.name();
-        String argType = varArg.type();
+        int argIdx = 0;
+        argIdx = compileFixedArgs(argMappings, fixedAnnotations, fixedArgs, argIdx);
+        argIdx = compileNamedArgs(argMappings, namedAnnotations, namedArgs, argIdx);
+        VarArg varArg = compileVarArg(argMappings, varArgAnnotation, argIdx);
 
+        final int varArgMinLength = varArgListAnnotation.minLength();
+        final int varArgMaxLength = varArgListAnnotation.maxLength();
+        final ArgList varArgList = new VarArgList(fixedArgs, varArg, varArgMinLength, varArgMaxLength, namedArgs);
+        return new RuntimeArgList(varArgList, argMappings);
+    }
+
+    /**
+     * Convert the variable argument annotation information {@link ScriptyArg} into the Java representation
+     * of a variable argument {@link VarArg}. It compiles the annotation to its corresponding Java model.
+     *
+     * @param argMappings Accumulate mappings that we can use at runtime when mapping arguments to parameters.
+     * @param varAnnotation The annotation we have to process.
+     * @param argIndex The position of the next argument, relative to the complete argument list containing all argument
+     *                 types: [cmd, [fixed args], [var arg], [named args]]
+     * @return The resulting Java model.
+     */
+    private static VarArg compileVarArg(Map<String, ArgMapping> argMappings, ScriptyArg varAnnotation, int argIndex)
+    throws ArgSpecException {
+        final String argName = varAnnotation.name();
+        final String argType = varAnnotation.type();
         try {
-            TypeSpec typeSpec = (TypeSpec) typeProcessor.startNonInteractive(argType);
-            varArgSpec = new VarArg(typeSpec);
+            final TypeSpec typeSpec = compileArgType(argType);
+            final VarArg varArg = new VarArg(typeSpec);
             // Offset with 1, the mappings should skip element 0 which is the name of the command.
             // Note that we use a ParialMapping for var args. The var arg values can be injected
             // into an array parameter. We currently only support array parameters.
-            argMappings.put(argName, new PartialMapping(argIdx + 1, -1));
+            argMappings.put(argName, new PartialMapping(argIndex + 1, -1));
+            return varArg;
         }
         catch (ReplEngineException e) {
             throw new ArgSpecException(String.format(ERR020, argType, e.getMessage()));
         }
-
-        ArgList argList = new VarArgList(lFixedSpecs, varArgSpec, varArgMinLength, varArgMaxLength, lNamedSpecs);
-        return new RuntimeArgList(argList, argMappings);
     }
 
-    private static int compileNamedArgs(Map<String, ArgMapping> argMappings, ScriptyArg[] lNamedArgs, NamedArg[] namedArgSpecs, int argIndex)
+    /**
+     * Convert the array of named argument annotations {@link ScriptyArg} into an array of the Java representation
+     * of named arguments {@link NamedArg}. It compiles the annotations to a Java model.
+     *
+     * @param argMappings Accumulate mappings that we can use at runtime when mapping arguments to parameters.
+     * @param namedAnnotations The annotations we have to process.
+     * @param namedArgs The resulting Java model.
+     * @param argIndex The position of the next argument, relative to the full argument list containing all argument
+     *                 types: [cmd, [fixed args], [opt args], [named args]]
+     * @return The updated free position in the global arg list.
+     */
+    private static int compileNamedArgs(Map<String, ArgMapping> argMappings, ScriptyArg[] namedAnnotations, NamedArg[] namedArgs, int argIndex)
     throws ArgSpecException {
-        int k = 0;
+        int namedIdx = 0;
+        for (ScriptyArg namedAnnotation : namedAnnotations) {
 
-        for (ScriptyArg lArg : lNamedArgs) {
-            String argName = lArg.name();
-            String argType = lArg.type();
-            String argValue = lArg.value();
-            boolean argIsOptional = lArg.optional();
+            final String argName = namedAnnotation.name();
+            final String argType = namedAnnotation.type();
+            final boolean argIsOptional = namedAnnotation.optional();
 
+            String argValue = namedAnnotation.value();
             if ("{null}".equals(argValue)) argValue = null;
 
             try {
-                TypeSpec typeSpec = (TypeSpec) typeProcessor.startNonInteractive(argType);
-                namedArgSpecs[k] = new NamedArg(argName, typeSpec, argValue, argIsOptional);
+                // Compile the type.
+                final TypeSpec typeSpec = compileArgType(argType);
+                namedArgs[namedIdx] = new NamedArg(argName, typeSpec, argValue, argIsOptional);
                 // Offset with 1, the mappings should skip element 0 which is the name of the command.
                 argMappings.put(argName, new ArrayIndexMapping(argIndex + 1));
 
                 argIndex++;
-                k++;
+                namedIdx++;
             }
             catch (ReplEngineException e) {
                 throw new ArgSpecException(String.format(ERR020, argType, e.getMessage()));
@@ -199,22 +203,77 @@ public class ArgListBuilder {
         return argIndex;
     }
 
-    private static int compileFixedArgs(Map<String, ArgMapping> argMappings, ScriptyArg[] fixedArgAnnotations, FixedArg[] fixedArgSpecs)
+    private static TypeSpec compileArgType(String argType)
+    throws ReplEngineException {
+        return (TypeSpec) typeCompiler.startNonInteractive(argType);
+    }
+
+    /**
+     * Convert the array of fixed argument annotations {@link ScriptyArg} into an array of the Java representation
+     * of fixed arguments {@link FixedArg}. It compiles the annotations to a Java model.
+     *
+     * @param argMappings Accumulate mappings that we can use at runtime when mapping arguments to parameters.
+     * @param fixedArgAnnotations The annotations we have to process.
+     * @param fixedArgs The resulting Java model.
+     * @param argIndex The position of the next argument, relative to the full argument list containing all argument
+     *                 types: [cmd, [fixed args], [opt args], [named args]]
+     * @return The updated free position in the global arg list.
+     */
+    private static int compileFixedArgs(Map<String, ArgMapping> argMappings, ScriptyArg[] fixedArgAnnotations, FixedArg[] fixedArgs, int argIndex)
     throws ArgSpecException {
-        int argIndex = 0;
 
         for (ScriptyArg argAnnotation : fixedArgAnnotations) {
-            String argName = argAnnotation.name();
-            String argType = argAnnotation.type();
+            final String argName = argAnnotation.name();
+            final String argType = argAnnotation.type();
             // Default value is ignored for fixed args.
             // Optional flag is ignored for fixed args.
 
             try {
-                TypeSpec typeSpec = (TypeSpec) typeProcessor.startNonInteractive(argType);
-                fixedArgSpecs[argIndex] = new FixedArg(typeSpec);
+                final TypeSpec typeSpec = compileArgType(argType);
+                fixedArgs[argIndex] = new FixedArg(typeSpec);
                 // Offset with 1, the mappings should skip element 0 which is the name of the command.
                 argMappings.put(argName, new ArrayIndexMapping(argIndex + 1));
                 argIndex++;
+            }
+            catch (ReplEngineException e) {
+                throw new ArgSpecException(String.format(ERR020, argType, e.getMessage()));
+            }
+        }
+        return argIndex;
+    }
+
+    /**
+     * Convert the array of optional argument annotations {@link ScriptyArg} into an array of the Java representation
+     * of optional arguments {@link OptionalArg}. It compiles the annotations to a Java model.
+     *
+     * @param argMappings Accumulate named mappings that we can use at runtime when mapping arguments to parameters.
+     * @param optArgAnnotations The annotations we have to process.
+     * @param optArgs The resulting Java model.
+     * @param argIndex The position of the next argument, relative to the full argument list containing all argument
+     *                 types: [cmd, [fixed args], [opt args], [named args]]
+     * @return The updated free position in the global arg list.
+     */
+    private static int compileOptArgs(Map<String, ArgMapping> argMappings, ScriptyArg[] optArgAnnotations, OptionalArg[] optArgs, int argIndex)
+    throws ArgSpecException {
+        int optIdx = 0;
+
+        for (ScriptyArg optArgAnnotation : optArgAnnotations) {
+
+            final String argName = optArgAnnotation.name();
+            final String argType = optArgAnnotation.type();
+            String argValue = optArgAnnotation.value();
+            // Optional flag is not needed, optional args are always optional.
+
+            if ("{null}".equals(argValue)) argValue = null;
+
+            try {
+                final TypeSpec typeSpec = compileArgType(argType);
+                optArgs[optIdx] = new OptionalArg(typeSpec, argValue);
+                // Offset with 1, the mappings should skip element 0 which is the name of the command.
+                argMappings.put(argName, new ArrayIndexMapping(argIndex + 1));
+
+                argIndex++;
+                optIdx++;
             }
             catch (ReplEngineException e) {
                 throw new ArgSpecException(String.format(ERR020, argType, e.getMessage()));
