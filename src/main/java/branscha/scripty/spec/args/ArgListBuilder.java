@@ -203,6 +203,11 @@ public class ArgListBuilder {
         return argIndex;
     }
 
+    /**
+     * Convert the Scripty type language (from the annotations) into a type data structure.
+     * @param argType The type description in Scripty.
+     * @return The type representation in Java.
+     */
     private static TypeSpec compileArgType(String argType)
     throws ReplEngineException {
         return (TypeSpec) typeCompiler.startNonInteractive(argType);

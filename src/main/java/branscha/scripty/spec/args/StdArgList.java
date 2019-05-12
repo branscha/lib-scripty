@@ -67,9 +67,14 @@ public class StdArgList extends AbstractArgList {
             throw new ArgSpecException(ERR010);
         }
 
-        // Create a new argument list where we will collect the converted results.
+        // Create a new argument list to collect the converted results.
         final Object[] newArgs = new Object[1 + fixedArgs.length + optArgs.length + namedArgs.length];
-        int newArgsEnd = resolveFixedArgs(args, ctx, newArgs);
+
+        // Copy the command name to the new argument list, the structure will remain the same.
+        newArgs[0] = args[0];
+        int newArgsEnd = 1;
+
+        newArgsEnd = resolveFixedArgs(args, ctx, newArgs, newArgsEnd);
 
         // Check the optional ones.
         // Start looking after the fixed args, 
@@ -121,7 +126,7 @@ public class StdArgList extends AbstractArgList {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("StdArgList{");
+        final StringBuilder sb = new StringBuilder("StdArgList{");
         if (fixedArgs != null && fixedArgs.length > 0) {
             sb.append("\n").append("   ").append("fixed=").append(Arrays.asList(fixedArgs).toString());
         }

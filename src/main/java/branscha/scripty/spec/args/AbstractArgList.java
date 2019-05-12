@@ -27,16 +27,16 @@ package branscha.scripty.spec.args;
 import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
 
-public abstract class AbstractArgList implements ArgList {
+abstract class AbstractArgList implements ArgList {
 
     private static final String ERR010 = "AbstractArgList/010: Found a badly formed named argument, where the name is not a string but an instance of type '%s'.";
     private static final String ERR020 = "AbstractArgList/020: Found an unexpected named argument '%s'.";
     private static final String ERR030 = "AbstractArgList/030: Not enough arguments. Expected at least %d arguments and received %d.";
 
-    protected FixedArg[] fixedArgs;
-    protected NamedArg[] namedArgs;
+    FixedArg[] fixedArgs;
+    NamedArg[] namedArgs;
 
-    public AbstractArgList(FixedArg fixedArgs[], NamedArg[] namedArgs) {
+    AbstractArgList(FixedArg[] fixedArgs, NamedArg[] namedArgs) {
         this.fixedArgs = fixedArgs;
         this.namedArgs = namedArgs;
     }
@@ -69,17 +69,13 @@ public abstract class AbstractArgList implements ArgList {
         return newArgsEnd;
     }
 
-    int resolveFixedArgs(Object[] args, Context ctx, Object[] newArgs)
+    int resolveFixedArgs(Object[] args, Context ctx, Object[] newArgs, int newArgsEnd)
     throws ArgSpecException {
-        // Copy the command name to the new argument list, the structure will remain the same.
-        newArgs[0] = args[0];
 
         // Check the fixed.
         if (args.length - 1 < fixedArgs.length)
             throw new ArgSpecException(String.format(ERR030, fixedArgs.length, args.length - 1));
 
-        // We skip the command name.
-        int newArgsEnd = 1;
         for (FixedArg fixedArg : fixedArgs) {
             newArgs[newArgsEnd] = fixedArg.guard(args, newArgsEnd++, ctx);
         }

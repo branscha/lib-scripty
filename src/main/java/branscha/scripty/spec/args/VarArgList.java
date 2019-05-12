@@ -89,8 +89,12 @@ public class VarArgList extends AbstractArgList {
 
         // Create a new argument list where we will accumulate the converted results.
         Object[] newArgs = new Object[1 + fixedArgs.length + nrVarArgs + namedArgs.length];
+
         // Copy the command name to the new argument list, the structure will remain the same.
-        int newArgsEnd = resolveFixedArgs(args, ctx, newArgs);
+        newArgs[0] = args[0];
+        int newArgsEnd = 1;
+
+        newArgsEnd = resolveFixedArgs(args, ctx, newArgs, newArgsEnd);
 
         // Check the namedArgs args.
         // We look for all pairs at the end of the argument list. We will only consider these trailing pairs.
@@ -141,7 +145,7 @@ public class VarArgList extends AbstractArgList {
     @Override
     public String toString() {
         final String indent = "   ";
-        final StringBuffer sb = new StringBuffer("VarArgList{");
+        final StringBuilder sb = new StringBuilder("VarArgList{");
         if(fixedArgs != null && fixedArgs.length > 0){
             sb.append("\n").append(indent).append("fixed=").append(Arrays.asList(fixedArgs).toString());
         }

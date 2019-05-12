@@ -35,17 +35,19 @@ public class NamedArg implements ArgSpec {
     private static final String ERR020 = "NamedArg/020: Missing named argument '%s'.";
 
     private String paramName;
-    private Object defaultValue;
     private TypeSpec type;
     private boolean optional = true;
     private String specName;
 
+    private Object defaultValue;
+    private Object defaultGuardedVal;
+
     public NamedArg(String name, TypeSpec type, Object defaultValue, boolean optional) {
-        paramName = name;
+        this.paramName = name;
         this.defaultValue = defaultValue;
         this.type = type;
         this.optional = optional;
-        specName = this.type.getSpecName();
+        this.specName = this.type.getSpecName();
     }
 
     public String getSpecName() {
@@ -68,8 +70,6 @@ public class NamedArg implements ArgSpec {
                         // Success, we found the named argument. Create a new pair where the
                         // defaultValue is the verified and coerced argument from the original pair.
                         final Pair newPair = new Pair(paramName, type.guard(named.getRight(), ctx));
-                        // Substitute the new pair in the old argument list.
-                        args[i] = newPair;
                         return newPair.getRight();
                     }
                     catch (TypeSpecException e) {
@@ -81,7 +81,7 @@ public class NamedArg implements ArgSpec {
 
         try {
             if (optional) {
-                return type.guard(defaultValue, ctx);
+                return getDefaultVal(ctx);
             }
             else {
                 throw new ArgSpecException(String.format(ERR020, paramName));
@@ -92,13 +92,21 @@ public class NamedArg implements ArgSpec {
         }
     }
 
+    private Object getDefaultVal(Context ctx)
+    throws TypeSpecException {
+        if (defaultGuardedVal == null) {
+            defaultGuardedVal = type.guard(defaultValue, ctx);
+        }
+        return defaultGuardedVal;
+    }
+
     public String getName() {
         return paramName;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Arg{");
+        final StringBuilder sb = new StringBuilder("Arg{");
         sb.append("name='").append(paramName).append('\'');
         sb.append(", type=\"").append(specName).append("\"");
         sb.append(", default=\"").append(defaultValue).append("\"");

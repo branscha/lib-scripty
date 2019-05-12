@@ -22,7 +22,7 @@ public class RuntimeArgList {
      */
     private Map<String, ArgMapping> argMappings;
 
-    public RuntimeArgList(ArgList argList, Map<String, ArgMapping> argMappings) {
+    RuntimeArgList(ArgList argList, Map<String, ArgMapping> argMappings) {
         this.argList = argList;
         this.argMappings = argMappings;
     }

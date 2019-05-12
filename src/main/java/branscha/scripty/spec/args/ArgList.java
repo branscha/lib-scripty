@@ -35,10 +35,10 @@ public interface ArgList {
     /**
      * Do the magic on the arguments: provide the missing optional and named arguments, and check the type of the
      * arguments.
+     *
      * @param args The arguments that should be completed and tested.
-     * @param ctx The contents of the context can be used for some verifications.
+     * @param ctx  The contents of the context can be used for some verifications.
      * @return The completed argument list. It will be longer than or equal to the provided argument list.
-     * @throws ArgSpecException
      */
     Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException;

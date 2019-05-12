@@ -43,14 +43,16 @@ public class OptionalArg implements ArgSpec {
 
     private static final String ERR010 = "OptionalArg/010: Optional argument at position %d: %s";
 
-    private TypeSpec spec;
+    private TypeSpec type;
     private String specName;
+
     private Object defaultVal;
+    private Object defaultGuardedVal;
 
     public OptionalArg(TypeSpec type, Object defaultValue) {
-        spec = type;
-        defaultVal = defaultValue;
-        specName = spec.getSpecName();
+        this.type = type;
+        this.defaultVal = defaultValue;
+        specName = this.type.getSpecName();
     }
 
     public String getSpecName() {
@@ -63,16 +65,16 @@ public class OptionalArg implements ArgSpec {
             if (pos < 0 || pos >= args.length) {
                 // Not enough arguments were provided, it can never contain the optional argument we are looking for.
                 // Use the default value (after type coercion).
-                return spec.guard(defaultVal, ctx);
+                return getDefaultVal(ctx);
             }
             else if (args[pos] instanceof Pair) {
                 // Use the default value (after type coercion).
                 // A pair is the start of the named arguments so we did not find the argument are looking for.
-                return spec.guard(defaultVal, ctx);
+                return getDefaultVal(ctx);
             }
             else {
                 // Coerce and check type.
-                return spec.guard(args[pos], ctx);
+                return type.guard(args[pos], ctx);
             }
         }
         catch (TypeSpecException e) {
@@ -80,9 +82,17 @@ public class OptionalArg implements ArgSpec {
         }
     }
 
+    private Object getDefaultVal(Context ctx)
+    throws TypeSpecException {
+        if (defaultGuardedVal == null) {
+            defaultGuardedVal = type.guard(defaultVal, ctx);
+        }
+        return defaultGuardedVal;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Arg{");
+        final StringBuilder sb = new StringBuilder("Arg{");
         sb.append("type=\"").append(specName).append("\"");
         sb.append(", default=\"").append(defaultVal).append("\"");
         sb.append('}');

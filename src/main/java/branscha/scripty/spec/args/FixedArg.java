@@ -67,7 +67,7 @@ public class FixedArg implements ArgSpec {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Arg{");
+        final StringBuilder sb = new StringBuilder("Arg{");
         sb.append("type=\"").append(specName).append("\"");
         sb.append('}');
         return sb.toString();
