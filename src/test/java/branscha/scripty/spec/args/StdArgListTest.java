@@ -153,20 +153,27 @@ public class StdArgListTest {
     public void namedOnly_Good()
     throws ArgSpecException {
         StdArgList namedOnly = new StdArgList.Builder()
-                .addNamed(new NamedArg("a1", StringType.STRING_TYPE, "val1", true))
-                .addNamed(new NamedArg("a2", StringType.STRING_TYPE, "val2", true))
-                .addNamed(new NamedArg("a3", StringType.STRING_TYPE, "val3", true))
+                .addNamed(new NamedArg("a1", "u", StringType.STRING_TYPE, "val1", true))
+                .addNamed(new NamedArg("a2", "d", StringType.STRING_TYPE, "val2", true))
+                .addNamed(new NamedArg("a3", "t", StringType.STRING_TYPE, "val3", true))
                 .build();
 
-        // All arguments provided.
-        Object[] args = new Object[]{"cmd", new Pair("a1", "one"), new Pair("a2","two"), new Pair("a3", "three")};
+        // All long arguments provided.
+        Object[] args = new Object[]{"cmd", new Pair("--a1", "one"), new Pair("--a2","two"), new Pair("--a3", "three")};
         Context ctx = new BasicContext();
         Object[] guarded = namedOnly.guard(args, ctx);
         assertNotNull(guarded);
         assertArrayEquals(new Object[]{"cmd", "one", "two", "three"}, guarded);
 
+        // All flag arguments provided.
+        args = new Object[]{"cmd", new Pair("-u", "one"), new Pair("-d","two"), new Pair("-t", "three")};
+        ctx = new BasicContext();
+        guarded = namedOnly.guard(args, ctx);
+        assertNotNull(guarded);
+        assertArrayEquals(new Object[]{"cmd", "one", "two", "three"}, guarded);
+
         // Last one missing.
-        args = new Object[]{"cmd", new Pair("a1", "one"), new Pair("a2","two")};
+        args = new Object[]{"cmd", new Pair("--a1", "one"), new Pair("--a2","two")};
         guarded = namedOnly.guard(args, ctx);
         assertNotNull(guarded);
         assertArrayEquals(new Object[]{"cmd", "one", "two", "val3"}, guarded);
@@ -181,13 +188,13 @@ public class StdArgListTest {
     @Test
     public void namedOnly_Bad() {
         StdArgList namedOnly = new StdArgList.Builder()
-                .addNamed(new NamedArg("a1", StringType.STRING_TYPE, "val1", true))
-                .addNamed(new NamedArg("a2", StringType.STRING_TYPE, "val2", false))
-                .addNamed(new NamedArg("a3", StringType.STRING_TYPE, "val3", true))
+                .addNamed(new NamedArg("a1", "u", StringType.STRING_TYPE, "val1", true))
+                .addNamed(new NamedArg("a2", "d", StringType.STRING_TYPE, "val2", false))
+                .addNamed(new NamedArg("a3", "t", StringType.STRING_TYPE, "val3", true))
                 .build();
 
         // Second one is required ...
-        Object[] args = new Object[]{"cmd", new Pair("a1", "one")};
+        Object[] args = new Object[]{"cmd", new Pair("--a1", "one")};
         Context ctx = new BasicContext();
 
         try {
@@ -195,18 +202,18 @@ public class StdArgListTest {
             fail("Guard should have taken action.");
         }
         catch (ArgSpecException e) {
-            assertThat(e.getMessage(), containsString("NamedArg/020"));
+            assertThat(e.getMessage(), containsString("AbstractArgList/040"));
         }
     }
 
     @Test
     public void namedOnly_BadTooMany() {
         StdArgList namedOnly = new StdArgList.Builder()
-                .addNamed(new NamedArg("a1", StringType.STRING_TYPE, "val1", true))
+                .addNamed(new NamedArg("a1", "u", StringType.STRING_TYPE, "val1", true))
                 .build();
 
         // Added an argument too much ...
-        Object[] args = new Object[]{"cmd", new Pair("a1", "one"), new Pair("a2", "one")};
+        Object[] args = new Object[]{"cmd", new Pair("--a1", "one"), new Pair("--a2", "one")};
         Context ctx = new BasicContext();
 
         try {
@@ -221,11 +228,11 @@ public class StdArgListTest {
     @Test
     public void namedOnly_BadType() {
         StdArgList namedOnly = new StdArgList.Builder()
-                .addNamed(new NamedArg("a1", BooleanType.BOOLEAN_TYPE, "val1", true))
+                .addNamed(new NamedArg("a1", "u", BooleanType.BOOLEAN_TYPE, "val1", true))
                 .build();
 
         // Second one is required ...
-        Object[] args = new Object[]{"cmd", new Pair("a1", "no-bool")};
+        Object[] args = new Object[]{"cmd", new Pair("--a1", "no-bool")};
         Context ctx = new BasicContext();
 
         try {
@@ -244,13 +251,19 @@ public class StdArgListTest {
         StdArgList namedOnly = new StdArgList.Builder()
                 .addFixed(new FixedArg(StringType.STRING_TYPE))
                 .addOptional(new OptionalArg(StringType.STRING_TYPE, "val2"))
-                .addNamed(new NamedArg("a3", StringType.STRING_TYPE, "val3", true))
+                .addNamed(new NamedArg("a3", "t", StringType.STRING_TYPE, "val3", true))
                 .build();
 
         // All provided.
-        Object[] args = new Object[]{"cmd", "x", "y", new Pair("a3", "z")};
+        Object[] args = new Object[]{"cmd", new Pair("--a3", "z"), "x", "y"};
         Context ctx = new BasicContext();
         Object[] guarded = namedOnly.guard(args, ctx);
+        assertNotNull(guarded);
+        assertArrayEquals(new Object[]{"cmd", "x", "y", "z"}, guarded);
+
+        args = new Object[]{"cmd", new Pair("-t", "z"), "x", "y"};
+        ctx = new BasicContext();
+        guarded = namedOnly.guard(args, ctx);
         assertNotNull(guarded);
         assertArrayEquals(new Object[]{"cmd", "x", "y", "z"}, guarded);
 
@@ -261,7 +274,7 @@ public class StdArgListTest {
         assertArrayEquals(new Object[]{"cmd", "x", "val2", "val3"}, guarded);
 
         // Omit optional.
-        args = new Object[]{"cmd", "x", new Pair("a3", "z")};
+        args = new Object[]{"cmd", new Pair("--a3", "z"), "x"};
         guarded = namedOnly.guard(args, ctx);
         assertNotNull(guarded);
         assertArrayEquals(new Object[]{"cmd", "x", "val2", "z"}, guarded);
@@ -272,5 +285,4 @@ public class StdArgListTest {
         assertNotNull(guarded);
         assertArrayEquals(new Object[]{"cmd", "x", "y", "val3"}, guarded);
     }
-
 }

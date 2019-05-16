@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
         std = {
                 @ScriptyStdArgList(name = "path", optional = {@ScriptyArg(name = "path", type = "String", value = ".")}),
                 @ScriptyStdArgList(name = "path + quiet option",
-                        named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")},
+                        named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", optional = true, value = "false")},
                         optional = {@ScriptyArg(name = "path", type = "String", value = ".")})},
         var = {
                 @ScriptyVarArgList(name = "call",

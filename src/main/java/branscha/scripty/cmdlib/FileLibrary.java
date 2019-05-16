@@ -50,13 +50,13 @@ import java.util.regex.Pattern;
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(std = {
         @ScriptyStdArgList(name = "noarg + quiet",
-                named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
+                named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)}),
         @ScriptyStdArgList(name = "file + quiet",
                 optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")},
-                named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
+                named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)}),
         @ScriptyStdArgList(name = "2files + quiet",
                 fixed = {@ScriptyArg(name = "arg1", type = "OneOf (String) (Instance java.io.File)", value = "null"), @ScriptyArg(name = "arg2", type = "OneOf (String) (Instance java.io.File)", value = "null")},
-                named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)})
+                named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)})
 })
 public class FileLibrary {
     private static final Pattern DRIVE = Pattern.compile("^\\p{Alpha}:.*$");
@@ -67,7 +67,7 @@ public class FileLibrary {
     @ScriptyCommand(name = "cd")
     @ScriptyStdArgList(
             optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = "~")},
-            named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)})
+            named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)})
     public File cd(@ScriptyParam("file") Object aFileRepr)
     throws CommandException {
         File file;
@@ -120,11 +120,11 @@ public class FileLibrary {
             optional = {
                     @ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")},
             named = {
-                    @ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true),
+                    @ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true),
                     @ScriptyArg(name = "files", type = "Boolean", value = "true", optional = true),
                     @ScriptyArg(name = "dirs", type = "Boolean", value = "true", optional = true),
                     @ScriptyArg(name = "grep", type = "String", value = ".*", optional = true),
-                    @ScriptyArg(name = "exec", type = "Instance branscha.scripty.parser.Lambda nullAllowed=true", value = "{null}", optional = true),
+                    @ScriptyArg(name = "exec", type = "Instance -n branscha.scripty.parser.Lambda", value = "{null}", optional = true),
                     @ScriptyArg(name = "recursive", type = "Boolean", value = "false", optional = true)
             })
     public Object[] ls(

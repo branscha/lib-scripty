@@ -34,11 +34,11 @@ import java.util.ArrayList;
 
 @ScriptyStdArgList(name = "text and password",
         fixed = {@ScriptyArg(name = "text", type = "String")},
-        named = {@ScriptyArg(name = "password", type = "String", optional = true, value = "")})
+        named = {@ScriptyArg(name = "password", flag="p", type = "String", optional = true, value = "")})
 public class TeaLibrary {
 
     @ScriptyCommand(name = "tea-encrypt", description =
-            "(tea-encrypt <plain-text> password=<pwd>)\n" +
+            "(tea-encrypt <plain-text> --password=<pwd>)\n" +
                     "Encrypt the text using the Tiny Encryption Algorithm.\n" +
                     "See also: tea-decrypt.")
     @ScriptyRefArgList(ref = "text and password")

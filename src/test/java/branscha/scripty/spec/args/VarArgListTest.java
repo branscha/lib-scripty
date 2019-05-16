@@ -85,9 +85,9 @@ public class VarArgListTest {
         VarArgList mixed = new VarArgList.Builder()
                 .addVarArg(new VarArg(IntegerType.INTEGER_TYPE), -1, -1)
                 .addFixed(new FixedArg(StringType.STRING_TYPE))
-                .addNamed(new NamedArg("city", StringType.STRING_TYPE, "London", true))
+                .addNamed(new NamedArg("city", "c", StringType.STRING_TYPE, "London", true))
                 .build();
-        Object[] args = new Object[]{"cmd", "Bruno", "1", "2", "3", new Pair("city","Bruges")};
+        Object[] args = new Object[]{"cmd",new Pair("--city","Bruges"), "Bruno", "1", "2", "3"};
         Context ctx = new BasicContext();
         Object[] guarded = mixed.guard(args, ctx);
 

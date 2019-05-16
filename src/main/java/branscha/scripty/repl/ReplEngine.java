@@ -326,11 +326,10 @@ implements ExtensionManager {
         output.flush();
     }
 
-//    private void writeError(String aTxt)
-//    {
-//        error.print(aTxt);
-//        error.flush();
-//    }
+    private void writeError(String aTxt) {
+        error.print(aTxt);
+        error.flush();
+    }
 
     private void writeLine(String line) {
         output.println(line);

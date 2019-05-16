@@ -45,7 +45,7 @@ public class InstanceType implements TypeSpec {
      * @param nullAllowed Is it a nullable type or not.
      */
     public InstanceType(Class clazz, boolean nullAllowed) {
-        this(clazz, "Instance " + clazz.getCanonicalName() + (nullAllowed ? " nullAllowed=true" : ""), nullAllowed);
+        this(clazz, "Instance " + clazz.getCanonicalName() + (nullAllowed ? " -n" : ""), nullAllowed);
     }
 
     /**

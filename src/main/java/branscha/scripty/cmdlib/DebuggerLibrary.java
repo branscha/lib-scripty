@@ -38,7 +38,7 @@ import java.util.List;
         std = {
                 @ScriptyStdArgList(name = "one argument", fixed = {@ScriptyArg(name = "arg", type = "Any")}),
                 @ScriptyStdArgList(name = "no arguments"),
-                @ScriptyStdArgList(name = "no arguments + quiet option", named = {@ScriptyArg(name = "quiet", type = "Boolean", optional = true, value = "false")}),
+                @ScriptyStdArgList(name = "no arguments + quiet option", named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", optional = true, value = "false")}),
                 @ScriptyStdArgList(name = "breakpoint", fixed = {@ScriptyArg(name = "arg", type = "Instance branscha.scripty.parser.EvalTrace$Breakpoint")}),
                 @ScriptyStdArgList(name = "name", fixed = {@ScriptyArg(name = "name", type = "String")}),
                 @ScriptyStdArgList(name = "name + bool", fixed = {@ScriptyArg(name = "name", type = "String"), @ScriptyArg(name = "bool", type = "Boolean")}),

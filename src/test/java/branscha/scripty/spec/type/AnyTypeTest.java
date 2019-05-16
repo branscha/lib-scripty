@@ -8,7 +8,7 @@ public class AnyTypeTest {
 
     @Test
     public void getSpecName() {
-        assertEquals("Any nullAllowed=true", new AnyType(true).getSpecName());
+        assertEquals("Any -n", new AnyType(true).getSpecName());
         assertEquals("Any", new AnyType(false).getSpecName());
     }
 }

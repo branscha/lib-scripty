@@ -68,7 +68,7 @@ public class TestArgListBuilder {
         }
 
         @ScriptyCommand(name = "go2")
-        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Any nullAllowed=true")})
+        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Any -n")})
         public static Object command2(@ScriptyParam("arg") Object aArg) {
             return aArg;
         }
@@ -116,7 +116,7 @@ public class TestArgListBuilder {
         }
 
         @ScriptyCommand(name = "do-integer-range")
-        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "IntegerRange min=3 max=13")})
+        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "IntegerRange --min=3 --max=13")})
         public Object doIntegerRange(@ScriptyParam("arg") Integer aNr) {
             return aNr;
         }
@@ -391,7 +391,7 @@ public class TestArgListBuilder {
         }
 
         @ScriptyCommand(name = "do-intlist-bounded")
-        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "ListOf (Integer) minLength=5 maxLength=10")})
+        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "ListOf --minLength=5 --maxLength=10 (Integer)")})
         public Object boundedList(@ScriptyParam("arg") List aList) {
             return aList;
         }
@@ -506,7 +506,7 @@ public class TestArgListBuilder {
         }
 
         @ScriptyCommand(name = "do-instance-null")
-        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Instance java.util.List nullAllowed=true")})
+        @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Instance -n java.util.List ")})
         public Object instance2(@ScriptyParam("arg") List aList) {
             return aList;
         }

@@ -48,6 +48,7 @@ public class ArgListBuilder {
 
     private static final String ERR010 = "ArgListBuilder/010: Internal Scripty error, could not initialize the argument type compiler.";
     private static final String ERR020 = "ArgListBuilder/020: Badly formed type expression '%s' encountered.%n%s";
+    private static final String ERR030 = "ArgListBuilder/030: Named argument '%s' flag should be single non-number character.";
 
     private static ReplEngine typeCompiler = new ReplEngine();
     static {
@@ -180,16 +181,21 @@ public class ArgListBuilder {
         for (ScriptyArg namedAnnotation : namedAnnotations) {
 
             final String argName = namedAnnotation.name();
+            final String argFlag = namedAnnotation.flag();
             final String argType = namedAnnotation.type();
             final boolean argIsOptional = namedAnnotation.optional();
 
             String argValue = namedAnnotation.value();
             if ("{null}".equals(argValue)) argValue = null;
 
+            if(argFlag.length() > 1) {
+                throw new ArgSpecException(String.format(ERR030, argName));
+            }
+
             try {
                 // Compile the type.
                 final TypeSpec typeSpec = compileArgType(argType);
-                namedArgs[namedIdx] = new NamedArg(argName, typeSpec, argValue, argIsOptional);
+                namedArgs[namedIdx] = new NamedArg(argName, argFlag, typeSpec, argValue, argIsOptional);
                 // Offset with 1, the mappings should skip element 0 which is the name of the command.
                 argMappings.put(argName, new ArrayIndexMapping(argIndex + 1));
 

@@ -26,13 +26,18 @@ import static branscha.scripty.spec.type.StringType.STRING_TYPE;
  */
 public class TypeLanguageLib {
 
+    private static final String ERR010 = "TypeLanguageLib/010: Could not find class '%s' for type Instance [CLASS].";
+    private static final String ERR020 = "TypeLanguageLib/020: The class '%s' does not seem to implement TypeSpec.";
+    private static final String ERR030 = "TypeLanguageLib/030: Could not instantiate the custom type spec '%s'.";
+    private static final String ERR040 = "TypeLanguageLib/040: Could not find class '%s'.";
+
     private static TypeSpec SPEC_TYPE = new InstanceType(TypeSpec.class, false);
 
-    private static NamedArg NAMED_MINLEN = new NamedArg("minLength", new IntegerRangeType(-1, Integer.MAX_VALUE), -1, true);
-    private static NamedArg NAMED_MAXLEN = new NamedArg("maxLength", new IntegerRangeType(-1, Integer.MAX_VALUE), -1, true);
-    private static NamedArg NAMED_MIN = new NamedArg("min", new IntegerRangeType(Integer.MIN_VALUE, Integer.MAX_VALUE), Integer.MIN_VALUE, true);
-    private static NamedArg NAMED_MAX = new NamedArg("max", new IntegerRangeType(Integer.MIN_VALUE, Integer.MAX_VALUE), Integer.MAX_VALUE, true);
-    private static NamedArg NAMED_NULLALLOWED = new NamedArg("nullAllowed", BOOLEAN_TYPE, false, true);
+    private static NamedArg NAMED_MINLEN = new NamedArg("minLength", "s", new IntegerRangeType(-1, Integer.MAX_VALUE), -1, true);
+    private static NamedArg NAMED_MAXLEN = new NamedArg("maxLength", "S", new IntegerRangeType(-1, Integer.MAX_VALUE), -1, true);
+    private static NamedArg NAMED_MIN = new NamedArg("min", "m", new IntegerRangeType(Integer.MIN_VALUE, Integer.MAX_VALUE), Integer.MIN_VALUE, true);
+    private static NamedArg NAMED_MAX = new NamedArg("max", "M", new IntegerRangeType(Integer.MIN_VALUE, Integer.MAX_VALUE), Integer.MAX_VALUE, true);
+    private static NamedArg NAMED_NULLALLOWED = new NamedArg("nullAllowed", "n", BOOLEAN_TYPE, false, true);
 
     private static FixedArg FIXED_TYPESPEC = new FixedArg(SPEC_TYPE);
     private static FixedArg FIXED_CLASSNAME = new FixedArg(STRING_TYPE);
@@ -54,7 +59,7 @@ public class TypeLanguageLib {
      * Argument list for {@link #listOfType(Context, Object[])}. It accepts a type for the list items and a length range.
      * Example:
      * <pre>
-     *     type="ListOf (Integer) minLength=0 maxLength=20"
+     *     type="ListOf --minLength=0 --maxLength=20 (Integer)"
      * </pre>
      */
     private static StdArgList LISTOF_ARGLIST = new StdArgList(new FixedArg[]{FIXED_TYPESPEC}, NO_OPTIONAL, new NamedArg[]{NAMED_MINLEN, NAMED_MAXLEN});
@@ -72,7 +77,7 @@ public class TypeLanguageLib {
      * Argument list for {@link #instanceType(Context, Object[])}. It accepts a classname for the instance.
      * Example:
      * <pre>
-     *     type="Instance branscha.MyClass nullAllowed=true"
+     *     type="Instance --nullAllowed=true branscha.MyClass"
      * </pre>
      */
     private static StdArgList INSTANCE_ARGLIST = new StdArgList(new FixedArg[]{FIXED_CLASSNAME}, NO_OPTIONAL, new NamedArg[]{NAMED_NULLALLOWED});
@@ -83,7 +88,7 @@ public class TypeLanguageLib {
      *
      * Example:
      * <pre>
-     *     type="Any nullAllowed=true"
+     *     type="Any --nullAllowed=true"
      * </pre>
      */
     private static StdArgList ANY_ARGLIST = new StdArgList(NO_FIXED, NO_OPTIONAL, new NamedArg[]{NAMED_NULLALLOWED});
@@ -94,7 +99,7 @@ public class TypeLanguageLib {
      *
      * Example:
      * <pre>
-     *     type="IngegerRange min=0 max=10"
+     *     type="IngegerRange --min=0 --max=10"
      * </pre>
      */
     private static StdArgList INTEGERRANGE_ARGLIST = new StdArgList(NO_FIXED, NO_OPTIONAL, new NamedArg[]{NAMED_MIN, NAMED_MAX});
@@ -253,7 +258,7 @@ public class TypeLanguageLib {
                 return new InstanceType(clazz, (Boolean) guarded[nullableIdx]);
             }
             catch (ClassNotFoundException e) {
-                throw new CommandException(String.format("Could not find class '%s' for type Instance [CLASS].", className));
+                throw new CommandException(String.format(ERR010, className));
             }
         }
         catch (ArgSpecException e) {
@@ -347,15 +352,15 @@ public class TypeLanguageLib {
                     return (TypeSpec) clazz.newInstance();
                 }
                 else {
-                    throw new CommandException(String.format("The class '%s' does not seem to implement TypeSpec.", className));
+                    throw new CommandException(String.format(ERR020, className));
                 }
             }
             catch (ClassNotFoundException e) {
-                String lMsg = String.format("Could not find class '%s'.", className);
+                String lMsg = String.format(ERR040, className);
                 throw new CommandException(lMsg);
             }
             catch (InstantiationException | IllegalAccessException e) {
-                String lMsg = String.format("Could not instantiate the custom typespec '%s'.", className);
+                String lMsg = String.format(ERR030, className);
                 throw new CommandException(lMsg);
             }
         }

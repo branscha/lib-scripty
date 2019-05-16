@@ -25,11 +25,11 @@
 package branscha.scripty.spec.args;
 
 import branscha.scripty.parser.Context;
-import branscha.scripty.parser.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * There are 3 types of parameters in a variable argument list.
@@ -50,6 +50,7 @@ public class VarArgList extends AbstractArgList {
     private static final String ERR010 = "VarArgList/010: Badly formed argument list. It should at least start with the command name.";
     private static final String ERR020 = "VarArgList/020: Too few arguments of type '%s'. Expected at least %d and received %d.";
     private static final String ERR030 = "VarArgList/030: Too many arguments of type '%s'. Expected at most %d and received %d.";
+    private static final String ERR040 = "VarArgList/040: Found named argument '%s' at a wrong location, named arguments should be at the beginning.";
 
     private VarArg varArg;
     private int min, max;
@@ -71,43 +72,57 @@ public class VarArgList extends AbstractArgList {
      */
     public Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException {
+
         if(args == null || args.length < 1) {
             throw new ArgSpecException(ERR010);
         }
 
-        // We look for all pairs at the end of the argument list. We will only
-        // consider these trailing pairs.
-        int firstNamedArg = args.length - 1;
-        while (firstNamedArg > 0 && (args[firstNamedArg] instanceof Pair)) firstNamedArg--;
-        int nrVarArgs = firstNamedArg - fixedArgs.length;
-        if (nrVarArgs < 0) nrVarArgs = 0;
+        // Nr varargs without named args (we will adjust later).
+        // The -1 is for the command in args[0]
+        int nrVarArgs = args.length - 1 - fixedArgs.length;
+        int nrNamedArgs = 0;
+        int lastNamedArg = -1;
 
-        if (min >= 0 && nrVarArgs < min)
+        // Find the boundaries of the named args.
+        final Optional<Integer> firstNamedArg = findFirstNamedArgAtStart(args, 1);
+        if(firstNamedArg.isPresent()) {
+            // If there is a first one, there must be a last one as well.
+            lastNamedArg = findLastNamedArg(args, firstNamedArg.get());
+            nrNamedArgs = lastNamedArg - firstNamedArg.get() + 1;
+            nrVarArgs = nrVarArgs - nrNamedArgs;
+
+            final Optional<Integer> rogue = findFirstNamedArgAtStart(args, lastNamedArg + 1);
+            if(rogue.isPresent()) {
+                throw new ArgSpecException(String.format(ERR040, args[rogue.get()].toString()));
+            }
+        }
+
+        if (min >= 0 && nrVarArgs < min) {
             throw new ArgSpecException(String.format(ERR020, varArg.getSpecName(), min, nrVarArgs));
-        if (max >= 0 && nrVarArgs > max)
+        }
+        if (max >= 0 && nrVarArgs > max) {
             throw new ArgSpecException(String.format(ERR030, varArg.getSpecName(), max, nrVarArgs));
+        }
 
         // Create a new argument list where we will accumulate the converted results.
         Object[] newArgs = new Object[1 + fixedArgs.length + nrVarArgs + namedArgs.length];
 
         // Copy the command name to the new argument list, the structure will remain the same.
         newArgs[0] = args[0];
-        int newArgsEnd = 1;
+        int newArgsFreePos = 1;
 
-        newArgsEnd = resolveFixedArgs(args, ctx, newArgs, newArgsEnd);
+        // 1. FIXED.
+        newArgsFreePos = resolveFixedArgs(args, nrNamedArgs, ctx, newArgs, newArgsFreePos);
 
-        // Check the namedArgs args.
-        // We look for all pairs at the end of the argument list. We will only consider these trailing pairs.
-        while (firstNamedArg > 0 && (args[firstNamedArg] instanceof Pair)) firstNamedArg--;
-        // Now we can resolve the namedArgs arguments within this range.
-        newArgsEnd = resolveNamedArgs(args, ctx, newArgs, newArgsEnd, firstNamedArg);
+        // 2. NAMED.
+        newArgsFreePos = resolveNamedArgs(args, ctx, newArgs, newArgsFreePos, firstNamedArg.orElse(-1), lastNamedArg);
 
-        // Check the varArg ones.
-        // Start looking after the fixed args, Provide the expected index. Skip the cmd in the beginning of the arguments.
-        final int firstVarArg = 1 + fixedArgs.length;
+        // 3. VARARG
+        final int firstVarArg = 1 + fixedArgs.length + nrNamedArgs;
         for (int i = 0; i < nrVarArgs; i++) {
-            newArgs[newArgsEnd++] = varArg.guard(args, firstVarArg + i, ctx);
+            newArgs[newArgsFreePos++] = varArg.guard(args, firstVarArg + i, ctx);
         }
+
         return newArgs;
     }
 

@@ -30,6 +30,7 @@ import branscha.scripty.parser.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * There are 3 types of parameters in a standard argument list.
@@ -49,6 +50,7 @@ public class StdArgList extends AbstractArgList {
 
     private static final String ERR010 = "StdArgList/010: Badly formed argument list. It should at least contain the command name.";
     private static final String ERR020 = "StdArgList/020: Too many arguments. Expected at most %d arguments.";
+    private static final String ERR030 = "StdArgList/030: Found named argument '%s' at a wrong location, named arguments should be at the beginning.";
 
     private OptionalArg[] optArgs;
 
@@ -63,6 +65,7 @@ public class StdArgList extends AbstractArgList {
      */
     public Object[] guard(Object[] args, Context ctx)
     throws ArgSpecException {
+
         if(args == null || args.length < 1) {
             throw new ArgSpecException(ERR010);
         }
@@ -72,27 +75,40 @@ public class StdArgList extends AbstractArgList {
 
         // Copy the command name to the new argument list, the structure will remain the same.
         newArgs[0] = args[0];
-        int newArgsEnd = 1;
-
-        newArgsEnd = resolveFixedArgs(args, ctx, newArgs, newArgsEnd);
-
-        // Check the optional ones.
-        // Start looking after the fixed args, 
-        // Provide the expected index.
-        for (ArgSpec argSpec : optArgs) {
-            newArgs[newArgsEnd] = argSpec.guard(args, newArgsEnd++, ctx);
-        }
-
-        // If there are still arguments left that are not pairs there are too many arguments.
-        if (newArgsEnd < args.length && !(args[newArgsEnd] instanceof Pair))
-            throw new ArgSpecException(String.format(ERR020, fixedArgs.length + optArgs.length));
+        int newArgsFreePos = 1;
+        int nrNamedArgs = 0;
+        int lastNamedArg = -2;
 
         // Check the namedArgs args. We look for all pairs at the end of the argument list. We will only consider these
         // trailing pairs. We start at the back and work towards the front.
-        int firstNamedArg = args.length - 1;
-        while (firstNamedArg > 0 && (args[firstNamedArg] instanceof Pair)) firstNamedArg--;
-        // Now we can resolve the namedArgs arguments within this range.
-        resolveNamedArgs(args, ctx, newArgs, newArgsEnd, firstNamedArg);
+        final Optional<Integer> firstNamedArg = findFirstNamedArgAtStart(args, 1);
+        if(firstNamedArg.isPresent()) {
+            // If there is a first one, there must be a last one as well.
+            lastNamedArg = findLastNamedArg(args, firstNamedArg.get());
+            nrNamedArgs = lastNamedArg - firstNamedArg.get() + 1;
+
+            final Optional<Integer> rogue = findFirstNamedArgAtStart(args, lastNamedArg + 1);
+            if(rogue.isPresent()) {
+                throw new ArgSpecException(String.format(ERR030, args[rogue.get()].toString()));
+            }
+        }
+
+        // 1. FIXED
+        newArgsFreePos = resolveFixedArgs(args, nrNamedArgs, ctx, newArgs, newArgsFreePos);
+
+        // 2. OPTIONAL
+        for (ArgSpec argSpec : optArgs) {
+            newArgs[newArgsFreePos] = argSpec.guard(args, nrNamedArgs + newArgsFreePos++, ctx);
+        }
+
+        // 3. NAMED
+        newArgsFreePos = resolveNamedArgs(args, ctx, newArgs, newArgsFreePos, firstNamedArg.orElse(-1), lastNamedArg);
+
+        // If there are still arguments left there are too many arguments.
+        if (newArgsFreePos < args.length) {
+            throw new ArgSpecException(String.format(ERR020, fixedArgs.length + optArgs.length));
+        }
+
         return newArgs;
     }
 

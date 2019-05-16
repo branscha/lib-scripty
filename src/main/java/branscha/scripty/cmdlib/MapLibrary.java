@@ -51,7 +51,7 @@ import java.util.Set;
 @SuppressWarnings("unused")
 @ScriptyNamedArgLists(
         std = {
-                @ScriptyStdArgList(name = "single map", fixed = {@ScriptyArg(name = "arg", type = "Instance java.util.Map nullAllowed=false")})
+                @ScriptyStdArgList(name = "single map", fixed = {@ScriptyArg(name = "arg", type = "Instance -n=false java.util.Map")})
         }
 )
 public class MapLibrary {
@@ -81,20 +81,20 @@ public class MapLibrary {
     }
 
     @ScriptyCommand(name = "map?")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Any nullAllowed=true")})
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "arg", type = "Any -n")})
     public static boolean isMap(@ScriptyParam("arg") Object aArg) {
         return aArg instanceof Map;
     }
 
     @ScriptyCommand(name = "map-set")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "map", type = "Instance java.util.Map nullAllowed=false"), @ScriptyArg(name = "key", type = "Any nullAllowed=false"), @ScriptyArg(name = "value", type = "Any")})
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "map", type = "Instance -n=false java.util.Map"), @ScriptyArg(name = "key", type = "Any -n=false"), @ScriptyArg(name = "value", type = "Any")})
     public static Map mapSet(@ScriptyParam("map") Map<Object, Object> aMap, @ScriptyParam("key") Object aKey, @ScriptyParam("value") Object aValue) {
         aMap.put(aKey, aValue);
         return aMap;
     }
 
     @ScriptyCommand(name = "map-get")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "map", type = "Instance java.util.Map nullAllowed=false"), @ScriptyArg(name = "key", type = "Any nullAllowed=false")})
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "map", type = "Instance -n=false java.util.Map"), @ScriptyArg(name = "key", type = "Any -n=false")})
     public static Object mapGet(@ScriptyParam("map") Map aMap, @ScriptyParam("key") Object aKey)
     throws CommandException {
         if (!aMap.containsKey(aKey))
@@ -103,7 +103,7 @@ public class MapLibrary {
     }
 
     @ScriptyCommand(name = "map-key?")
-    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "map", type = "Instance java.util.Map nullAllowed=false"), @ScriptyArg(name = "key", type = "Any nullAllowed=false")})
+    @ScriptyStdArgList(fixed = {@ScriptyArg(name = "map", type = "Instance -n=false java.util.Map"), @ScriptyArg(name = "key", type = "Any -n=false")})
     public static boolean isKey(@ScriptyParam("map") Map aMap, @ScriptyParam("key") Object aKey) {
         return aMap.containsKey(aKey);
     }

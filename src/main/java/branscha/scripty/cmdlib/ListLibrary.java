@@ -59,8 +59,8 @@ import java.util.List;
 @ScriptyLibrary(name = "Lisp", type = ScriptyLibraryType.STATIC)
 @ScriptyNamedArgLists(
         std = {
-                @ScriptyStdArgList(name = "1object", fixed = {@ScriptyArg(name = "arg", type = "Any nullAllowed=true")}),
-                @ScriptyStdArgList(name = "1list/+elements", fixed = {@ScriptyArg(name = "arg", type = "ListOf(Any) minLength=1")}),
+                @ScriptyStdArgList(name = "1object", fixed = {@ScriptyArg(name = "arg", type = "Any --nullAllowed=true")}),
+                @ScriptyStdArgList(name = "1list/+elements", fixed = {@ScriptyArg(name = "arg", type = "ListOf --minLength=1 (Any)")}),
                 @ScriptyStdArgList(name = "1list/*elements", fixed = {@ScriptyArg(name = "arg", type = "ListOf(Any)")}),
                 @ScriptyStdArgList(name = "list+object", fixed = {@ScriptyArg(name = "lst", type = "ListOf(Any)"), @ScriptyArg(name = "obj", type = "Any")}),
                 @ScriptyStdArgList(name = "object+list", fixed = {@ScriptyArg(name = "obj", type = "Any"), @ScriptyArg(name = "lst", type = "ListOf(Any)")}),

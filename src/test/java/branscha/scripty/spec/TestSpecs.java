@@ -61,9 +61,9 @@ public class TestSpecs {
     @Test
     public void testNamedArgs()
     throws ArgSpecException {
-        ArgSpec lSpec = new NamedArg("oele", INTEGER_TYPE, Integer.valueOf(13), true);
-        Object[] args = new Object[]{1, 2, 3, new Pair("oele", Integer.valueOf(17))};
-        lSpec.guard(args, 0, null);
+        ArgSpec lSpec = new NamedArg("oele", "o", INTEGER_TYPE, Integer.valueOf(13), true);
+        Object[] args = new Object[]{1, 2, 3, Integer.valueOf(17)};
+        lSpec.guard(args, 3, null);
         System.out.println(Arrays.toString(args));
     }
 }

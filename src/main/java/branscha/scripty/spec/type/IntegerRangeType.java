@@ -39,7 +39,7 @@ public class IntegerRangeType implements TypeSpec {
     public IntegerRangeType(int from, int to) {
         this.from = from;
         this.to = to;
-        typeName = String.format("IntegerRange min=%d max=%d", from, to);
+        typeName = String.format("IntegerRange --min=%d --max=%d", from, to);
     }
 
     public String getSpecName() {

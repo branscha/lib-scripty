@@ -12,14 +12,14 @@ public class IntegerRangeTypeTest {
     @Test
     public void getSpecName() {
         TypeSpec range = new IntegerRangeType(5, 10);
-        assertEquals("IntegerRange min=5 max=10", range.getSpecName());
+        assertEquals("IntegerRange --min=5 --max=10", range.getSpecName());
     }
 
     @Test
     public void guard_Good()
     throws TypeSpecException {
         TypeSpec range = new IntegerRangeType(5, 10);
-        assertEquals("IntegerRange min=5 max=10", range.getSpecName());
+        assertEquals("IntegerRange --min=5 --max=10", range.getSpecName());
         Context ctx = new BasicContext();
 
         for (int i = 5; i < 11; i++) assertEquals(i, range.guard(i, ctx));
@@ -29,7 +29,7 @@ public class IntegerRangeTypeTest {
     public void guard_Bad()
     throws TypeSpecException {
         TypeSpec range = new IntegerRangeType(5, 10);
-        assertEquals("IntegerRange min=5 max=10", range.getSpecName());
+        assertEquals("IntegerRange --min=5 --max=10", range.getSpecName());
         Context ctx = new BasicContext();
 
         try {

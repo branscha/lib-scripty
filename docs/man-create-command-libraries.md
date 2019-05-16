@@ -61,13 +61,13 @@ Since the annotation parameters cannot refer to objects, the default value has t
 
 Type expressions are in fact Scripty expressions which enable us to write nested type definitions.
 
-* Any nullAllowed=true|false
+* Any --nullAllowed=true|false
 * Double
 * Boolean
-* Integer min=... max=...
+* Integer --min=... --max=...
 * Byte
-* String pattern="..."
-* InstanceOf "classname" nullAllowed=true|false
+* String
+* InstanceOf --nullAllowed=true|false "classname" 
 * Long
 * BigDecimal
 * Float
@@ -78,7 +78,7 @@ Type expressions are in fact Scripty expressions which enable us to write nested
 Nested expressions
 
 * OneOf (String) (Integer) ...
-* CheckedList (Integer) min=..., max=...
+* CheckedList --min=... --max=... (Integer) 
 * InstanceOrBinding (...), it goes looking for a binding in the context and if the binding is not found, it will try to convert the value itself to the type.
 * CustomType "classname", add your own custom type specification. The class should implement ITypeSpec<T>. Your implementation class should have a default constructor.
 * TypeChain (String) (Integer) ..., worden na elkaar toegepast in volgorde. Dit kan nuttig zijn om eerst alles naar een string om te zetten met @ScriptyString en vervolgens de String naar iets anders om te zetten met bvb. een custom type.

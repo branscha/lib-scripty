@@ -59,14 +59,14 @@ public class TestTeaLibrary {
     @Test
     public void encryptPwd()
     throws ProcessorException {
-        Object lResult = scripty.process("tea-encrypt \"Bruno Ranschaert is my name\" password=\"Lang leve de koning!\"");
+        Object lResult = scripty.process("tea-encrypt --password=\"Lang leve de koning!\" \"Bruno Ranschaert is my name\"");
         assertEquals("ebe7d6aff359a43aaf6bb157504eb980633005aa56fa84b5642b928a2d72d193d60c1af1435c043bd60c1af1435c043bd60c1af1435c043b", lResult);
     }
 
     @Test
     public void decryptPwd()
     throws ProcessorException {
-        Object lResult = scripty.process("tea-decrypt ebe7d6aff359a43aaf6bb157504eb980633005aa56fa84b5642b928a2d72d193d60c1af1435c043bd60c1af1435c043bd60c1af1435c043b password=\"Lang leve de koning!\"");
+        Object lResult = scripty.process("tea-decrypt -p=\"Lang leve de koning!\" ebe7d6aff359a43aaf6bb157504eb980633005aa56fa84b5642b928a2d72d193d60c1af1435c043bd60c1af1435c043bd60c1af1435c043b");
         assertEquals("Bruno Ranschaert is my name", lResult);
     }
 }

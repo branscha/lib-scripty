@@ -30,6 +30,6 @@ package branscha.scripty.spec.type;
  */
 public class AnyType extends InstanceType {
     public AnyType(boolean nullAllowed) {
-        super(Object.class, "Any" + (nullAllowed ? " nullAllowed=true" : ""), nullAllowed);
+        super(Object.class, "Any" + (nullAllowed ? " -n" : ""), nullAllowed);
     }
 }

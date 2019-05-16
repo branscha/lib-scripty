@@ -43,6 +43,13 @@ public @interface ScriptyArg {
     String name();
 
     /**
+     * The single letter flag representing the argument. Only for named parameters.
+     * The user can use the --name with double dash or the -flag with single dash.
+     * The flag cannot be a number.
+     */
+    String flag() default "";
+
+    /**
      * The type of the argument, the description is in the type DSL (written in Scripty). The Scripty engine will
      * verify the argument type and will try to convert the argument before handing it over to the command.
      */

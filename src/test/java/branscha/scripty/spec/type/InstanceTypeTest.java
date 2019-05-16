@@ -55,7 +55,7 @@ public class InstanceTypeTest {
         assertEquals("myType", new InstanceType(Integer.class, "myType", true).getSpecName());
 
         // Generated name.
-        assertEquals("Instance java.lang.Integer nullAllowed=true", new InstanceType(Integer.class, true).getSpecName());
+        assertEquals("Instance java.lang.Integer -n", new InstanceType(Integer.class, true).getSpecName());
         assertEquals("Instance java.lang.Integer", new InstanceType(Integer.class, false).getSpecName());
     }
 }

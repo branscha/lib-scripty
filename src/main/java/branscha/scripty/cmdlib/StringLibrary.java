@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 @ScriptyLibrary(name = "String", type = ScriptyLibraryType.STATIC)
 @ScriptyNamedArgLists(
         std = {
-                @ScriptyStdArgList(name = "1object", fixed = {@ScriptyArg(name = "arg", type = "Any nullAllowed=true")}),
+                @ScriptyStdArgList(name = "1object", fixed = {@ScriptyArg(name = "arg", type = "Any -n")}),
                 @ScriptyStdArgList(name = "1string", fixed = {@ScriptyArg(name = "arg", type = "String")}),
                 @ScriptyStdArgList(name = "2strings", fixed = {@ScriptyArg(name = "arg1", type = "String"), @ScriptyArg(name = "arg2", type = "String")})
         },

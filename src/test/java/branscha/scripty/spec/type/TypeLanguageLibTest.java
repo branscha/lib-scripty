@@ -98,7 +98,7 @@ public class TypeLanguageLibTest {
     @Test
     public void anyType()
     throws ProcessorException {
-        TypeSpec spec = (TypeSpec) scripty.process("Any nullAllowed=false");
+        TypeSpec spec = (TypeSpec) scripty.process("Any --nullAllowed=false");
         assertTrue(spec instanceof AnyType);
         assertEquals("Any", spec.getSpecName());
     }
@@ -106,17 +106,17 @@ public class TypeLanguageLibTest {
     @Test
     public void integerRangeType()
     throws ProcessorException {
-        TypeSpec spec = (TypeSpec) scripty.process("IntegerRange min=5 max=10");
+        TypeSpec spec = (TypeSpec) scripty.process("IntegerRange --min=5 --max=10");
         assertTrue(spec instanceof IntegerRangeType);
-        assertEquals("IntegerRange min=5 max=10", spec.getSpecName());
+        assertEquals("IntegerRange --min=5 --max=10", spec.getSpecName());
 
-        spec = (TypeSpec) scripty.process("IntegerRange max=100");
+        spec = (TypeSpec) scripty.process("IntegerRange --max=100");
         assertTrue(spec instanceof IntegerRangeType);
-        assertEquals("IntegerRange min=-2147483648 max=100", spec.getSpecName());
+        assertEquals("IntegerRange --min=-2147483648 --max=100", spec.getSpecName());
 
-        spec = (TypeSpec) scripty.process("IntegerRange min=0");
+        spec = (TypeSpec) scripty.process("IntegerRange --min=0");
         assertTrue(spec instanceof IntegerRangeType);
-        assertEquals("IntegerRange min=0 max=2147483647", spec.getSpecName());
+        assertEquals("IntegerRange --min=0 --max=2147483647", spec.getSpecName());
     }
 
     @Test
