@@ -14,10 +14,6 @@ test-output/
 .project
 .settings/
 
-# Gradle.
-.gradle
-build/
-out/
-gradle-app.setting
-!gradle-wrapper.jar
-.gradletasknamecache
+# Java
+target/
+

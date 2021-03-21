@@ -33,8 +33,6 @@ public class MyRepl {
 }
 ```
 
-Use `./gradlew run` comman to start the minimalistic GUI.
-
 Note that you have to provide a list of command libraries to Scripty, you have complete control over the commands that will be available.
 
 In order to create your own commands that access the business logic you have to create a class and annotate its methods. The class and the methods can be static or not.
@@ -51,19 +49,17 @@ public class PrintLibrary {
 
 ### Build
 
-The project is based on gradle.
-
-`./gradlew clean build`
+`mvn clean install`
 	
 ## Run
 
 Start the minimalistic example GUI:
 
-`./gradlew --console plain repl`
+`mvn exec:java -Dexec.mainClass="branscha.scripty.ScriptyAutoRepl"`
 
 And the text mode repl:
 
-`./gradlew --console plain textrepl`
+`mvn exec:java -Dexec.mainClass="branscha.scripty.ScriptyAutoRepl" -Dmode=text `
 
 ## Available Libraries
 
