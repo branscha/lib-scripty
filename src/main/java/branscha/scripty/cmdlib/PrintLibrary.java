@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,47 +24,67 @@
  ******************************************************************************/
 package branscha.scripty.cmdlib;
 
-import branscha.scripty.annot.ScriptyBindingParam;
-import branscha.scripty.annot.ScriptyCommand;
-import branscha.scripty.annot.ScriptyLibrary;
-import branscha.scripty.annot.ScriptyLibraryType;
 import branscha.scripty.annot.*;
 
 import java.io.PrintWriter;
 
-@ScriptyLibrary(name="System", type= ScriptyLibraryType.STATIC)
-public class PrintLibrary
-{
-    @ScriptyCommand
-    public static String print(Object[] aArgs,
-                               @ScriptyBindingParam("*output") PrintWriter aWriter)
-    {
-        final String lResult = buildString(aArgs);
-        if (aWriter != null) aWriter.print(lResult);
-        return lResult;
+@ScriptyNamedArgLists(
+        var = {@ScriptyVarArgList(name = "string*",
+                vararg = @ScriptyArg(name = "args", type = "String"),
+                named = {@ScriptyArg(name = "delimiter", type = "String", optional = true, value = " "),
+                        @ScriptyArg(name = "prefix", type = "String", optional = true, value = ""),
+                        @ScriptyArg(name = "suffix", type = "String", optional = true, value = "")})}
+)
+@ScriptyLibrary(name = "System", type = ScriptyLibraryType.STATIC)
+public class PrintLibrary {
+
+    @ScriptyRefArgList(ref = "string*")
+    @ScriptyCommand(name = "print", description =
+            "(print str-1 ... str-n)\n" +
+                    "Convert the arguments to strings and write them to *output.\n" +
+                    "Returns: nothing.")
+    public static String print(
+            @ScriptyParam("args") Object[] args,
+            @ScriptyBindingParam("*output") PrintWriter writer,
+            @ScriptyParam("delimiter") String delimiter,
+            @ScriptyParam("prefix") String prefix,
+            @ScriptyParam("suffix") String suffix) {
+
+        final String result = buildString(args, delimiter, prefix, suffix);
+        if (writer != null) {
+            writer.print(result);
+        }
+        return null;
     }
 
-    @ScriptyCommand
-    public static String println(Object[] aArgs,
-                               @ScriptyBindingParam("*output") PrintWriter aWriter)
-    {
-        final String lResult = buildString(aArgs);
-        if (aWriter != null) aWriter.println(lResult);
-        return lResult;
+    @ScriptyRefArgList(ref = "string*")
+    @ScriptyCommand(name = "println", description = "(println str-1 ... str-n)\n" +
+            "Convert the arguments to strings and write them to *output followed by a new line.\n" +
+            "Returns: nothing.")
+    public static String println(
+            @ScriptyParam("args") Object[] args,
+            @ScriptyBindingParam("*output") PrintWriter writer,
+            @ScriptyParam("delimiter") String delimiter,
+            @ScriptyParam("prefix") String prefix,
+            @ScriptyParam("suffix") String suffix) {
+
+        final String result = buildString(args, delimiter, prefix, suffix);
+        if (writer != null) {
+            writer.println(result);
+        }
+        return null;
     }
-    
-    private static String buildString(Object[] aArgs)
-    {
-        final StringBuilder lBuilder = new StringBuilder();
-        for (int i = 1; i < aArgs.length; i++)
-        {
-            final Object lObj = aArgs[i];
-            if (lObj != null)
-            {
-                lBuilder.append(lObj.toString());
-                if(i < aArgs.length - 1) lBuilder.append(" ");
+
+    private static String buildString(Object[] args, String delimiter, String prefix, String suffix) {
+        final StringBuilder builder = new StringBuilder(prefix);
+        for (int i = 0; i < args.length; i++) {
+            final Object obj = args[i];
+            if (obj != null) {
+                builder.append(obj.toString());
+                if (i < args.length - 1) builder.append(delimiter);
             }
         }
-        return lBuilder.toString();
+        builder.append(suffix);
+        return builder.toString();
     }
 }

@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,20 +24,15 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Context;
+import branscha.scripty.parser.Eval;
 
-public class EvalMapping
-implements IArgMapping
-{
-    public Object map(IEval aEval, IContext aContext, Object aArgs)
-    throws ArgMappingException
-    {
-        return aEval;
-    }
-
-    public void setOffset(int aOffset)
-    {
-        // Nop.
+/**
+ * Map the {@link Eval} itself into a command parameter. This can be useful for commands that want to do their own
+ * expression evaluation.
+ */
+public class EvalMapping implements ArgMapping {
+    public Object map(Eval eval, Context ctx, Object args) {
+        return eval;
     }
 }

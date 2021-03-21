@@ -6,12 +6,12 @@
 
 ; Internal recursive version.
 (defun queens* (size board n m)
-    (if (not (~ $m $size))
+    (if (not (= $m $size))
         (progn
             ; First we check if we have a good position.
             (if (not (conflict $n $m $board))
                 ; Yes we have a good position.
-                (if (~ (+ 1 $n) $size)
+                (if (= (+ 1 $n) $size)
                     ; The board is full, we have a solution!
                     ; We have to dup the board because cons is destructive.
                     (print (cons (list $n $m) (dup $board)))
@@ -25,10 +25,10 @@
 
 ; Discovers if a piece threatens another.
 (defun threat (i j a b)
-  (or (~ $i $a)
-      (~  $j $b)
-      (~ (- $i $j) (- $a $b))
-      (~ (+ $i $j) (+ $a $b))))
+  (or (= $i $a)
+      (=  $j $b)
+      (= (- $i $j) (- $a $b))
+      (= (+ $i $j) (+ $a $b))))
 
 ; Discovers if a placement is OK.
 (defun conflict (n m board)

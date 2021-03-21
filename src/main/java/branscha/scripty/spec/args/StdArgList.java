@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,101 +24,135 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * There are 3 types of parameters in a standard argument list.
- * 1. Fixed and required arguments. Each with its own type.
- * 2. Optional. Each argument has its own type. These cannot be of type Pair, because this might conflict with the named arguments.
- *    The optional parameters can have a default value which will be used when the argument is not present.
- * 3. Named (optional or required). These are pairs at the end of the command line.
- *    The named parameters can have a default value.
+ *
+ * <ol>
+ * <li>Fixed, required arguments. Each with its own type.</li>
+ * <li>Optional. Each argument has its own type. These cannot be of type Pair, because this might conflict with the
+ * namedArgs arguments. The optional parameters can have a default value which will be used when the argument is not
+ * present.</li>
+ * <li>Named (optional or required). These are pairs at the end of the command line. The namedArgs parameters can have
+ * a default value.</li>
+ * </ol>
+ *
+ * Also see {@link ArgList}
  */
-public class StdArgList 
-implements IArgList
-{
-    public static final IArgList NOARG = new StdArgList(new FixedArg[]{}, new OptionalArg[]{}, new NamedArg[]{});
-    
-    private FixedArg req[];
-    private OptionalArg[] opt;
-    private NamedArg[] named;
-    
-    public StdArgList(FixedArg aReq[], OptionalArg[] aOpt, NamedArg[] aNamed)
-    {
-        req = aReq;
-        opt = aOpt;
-        named = aNamed;
+public class StdArgList extends AbstractArgList {
+
+    private static final String ERR010 = "StdArgList/010: Badly formed argument list. It should at least contain the command name.";
+    private static final String ERR020 = "StdArgList/020: Too many arguments. Expected at most %d arguments.";
+    private static final String ERR030 = "StdArgList/030: Found named argument '%s' at a wrong location, named arguments should be at the beginning.";
+
+    private OptionalArg[] optArgs;
+
+    public StdArgList(FixedArg[] fixedArgs, OptionalArg[] optionalArgs, NamedArg[] namedArgs) {
+        super(fixedArgs, namedArgs);
+        optArgs = optionalArgs;
     }
-    
+
     /**
-     * The ars are expected to have the form ("CMD", arg-1, arg-2, ... arg-n).
+     * See {@link ArgList#guard(Object[], Context)}.
+     * The arguments are expected to have the form ("CMD", arg-1, arg-2, ... arg-n).
      */
-    public Object[] guard(Object[] aArgs, IContext aCtx)
-    throws ArgSpecException
-    {
-        // Create a new argument list where we will accumulate the
-        // converted results.
-        Object[] lNewArgs = new Object[1 + req.length + opt.length + named.length];
+    public Object[] guard(Object[] args, Context ctx)
+    throws ArgSpecException {
+
+        if(args == null || args.length < 1) {
+            throw new ArgSpecException(ERR010);
+        }
+
+        // Create a new argument list to collect the converted results.
+        final Object[] newArgs = new Object[1 + fixedArgs.length + optArgs.length + namedArgs.length];
+
         // Copy the command name to the new argument list, the structure will remain the same.
-        lNewArgs[0] = aArgs[0];
-        
-        // Check the fixed.
-        if(aArgs.length - 1 < req.length)
-            throw new ArgSpecException(String.format("Too few arguments. Expected at least %d arguments but received %d.", req.length, aArgs.length - 1));
-        
-        // We skip the command name.
-        int lArgIdx = 1;
-        for(int i = 0; i < req.length; i++) 
-        {
-            lNewArgs[lArgIdx] = req[i].guard(aArgs, lArgIdx++, aCtx);
-        }
-        
-        // Check the optional ones.
-        // Start looking after the fixed args, 
-        // Provide the expected index.
-        for(IArgSpec lSpec: opt) 
-        {
-            lNewArgs[lArgIdx] = lSpec.guard(aArgs, lArgIdx++, aCtx);
-        }
-        
-        // If there are still arguments left that are not pairs there are 
-        // too many arguments.
-        if(lArgIdx < aArgs.length && !(aArgs[lArgIdx] instanceof Pair))
-            throw new ArgSpecException(String.format("Too many arguments. Expected at most %d arguments.", req.length + opt.length));
-        
-        // Check the named args.
-        // We look for all pairs at the end of the argument list. We will only
-        // consider these trailing pairs.
-        int lStartNamed = aArgs.length - 1;
-        while(lStartNamed > 0 && (aArgs[lStartNamed] instanceof Pair)) lStartNamed --;
-        // Now we can resolve the named arguments within this range.
-        for(IArgSpec lSpec: named) 
-        {
-            lNewArgs[lArgIdx++] = lSpec.guard(aArgs, lStartNamed, aCtx);
-        }        
-        // Finally we go looking for spurious named parameters that were not specified ...
-        for(int i = lStartNamed; i < aArgs.length; i++)
-        {
-            if(aArgs[i] instanceof Pair)
-            {
-                final Pair lPair = (Pair) aArgs[i];
-                if(!(lPair.getLeft() instanceof String))
-                    throw new ArgSpecException(String.format("Found an badly formed named argument, where the name is not a string but an instance of type '%s'.", lPair.getLeft()==null?"null":lPair.getLeft().getClass().getCanonicalName()));
-                String lPairName = (String) lPair.getLeft();
-                boolean found = false;
-                for(int j = 0; j < named.length; j++)
-                {
-                    if(named[j].getName().equals(lPairName))
-                    {
-                        found = true;
-                        break;                        
-                    }
-                }
-                if(!found)
-                    throw new ArgSpecException(String.format("Found an unexpected named argument '%s'.", lPairName));                
+        newArgs[0] = args[0];
+        int newArgsFreePos = 1;
+        int nrNamedArgs = 0;
+        int lastNamedArg = -2;
+
+        // Check the namedArgs args. We look for all pairs at the end of the argument list. We will only consider these
+        // trailing pairs. We start at the back and work towards the front.
+        final Optional<Integer> firstNamedArg = findFirstNamedArgAtStart(args, 1);
+        if(firstNamedArg.isPresent()) {
+            // If there is a first one, there must be a last one as well.
+            lastNamedArg = findLastNamedArg(args, firstNamedArg.get());
+            nrNamedArgs = lastNamedArg - firstNamedArg.get() + 1;
+
+            final Optional<Integer> rogue = findFirstNamedArgAtStart(args, lastNamedArg + 1);
+            if(rogue.isPresent()) {
+                throw new ArgSpecException(String.format(ERR030, args[rogue.get()].toString()));
             }
         }
-        return lNewArgs;
+
+        // 1. FIXED
+        newArgsFreePos = resolveFixedArgs(args, nrNamedArgs, ctx, newArgs, newArgsFreePos);
+
+        // 2. OPTIONAL
+        for (ArgSpec argSpec : optArgs) {
+            newArgs[newArgsFreePos] = argSpec.guard(args, nrNamedArgs + newArgsFreePos++, ctx);
+        }
+
+        // 3. NAMED
+        newArgsFreePos = resolveNamedArgs(args, ctx, newArgs, newArgsFreePos, firstNamedArg.orElse(-1), lastNamedArg);
+
+        // If there are still arguments left there are too many arguments.
+        if (newArgsFreePos < args.length) {
+            throw new ArgSpecException(String.format(ERR020, fixedArgs.length + optArgs.length));
+        }
+
+        return newArgs;
+    }
+
+    public static class Builder {
+        private List<FixedArg> fixed = new ArrayList<>();
+        private List<NamedArg> named = new ArrayList<>();
+        private List<OptionalArg> optional = new ArrayList<>();
+
+        public StdArgList build() {
+            return new StdArgList(
+                    fixed.toArray(new FixedArg[0]),
+                    optional.toArray(new OptionalArg[0]),
+                    named.toArray(new NamedArg[0]));
+        }
+
+        public Builder addFixed(FixedArg arg) {
+            fixed.add(arg);
+            return this;
+        }
+
+        public Builder addNamed(NamedArg arg) {
+            named.add(arg);
+            return this;
+        }
+
+        public Builder addOptional(OptionalArg arg) {
+            optional.add(arg);
+            return this;
+        }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("StdArgList{");
+        if (fixedArgs != null && fixedArgs.length > 0) {
+            sb.append("\n").append("   ").append("fixed=").append(Arrays.asList(fixedArgs).toString());
+        }
+        if (optArgs != null && optArgs.length > 0) {
+            sb.append("\n").append("   ").append("optional=").append(Arrays.asList(optArgs).toString());
+        }
+        if (namedArgs != null && namedArgs.length > 0) {
+            sb.append("\n").append("   ").append("named=").append(Arrays.asList(namedArgs).toString());
+        }
+        sb.append('}');
+        return sb.toString();
     }
 }

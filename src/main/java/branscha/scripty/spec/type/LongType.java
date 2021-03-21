@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,41 +24,28 @@
  ******************************************************************************/
 package branscha.scripty.spec.type;
 
-import branscha.scripty.parser.IContext;
+/**
+ * Long type, a non nullable numerical type.
+ */
+public class LongType extends InstanceType {
 
-public class LongType 
-implements ITypeSpec<Long>
-{
-    public String getSpecName()
-    {        
-        return "Long";
+    public static final LongType LONG_TYPE = new LongType();
+
+    LongType() {
+        super(Long.class, "Long", false);
     }
 
-    public Long guard(Object aArg, IContext aCtx)
-    throws TypeSpecException
-    {
-        if(aArg instanceof Long)
-        {
-            return (Long) aArg;            
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
+            return ((Number) arg).longValue();
         }
-        else if (aArg instanceof Number)
-        {
-            return ((Number)aArg).longValue();            
+        else if (arg instanceof String) {
+            // The caller will deal with the exceptions.
+            return Long.parseLong((String) arg);
         }
-        else if (aArg instanceof String)
-        {
-            try
-            {      
-                return Long.parseLong((String) aArg);
-            }
-            catch (NumberFormatException e)
-            {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
-            }            
-        }
-        else
-        {
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+        else {
+            return super.convertArg(arg);
         }
     }
 }

@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,10 +26,9 @@ package branscha.scripty.cmdlib;
 
 import branscha.scripty.annot.*;
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.parser.IContext;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Context;
+import branscha.scripty.parser.Eval;
 import branscha.scripty.parser.Lambda;
-import branscha.scripty.annot.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,57 +46,66 @@ import java.util.regex.Pattern;
 //    command provides a lookup facility.
 //  * Delete was not implemented for safety reasons.
 //
+@SuppressWarnings("unused")
 @ScriptyLibrary(type = ScriptyLibraryType.INSTANCE)
 @ScriptyNamedArgLists(std = {
-        @ScriptyStdArgList(name = "noarg + quiet", named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
-        @ScriptyStdArgList(name = "file + quiet", optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")}, named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)}),
-        @ScriptyStdArgList(name = "2files + quiet", fixed = {@ScriptyArg(name = "arg1", type = "OneOf (String) (Instance java.io.File)", value = "null"), @ScriptyArg(name = "arg2", type = "OneOf (String) (Instance java.io.File)", value = "null")}, named = {@ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)})
+        @ScriptyStdArgList(name = "noarg + quiet",
+                named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)}),
+        @ScriptyStdArgList(name = "file + quiet",
+                optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")},
+                named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)}),
+        @ScriptyStdArgList(name = "2files + quiet",
+                fixed = {@ScriptyArg(name = "arg1", type = "OneOf (String) (Instance java.io.File)", value = "null"), @ScriptyArg(name = "arg2", type = "OneOf (String) (Instance java.io.File)", value = "null")},
+                named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)})
 })
-public class FileLibrary
-{
+public class FileLibrary {
     private static final Pattern DRIVE = Pattern.compile("^\\p{Alpha}:.*$");
     private File currentDirectory;
 
-    // Always quit. The option is allowed but does not have any effect.
+    // Always quiet. The option is allowed but does not have any effect.
     //
     @ScriptyCommand(name = "cd")
     @ScriptyStdArgList(
-            optional = {
-                    @ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")},
-            named = {
-                    @ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true)
-            })
-    public File cd(
-            @ScriptyParam("file") Object aFileRepr)
-            throws CommandException
-    {
-        File lFile;
-        if (aFileRepr instanceof File) lFile = (File) aFileRepr;
-        else lFile = resolveFile((String) aFileRepr);
-        if (!lFile.isDirectory())
-            throw new CommandException(String.format("Cannot go to '%s', it is not a directory.", lFile));
-        else currentDirectory = lFile;
-        return lFile;
+            optional = {@ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = "~")},
+            named = {@ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true)})
+    public File cd(@ScriptyParam("file") Object aFileRepr)
+    throws CommandException {
+        File file;
+
+        if (aFileRepr instanceof File) {
+            file = (File) aFileRepr;
+        }
+        else {
+            String fileName = (String) aFileRepr;
+            if ("~".equals(fileName)) fileName = System.getProperty("user.home");
+            file = resolveFile(fileName);
+        }
+
+        if (!file.isDirectory()) {
+            throw new CommandException(String.format("Cannot go to '%s', it is not a directory.", file));
+        }
+        else {
+            currentDirectory = file;
+        }
+        return file;
     }
 
-    // Print the currrent directory and return the File object.
+    // Print the current directory and return the File object.
     //
     @ScriptyCommand(name = "pwd")
     @ScriptyRefArgList(ref = "noarg + quiet")
-    public File pwd(@ScriptyParam("quiet") boolean aQuiet, @ScriptyBindingParam("*output") PrintWriter aWriter)
-            throws CommandException
-    {
-        final File lCurDir = getCurrentDirectory();
-
-        try
-        {
-            if (!aQuiet) aWriter.println(lCurDir.getCanonicalPath());
-            return lCurDir;
-        } catch (IOException e)
-        {
-            throw new CommandException(String.format("Cannot calculate the canonical name for '%s'.", lCurDir), e);
+    public File pwd(@ScriptyParam("quiet") boolean isQuiet, @ScriptyBindingParam("*output") PrintWriter writer)
+    throws CommandException {
+        final File currDir = getCurrentDirectory();
+        try {
+            if (!isQuiet) {
+                writer.println(currDir.getCanonicalPath());
+            }
+            return currDir;
         }
-
+        catch (IOException e) {
+            throw new CommandException(String.format("Cannot calculate the canonical name for '%s'.", currDir), e);
+        }
     }
 
     // Print a listing of the current directory and return it als an array.
@@ -112,11 +120,11 @@ public class FileLibrary
             optional = {
                     @ScriptyArg(name = "file", type = "OneOf (String) (Instance java.io.File)", value = ".")},
             named = {
-                    @ScriptyArg(name = "quiet", type = "Boolean", value = "false", optional = true),
+                    @ScriptyArg(name = "quiet", flag="q", type = "Boolean", value = "false", optional = true),
                     @ScriptyArg(name = "files", type = "Boolean", value = "true", optional = true),
                     @ScriptyArg(name = "dirs", type = "Boolean", value = "true", optional = true),
                     @ScriptyArg(name = "grep", type = "String", value = ".*", optional = true),
-                    @ScriptyArg(name = "exec", type = "Instance Lambda nullAllowed=true", value = "{null}", optional = true),
+                    @ScriptyArg(name = "exec", type = "Instance -n branscha.scripty.parser.Lambda", value = "{null}", optional = true),
                     @ScriptyArg(name = "recursive", type = "Boolean", value = "false", optional = true)
             })
     public Object[] ls(
@@ -128,12 +136,10 @@ public class FileLibrary
             @ScriptyParam("recursive") boolean aRecursive,
             @ScriptyParam("file") Object aFileRepr,
             @ScriptyBindingParam("*output") PrintWriter aWriter,
-            IContext aCtx,
-            IEval aEval)
-            throws CommandException
-    {
-        try
-        {
+            Context aCtx,
+            Eval aEval)
+    throws CommandException {
+        try {
             File lFile;
             if (aFileRepr instanceof File) lFile = (File) aFileRepr;
             else lFile = resolveFile((String) aFileRepr);
@@ -144,13 +150,12 @@ public class FileLibrary
             // Calculate the grep pattern.
             Pattern lPattern = Pattern.compile(aGrep);
             // The worklist handles recursion.
-            List<File> lWorkList = new LinkedList<File>();
-            List<File> lResultList = new LinkedList<File>();
+            List<File> lWorkList = new LinkedList<>();
+            List<File> lResultList = new LinkedList<>();
             // Push our starting point on the directory worklist.
             lWorkList.add(lFile);
 
-            while (lWorkList.size() > 0)
-            {
+            while (lWorkList.size() > 0) {
                 // Get one from the worklist.
                 File lDir = lWorkList.remove(0);
                 File[] lXfiles = lDir.listFiles();
@@ -158,21 +163,17 @@ public class FileLibrary
                 // A guard, listing files can result in
                 // a null value ... meaning that there probably are
                 // security constraints on the directory.
-                if (lXfiles != null)
-                {
-                    for (File lXFile : lXfiles)
-                    {
-                        if (!".".equals(lXFile.getName()) && !"..".equals(lXFile.getName()))
-                        {
-                            if (lXFile.isDirectory())
-                            {
+                if (lXfiles != null) {
+                    for (File lXFile : lXfiles) {
+                        if (!".".equals(lXFile.getName()) && !"..".equals(lXFile.getName())) {
+                            if (lXFile.isDirectory()) {
                                 // Remember if we want dirs.
                                 if (aDirs && lPattern.matcher(lXFile.getCanonicalPath()).matches())
                                     lResultList.add(lXFile);
-                                // Add to the worklist if recursive.
+                                // Add to the work list if recursive.
                                 if (aRecursive) lWorkList.add(lXFile);
-                            } else if (lXFile.isFile())
-                            {
+                            }
+                            else if (lXFile.isFile()) {
                                 // Remember if we want files.
                                 if (aFiles && lPattern.matcher(lXFile.getCanonicalPath()).matches())
                                     lResultList.add(lXFile);
@@ -182,27 +183,25 @@ public class FileLibrary
                 }
             }
 
-            for (File lEntry : lResultList)
-            {
+            for (File lEntry : lResultList) {
                 if (aLambda != null) aEval.eval(lambdaMacro(aLambda, lFile), aCtx);
 
-                if (!aQuiet)
-                {
+                if (!aQuiet) {
                     // Get basic file info.
-                    String lDirFlag = lEntry.isDirectory() ? "d" : " ";
-                    String lReadFlag = lEntry.canRead() ? "r" : " ";
-                    String lWriteFlag = lEntry.canWrite() ? "w" : " ";
-                    String lHiddenFlag = lEntry.isHidden() ? "h" : " ";
+                    String lDirFlag = lEntry.isDirectory() ? "d" : "-";
+                    String lReadFlag = lEntry.canRead() ? "r" : "-";
+                    String lWriteFlag = lEntry.canWrite() ? "w" : "-";
+                    String lHiddenFlag = lEntry.isHidden() ? "h" : "-";
                     long lLastModified = lEntry.lastModified();
                     // Print the info.
                     if (aWriter != null)
-                        aWriter.println(String.format("%s%s%s%s  %5$tF %5$tR  %6$s", lDirFlag, lReadFlag, lWriteFlag, lHiddenFlag, lLastModified, lEntry.getCanonicalFile()));
+                        aWriter.println(String.format("%1s%1s%1s%1s\t%5$tF %5$tR  %6$s", lDirFlag, lReadFlag, lWriteFlag, lHiddenFlag, lLastModified, lEntry.getCanonicalFile()));
                 }
             }
             return lResultList.toArray();
-        } catch (IOException e)
-        {
-            throw new CommandException(String.format("Internal error.\n%s", e.getMessage()), e);
+        }
+        catch (IOException e) {
+            throw new CommandException(String.format("Internal error.%n%s", e.getMessage()), e);
         }
     }
 
@@ -210,8 +209,7 @@ public class FileLibrary
     // Not implemented.
     //
     @ScriptyCommand(name = "cat")
-    public void cat()
-    {
+    public void cat() {
 
     }
 
@@ -223,9 +221,7 @@ public class FileLibrary
     //
     @ScriptyCommand(name = "rslv")
     @ScriptyRefArgList(ref = "file + quiet")
-    public File rslv(@ScriptyParam("file") Object aFileRepr)
-            throws CommandException
-    {
+    public File rslv(@ScriptyParam("file") Object aFileRepr) {
         File lFile;
         if (aFileRepr instanceof File) lFile = (File) aFileRepr;
         else lFile = resolveFile((String) aFileRepr);
@@ -233,14 +229,13 @@ public class FileLibrary
     }
 
     // Rename a file.
-    // It does not use wildcards sinds the implementation is based on the Java File class which
+    // It does not use wildcards since the implementation is based on the Java File class which
     // does not accept wildcards.
     //
     @ScriptyCommand(name = "mv")
     @ScriptyRefArgList(ref = "2files + quiet")
     public File mv(@ScriptyParam("arg1") Object aArg1, @ScriptyParam("arg2") Object aArg2)
-            throws CommandException
-    {
+    throws CommandException {
         File lFrom;
         if (aArg1 instanceof File) lFrom = (File) aArg1;
         else lFrom = resolveFile((String) aArg1);
@@ -257,17 +252,14 @@ public class FileLibrary
     }
 
     @SuppressWarnings("unchecked")
-    private List lambdaMacro(Lambda aLambda, File aFile)
-    {
+    private List lambdaMacro(Lambda aLambda, File aFile) {
         List lMacro = new ArrayList();
         lMacro.add(aLambda);
         lMacro.add(aFile);
         return lMacro;
     }
 
-    private File resolveFile(String aPath)
-            throws CommandException
-    {
+    private File resolveFile(String aPath) {
         // Check the setup. Other command libraries
         // might invoke this method directly, and in that case
         // this is the first initialization point.
@@ -285,17 +277,12 @@ public class FileLibrary
         return lFile;
     }
 
-    private void initCurrDir()
-            throws CommandException
-    {
+    private void initCurrDir() {
         if (currentDirectory == null)
             currentDirectory = new File(".");
     }
 
-
-    private File getCurrentDirectory()
-            throws CommandException
-    {
+    private File getCurrentDirectory() {
         // Check the setup. Other command libraries
         // might invoke this method directly, and in that case
         // this is the first initialization point.

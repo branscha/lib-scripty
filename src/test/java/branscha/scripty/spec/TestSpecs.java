@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,50 +25,45 @@
 package branscha.scripty.spec;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import branscha.scripty.spec.type.*;
 import org.junit.Test;
 
 import branscha.scripty.parser.Pair;
 import branscha.scripty.spec.args.ArgSpecException;
-import branscha.scripty.spec.args.IArgSpec;
+import branscha.scripty.spec.args.ArgSpec;
 import branscha.scripty.spec.args.NamedArg;
-import branscha.scripty.spec.type.CheckedListType;
-import branscha.scripty.spec.type.ITypeSpec;
-import branscha.scripty.spec.type.InstanceType;
-import branscha.scripty.spec.type.IntegerType;
-import branscha.scripty.spec.type.TypeSpecException;
+import branscha.scripty.spec.type.TypeSpec;
 
-public class TestSpecs
-{
+import static branscha.scripty.spec.type.IntegerType.INTEGER_TYPE;
+
+public class TestSpecs {
     @Test
     public void testClassSpec()
-    throws TypeSpecException
-    {
+    throws TypeSpecException {
         InstanceType lSpec = new InstanceType(Integer.class, false);
-        lSpec.guard(10, null);        
+        lSpec.guard(10, null);
     }
-    
+
     @Test
     public void testIntList()
-    throws TypeSpecException
-    {
-        ITypeSpec lSpec = new CheckedListType(new IntegerType());
+    throws TypeSpecException {
+        TypeSpec lSpec = new CheckedListType(INTEGER_TYPE);
         List lList = new ArrayList();
         lList.add(13);
         lList.add(17);
         lList.add(Long.valueOf(5000000000L));
-        Object[] args = new Object[] {lList};
         lSpec.guard(lList, null);
     }
-    
+
     @Test
     public void testNamedArgs()
-    throws ArgSpecException
-    {
-        IArgSpec lSpec = new NamedArg("oele", new IntegerType(), Integer.valueOf(13), true);
-        Object[] args = new Object [] {1, 2, 3, new Pair("oele", Integer.valueOf(17))};
-        lSpec.guard(args, 0, null);
-        System.out.println(args);
+    throws ArgSpecException {
+        ArgSpec lSpec = new NamedArg("oele", "o", INTEGER_TYPE, Integer.valueOf(13), true);
+        Object[] args = new Object[]{1, 2, 3, Integer.valueOf(17)};
+        lSpec.guard(args, 3, null);
+        System.out.println(Arrays.toString(args));
     }
 }

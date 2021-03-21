@@ -1,16 +1,28 @@
 # Scripty Syntax
 
-This is a description of the core Scripty language without any of the command libraries, this describes the base functionality. You have to augment the core with one or more command libraries.
+The core Scripty language without any of the command libraries, this describes the base functionality. You have to 
+augment the core with one or more command libraries to get a working system.
 
 ## Expression Evaluation
 
-Each Scripty expression consists of a command and zero or more arguments. All arguments are evaluated first, from left to right, and then the command is applied to the evaluated arguments. The command must evaluate to the name of a built-in form, the name of a user defined function, the name of a command or a lambda expression.
+Each Scripty expression consists of a command and zero or more arguments. All arguments are evaluated first, from left 
+to right, and then the command is applied to the evaluated arguments. The command must evaluate to the name of a built-in 
+form, the name of a user defined function, the name of a command or a lambda expression.
+
+```
+(<command> arg-1 arg-2 ... arg-n)
+```
 
 ## Data Types
 
-Scripty itself only uses strings and lists. No other data types are built into the scripting language (no booleans, no numeric values, ...). How can such a language be of any use? The commands can return any type of reference as a result. This means that whatever Java instance can be stored in the Scripty context, and although Scripty itself cannot utilize this value, it can pass these variables to other commands.
+Scripty itself only uses strings and lists. No other data type literals are built into the scripting language (no booleans, 
+no numeric values, ...). How can such a language be of any use? The commands can return a reference of any type as 
+a result, or create and store instances of any type in the context. Although there is no standard way to have Scripty
+literals for these types, other commands can use the results or fetch the instances from the context.
 
-The file commands in the file library print out file information on the standard output, but they also return java.io.File objects as a result of the call. These instances can be passed to the other commands or to your own commands. You can utilize the file commands to scan a directory and pass the File instances to your own extensions.
+The file commands in the file library print out file information on the standard output, but they also return 
+java.io.File objects as a result of the call. These instances can be passed to the other commands or to your own commands. 
+You can utilize the file commands to scan a directory and pass the File instances to your own extensions.
 
 1. **Strings**. They can be quoted "this is a string" and in this form it can contain the usual control characters. In unquoted form, Scripty will create a string for each delimited series of characters.
 2. **Pairs**. They have the form `key=value`, and are instances of the class Pair. It is up to the commands process these. They are frequently used for named arguments.
@@ -33,15 +45,21 @@ Or stated otherwise:
 
 ## Final Remarks
 
-Scripty is not Lisp. The syntax is the same, most of the concepts and ideas were borrowed from Lisp. Scripty was not built to be a Lisp clone, it was built to be extended with your own Java commands. Some of the differences that might trip you up are listed below.
+Scripty is not Lisp. The syntax is the same, most of the concepts and ideas were borrowed from Lisp. Scripty was not 
+built to be a Lisp clone, it was built to be extended with your own Java commands. Some of the differences that might 
+trip you up are listed below.
 
-* Lists are Java lists and not conses. So list semantics is different (and maybe less efficient). There is no 'nil' concept; a list does not end with a nil, a nil is not the same as an empty list.
-* No separate name spaces for different constructs, there is only a single context stack.
+* Lists are Java lists and not conses. List semantics is different (and maybe less efficient). There is no 'nil' concept; 
+a list does not end with a nil, a nil is not the same as an empty list.
+* No separate name spaces for different constructs, there is a single context stack.
 * Contexts have side effects, bindings can be changed.
-* Only strings are provided, there is no 'symbol' concept. If an application wants e.g. numbers for calculation, the commands should parse the strings.
-* Binding context lookup order. Scoping is lexical. The global context is always available for everybody, there is no need to introduce dynamic scoping.
+* Only strings are provided, there is no 'symbol' concept. If an application wants e.g. numbers for calculation, the 
+commands should parse the strings.
+* Binding context lookup order. Scoping is lexical. The global context is always available for everybody, there is no 
+need to introduce dynamic scoping.
 
-  1. Call context, arguments are bound to parameters. This context is especially created for this call. It contains all local bindings.
+  1. Call context, arguments are bound to parameters. This context is especially created for this call. It contains all 
+  local bindings.
   2. Lexical (static) context, where the function or lambda was defined. It is the closure of the lambda.
 
 ## Form Reference
@@ -103,24 +121,31 @@ Example 2
 
 **eq**
 
-The comparison operator has the same semantics as the 'equals' method in Java. It is the only data inspection that is implemented in the Eval. It is included because it is a standard Java Object method, applicable to all instances.
+The comparison operator has the same semantics as the 'equals' method in Java. It is the only data inspection that is 
+implemented in the Eval. It is included because it is a standard Java Object method, applicable to all instances.
 
 **eval**
 
-Evaluate an expression. This is less important for a command language, but it is here for completeness sake. Eval works on lists, it does not work on string representations of expressions.
+Evaluate an expression. This is less important for a command language, but it is here for completeness sake. Eval works 
+on lists, it does not work on string representations of expressions.
 
 Example
 
-In this example we make use of the optional library containing list manipulation commands, the 'list' command creates a list. If we want to execute this command we created on the fly, we can use the 'eval' command.
+In this example we make use of the optional library containing list manipulation commands, the 'list' command creates 
+a list. If we want to execute this command we created on the fly, we can use the 'eval' command.
 
 	> eval (list print Hello)
 	Hello
 
 **funcall**
 
-This is the official way to call a user defined function `(funcall name <args>)`. But luckily there is a shorthand call of the form `(name arg-list)`. This form will lead to a function call if there was no registered command with the same name. The first 'funcall' form will only work for user defined functions and lambdas, not for commands. The second form will work for commands as well. Commands are not considered to be real functions that is why there is a difference.
+This is the official way to call a user defined function `(funcall name <args>)`. But luckily there is a shorthand call 
+of the form `(name arg-list)`. This form will lead to a function call if there was no registered command with the 
+same name. The first 'funcall' form will only work for user defined functions and lambdas, not for commands. 
+The second form will work for commands as well. Commands are not considered to be real functions that is why there is 
+a difference.
 
- * name should be a string and is not evaluated.
+ * `name` should be a string and is not evaluated like the arguments are.
  * `<args>` The arguments in a separate list.
 
 Example
@@ -131,7 +156,8 @@ Example
  
 **get**
 
-This form retrieves a binding. It does not do any evaluation: (get name) or the shorthand notational convenience $name does exactly the same thing. It does not do Perl-like interpolation in strings, don't let the notation mislead you.
+This form retrieves a binding. It does not do any evaluation: `(get name)` or the shorthand notational convenience `$name` 
+does exactly the same thing. It does not do Perl-like interpolation in strings, don't let the notation mislead you.
 
 Example The two forms are equivalent.
 
@@ -143,7 +169,9 @@ Example The two forms are equivalent.
 
 **if**
 
-The expression has the form `(if <bool-expr> <then-expr> <else-expr>)` . It is a special form because the evaluation of the then-expr or else-expr depends on the outcome of the test. Since the evaluation order of all boolean constructs is deviant from normal evaluation they have to be built into the core.
+The expression has the form `(if <bool-expr> <then-expr> <else-expr>)` . It is a special form because the evaluation 
+of the then-expr or else-expr depends on the outcome of the test. Since the evaluation order of all boolean constructs 
+is deviant from normal evaluation they have to be built into the core.
 
 Example
 
@@ -152,7 +180,9 @@ Example
 
 **lambda**
 
-A nameless function, it contains a reference to the lexical context where it was defined. So this creates closures. Again, this is less important for Scripty as a command language, but it is here for completeness sake. You cannot pretend that Scripty is not complete.
+A nameless function, it contains a reference to the lexical context where it was defined. It creates closures. 
+Again, this is less important for Scripty as a command language, but it is here for completeness sake. You cannot 
+pretend that Scripty is not complete.
 
 Example
 
@@ -164,9 +194,16 @@ Example
  
 **let, let***
 
-The forms let, let* define variables locally: `(let ((var val) | var=val | var ...) expr)`. The first form without asterisk is non recursive, the right sides are evaluated first before assignment, whereas in the second form the assignments are performed sequentially, a latter assignment can make use of a former one.
+The forms let, let* define variables locally: `(let ((var val) | var=val | var ...) expr)`. The first form without 
+asterisk (parallel assignment) is non recursive, the right sides are evaluated first before assignment. This means
+that you cannot make use of the new variables in any of the expressions, the expressions have to be independent of 
+each other.
 
-Both forms create a temporary context with new bindings in which the expression is evaluated. The new bindings will be available for the expression. When the evaluation is finished, the context and the bindings in it will be removed.
+In the second form (sequential assignment) the assignments are performed sequentially, a latter assignment can make 
+use of a former one.
+
+Both forms create a temporary context with new bindings in which the expression is evaluated. The new bindings will be 
+available for the expression. When the evaluation is finished, the context and the bindings in it will be removed.
 
 A lambda within a let context will keep the access to the defining context.
 
@@ -223,8 +260,9 @@ Some commands add something to the context too. It is up to the various commands
 Example 1: A binding must exist before a set can be executed.
 
 	> set newvar 13
-	ERROR: There is no binding for 'newvar' in the context.
-	-> [set, newvar, 13]
+	ERROR: On line 1 column 1.
+    BasicContext/010: There is no binding for 'newvar' in the context.
+    -> (set newvar 13)
 
 Example 2: An existing binding is changed here.
 

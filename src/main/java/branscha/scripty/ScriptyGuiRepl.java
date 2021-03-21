@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -32,45 +32,42 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-public class ScriptyGuiRepl
-extends ScriptyCapable    
-{
+/**
+ * A GUI to demonstrate how Scripty could be embedded in a more elaborate GUI. The scripty library wants
+ * to be independent of a GUI framework that is why the example is kept simple on purpose. A more elaborate GUI
+ * will first have to make a decision on which GUI library to use.
+ */
+public class ScriptyGuiRepl extends ScriptyCapable {
+
     private JFrame frame;
     private String title = "Scripty";
     private ScriptyPanel scriptyPanel;
 
-    public ScriptyGuiRepl()
-    {
+    public ScriptyGuiRepl() {
     }
 
-    public ScriptyGuiRepl(ScriptyCapable aFacade)
-    {
+    public ScriptyGuiRepl(ScriptyCapable aFacade) {
         super(aFacade);
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title)
-    {
+    public void setTitle(String title) {
         this.title = title;
-        if(frame != null) frame.setTitle(title);
+        if (frame != null) frame.setTitle(title);
     }
 
-    private void buildGuiConsole()
-    {
+    private void buildGuiConsole() {
         frame = new JFrame(title);
 
         // Install the closing mechanism on the frame when the user
         // wants to close the frame by clicking the X button.
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter()
-        {
-            public void windowClosing(WindowEvent e)
-            {
-                for(Frame lAppFrm : JFrame.getFrames()) lAppFrm.dispose();
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                for (Frame lAppFrm : JFrame.getFrames()) lAppFrm.dispose();
             }
         });
 
@@ -79,17 +76,16 @@ extends ScriptyCapable
         // Using the 'golden ratio' 1.618 for the width/height ratio.
         final Rectangle lFrameRect = new Rectangle(Math.min(647, lScreenRect.width), Math.min(400, lScreenRect.height));
         // Set the window size and location.
-        frame.setLocation((lScreenRect.width - lFrameRect.width) / 2,(lScreenRect.height - lFrameRect.height) / 2);
+        frame.setLocation((lScreenRect.width - lFrameRect.width) / 2, (lScreenRect.height - lFrameRect.height) / 2);
         frame.setSize(lFrameRect.width, lFrameRect.height);
         //
         scriptyPanel = new ScriptyPanel(this);
         frame.add(scriptyPanel);
     }
 
-    public void startLoop()
-    {
+    void startLoop() {
         buildGuiConsole();
-        if(frame != null) frame.setVisible(true);
+        if (frame != null) frame.setVisible(true);
     }
 }
 

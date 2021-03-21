@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,66 +24,63 @@
  ******************************************************************************/
 package branscha.scripty;
 
-import branscha.scripty.parser.ICommand;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Command;
+import branscha.scripty.parser.Context;
 import branscha.scripty.repl.ReplEngine;
 
+/**
+ * An embedding component that has a Scripty {@link ReplEngine} on board.
+ */
 public abstract class ScriptyCapable
-implements IExtensions, IContextHolder
-{
+implements ExtensionManager, ContextHolder {
+
     private ReplEngine replEngine;
 
-    public ScriptyCapable()
-    {
+    public ScriptyCapable() {
         replEngine = new ReplEngine();
     }
 
-    public ScriptyCapable(ScriptyCapable aFacade)
-    {
+    /**
+     * Initialize the Scripty shell based on the contents of an existing shell.
+     * @param aFacade
+     */
+    public ScriptyCapable(ScriptyCapable aFacade) {
         replEngine = aFacade.getReplEngine();
     }
-    
-    protected ReplEngine getReplEngine()
-    {
+
+    protected ReplEngine getReplEngine() {
         return replEngine;
     }
 
-    protected void setReplEngine(ReplEngine aEngine)
-    {
+    protected void setReplEngine(ReplEngine aEngine) {
         replEngine = aEngine;
     }
-    
-    public IContext getContext()
-    {
+
+    public Context getContext() {
         return getReplEngine().getContext();
     }
-    
-    public void setContext(IContext aContext)
-    {
+
+    public void setContext(Context aContext) {
         getReplEngine().setContext(aContext);
     }
 
-    public void addCommand(String aName, ICommand aCommand)
-            throws ExtensionException
-    {
-        getReplEngine().addCommand(aName, aCommand);
+    public void addCommand(String aName, Command command)
+    throws ExtensionException {
+        getReplEngine().addCommand(aName, command);
     }
 
-    public void addMacro(String aName, ICommand aMacro)
-    throws ExtensionException
-    {
-        getReplEngine().addMacro(aName, aMacro);
+    public void addMacro(String aName, Command macro)
+    throws ExtensionException {
+        getReplEngine().addMacro(aName, macro);
     }
 
-    public void addLibraryClasses(Class... aLibraryClasses)
-            throws ExtensionException
-    {
-        getReplEngine().addLibraryClasses(aLibraryClasses);
+    public void addLibraryClasses(Class... libraryClasses)
+    throws ExtensionException {
+        getReplEngine().addLibraryClasses(libraryClasses);
     }
 
-    public void addLibraryInstances(Object... aLibraryInstances)
-            throws ExtensionException
-    {
-        getReplEngine().addLibraryInstances(aLibraryInstances);
+    public void addLibraryInstances(Object... libraryInstances)
+    throws ExtensionException {
+        getReplEngine().addLibraryInstances(libraryInstances);
     }
 }

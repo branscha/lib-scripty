@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,72 +24,76 @@
  ******************************************************************************/
 package branscha.scripty.spec.args;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 import branscha.scripty.parser.Pair;
-import branscha.scripty.spec.type.ITypeSpec;
+import branscha.scripty.spec.type.TypeSpec;
 import branscha.scripty.spec.type.TypeSpecException;
 
-public class NamedArg 
-implements IArgSpec
-{
+public class NamedArg implements ArgSpec {
+
+    private static final String ERR010 = "NamedArg/010: Named argument '%s': %s";
+
     private String paramName;
-    private Object value;
-    private ITypeSpec valueSpec;
+    private String paramFlag;
+    private TypeSpec type;
     private boolean optional = true;
     private String specName;
-    
-    public NamedArg(String aName, ITypeSpec aValSpec, Object aValue, boolean aOptional)
-    {
-        paramName = aName;
-        value = aValue;
-        valueSpec = aValSpec;        
-        optional = aOptional;
-        
-        specName = paramName + "=" + valueSpec.getSpecName();
+
+    private Object defaultValue;
+    private Object defaultGuardedVal;
+
+    public NamedArg(String name, String flag, TypeSpec type, Object defaultValue, boolean optional) {
+        this.paramName = name;
+        this.paramFlag = flag;
+        this.defaultValue = defaultValue;
+        this.type = type;
+        this.optional = optional;
+        this.specName = this.type.getSpecName();
     }
-    
-    public String getSpecName()
-    {        
+
+    public String getSpecName() {
         return specName;
     }
 
-    public Object guard(Object[] aArgs, int aPos, IContext aCtx)
-    throws ArgSpecException
-    {
-        for(int i = aPos; i < aArgs.length; i++)
-        {
-            if(aArgs[i] instanceof Pair)
-            {
-                Pair lPair = (Pair) aArgs[i];
-                if(paramName.equals(lPair.getLeft()))
-                {                    
-                    try
-                    {
-                        Pair lNewPair =  new Pair(paramName, valueSpec.guard(lPair.getRight(), aCtx));
-                        aArgs[i] = lNewPair;
-                        return lNewPair.getRight();
-                    }
-                    catch (TypeSpecException e)
-                    {
-                        throw new ArgSpecException(String.format("Named argument '%s': %s", paramName, e.getMessage()));
-                    }
-                }
-            }
+    public Object guard(Object[] args, int pos, Context ctx)
+    throws ArgSpecException {
+        try {
+            return type.guard(args[pos], ctx);
         }
-
-        try
-        {
-            if(optional) return valueSpec.guard(value, aCtx);
-            else throw new ArgSpecException(String.format("Missing named argument '%s'.", paramName));
-        }
-        catch (TypeSpecException e)
-        {
-            throw new ArgSpecException(e.getMessage());
+        catch (TypeSpecException e) {
+            throw new ArgSpecException(String.format(ERR010, paramName, e.getMessage()));
         }
     }
-    
-    public String getName()
-    {
+
+    Object getDefaultVal(Context ctx)
+    throws TypeSpecException {
+        if (defaultGuardedVal == null) {
+            defaultGuardedVal = type.guard(defaultValue, ctx);
+        }
+        return defaultGuardedVal;
+    }
+
+    public String getName() {
         return paramName;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public String getFlag() {
+        return paramFlag;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Arg{");
+        sb.append("name='").append(paramName).append('\'');
+        if(paramFlag.length() > 0) sb.append(", flag=\"").append(paramFlag).append("\"");
+        sb.append(", type=\"").append(specName).append("\"");
+        if(defaultValue != null) sb.append(", default=\"").append(defaultValue).append("\"");
+        sb.append(", optional=").append(optional);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,41 +26,24 @@ package branscha.scripty.spec.type;
 
 import java.math.BigDecimal;
 
-import branscha.scripty.parser.IContext;
+public class BigDecimalType extends InstanceType {
 
-public class BigDecimalType 
-implements ITypeSpec<BigDecimal>
-{
-    public String getSpecName()
-    {
-        return "BigDecimal";
+    public static final BigDecimalType BIGDECIMAL_TYPE = new BigDecimalType();
+
+    BigDecimalType() {
+        super(BigDecimal.class, "BigDecimal", false);
     }
 
-    public BigDecimal guard(Object aArg, IContext aCtx)
-    throws TypeSpecException
-    {
-        if(aArg instanceof BigDecimal)
-        {
-            return (BigDecimal) aArg;            
+    @Override
+    Object convertArg(Object arg) {
+        if (arg instanceof Number) {
+            return new BigDecimal(((Number) arg).doubleValue());
         }
-        else if (aArg instanceof Number)
-        {
-            return new BigDecimal(((Number) aArg).doubleValue());            
+        else if (arg instanceof String) {
+            return new BigDecimal((String) arg);
         }
-        else if (aArg instanceof String)
-        {
-            try
-            {      
-                return new BigDecimal((String) aArg);
-            }
-            catch (NumberFormatException e)
-            {
-                throw new TypeSpecException(TypeUtil.msgBadRepr(getSpecName(), (String) aArg));
-            }            
-        }
-        else
-        {           
-            throw new TypeSpecException(TypeUtil.msgExpectedOther(getSpecName(), aArg));
+        else {
+            return super.convertArg(arg);
         }
     }
 }

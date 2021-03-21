@@ -3,12 +3,13 @@
 ;;; e '<expr>    Start debugging an expression.
 ;;; t            Terminate the debug session.
 ;;; x            Stack dump.
-;;; s            Step + stack.
+;;; s            Step over + stack.
 ;;; b            Backstep + stack.
 ;;; sover        Step over (the parameter) + stack.
+;;; sin          Step + stack.
 ;;; sout         Step out (of the expression) + stack.
 ;;; r            Run until finished.
-;;; rready       Run until the parmeters of the topmost expression are evaluated and the expression itself can be executed.
+;;; rready       Run until the parameters of the topmost expression are evaluated and the expression itself can be executed.
 ;;; rresult      Run until a result is reached.
 ;;; result       Print the result.
 ;;; ctx          Print the current context (of the topmost expression).
@@ -32,13 +33,21 @@
 ;;
 (defun s ()
    (if (dbg-moresteps?)
-	   (progn (dbg-stepin)
+	   (progn (dbg-stepover)
 	          (dbg-stack))
 	   (print "No more steps.")))
 
 (defun b ()
    (if (dbg-moresteps?)
 	   (progn (dbg-back)
+	          (dbg-stack))
+	   (print "No more steps.")))
+
+;; Step in.
+;;
+(defun sin ()
+   (if (dbg-moresteps?)
+	   (progn (dbg-step)
 	          (dbg-stack))
 	   (print "No more steps.")))
 

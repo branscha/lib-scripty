@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,21 +24,24 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
-public class DefResultMapping
-implements IResultMapping
-{
-    private String binding;
+/**
+ * Define a binding in the context with the result of the command.
+ */
+public class DefResultMapping implements ResultMapping {
 
-    public DefResultMapping(String aBinding)
-    {
-        binding = aBinding;
+    private String bindingKey;
+
+    /**
+     * Create a result binder to the context. If the binding already exists, it will be overwritten.
+     * @param bindingKey The name of the binding that will be created in the context.
+     */
+    public DefResultMapping(String bindingKey) {
+        this.bindingKey = bindingKey;
     }
 
-    public void map(Object aResult, IContext aContext)
-    throws ResultMappingException
-    {
-        aContext.defBinding(binding, aResult);
+    public void map(Object cmdResult, Context ctx) {
+        ctx.defBinding(bindingKey, cmdResult);
     }
 }

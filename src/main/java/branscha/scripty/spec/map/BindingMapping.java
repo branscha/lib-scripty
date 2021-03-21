@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,31 +24,35 @@
  ******************************************************************************/
 package branscha.scripty.spec.map;
 
-import branscha.scripty.parser.IContext;
-import branscha.scripty.parser.IEval;
+import branscha.scripty.parser.Context;
+import branscha.scripty.parser.Eval;
 
-public class BindingMapping
-implements IArgMapping
-{
-    private String binding;
+/**
+ * This mapping fetches data from the {@link Context} of the {@link Eval} and provides it as an argument
+ * to a Script command method when it is part of a {@link  CmdMethodInjector}.
+ */
+public class BindingMapping implements ArgMapping {
+
+    private  static final String ERR010 = "BindingMapping/010: The context does not contain a binding '%s' to inject into a command.";
+
+    private String bindingKey;
     private boolean excIfNull;
 
-    public BindingMapping(String aBinding, boolean aExcIfNull)
-    {
-        binding = aBinding;
-        excIfNull = aExcIfNull;
+    public BindingMapping(String bindingKey, boolean excIfNull) {
+        this.bindingKey = bindingKey;
+        this.excIfNull = excIfNull;
     }
 
-    public Object map(IEval aEval, IContext aContext, Object aArgs)
-    throws ArgMappingException
-    {
-        if(aContext.isBound(binding)) return aContext.getBinding(binding);
-        else if(excIfNull) throw new ArgMappingException("... no such binding ...");
-        else return null;
-    }
-
-    public void setOffset(int aOffset)
-    {
-        // Nop.
+    public Object map(Eval eval, Context ctx, Object args)
+    throws ArgMappingException {
+        if (ctx.isBound(bindingKey)) {
+            return ctx.getBinding(bindingKey);
+        }
+        else if (excIfNull) {
+            throw new ArgMappingException(String.format(ERR010, bindingKey));
+        }
+        else {
+            return null;
+        }
     }
 }

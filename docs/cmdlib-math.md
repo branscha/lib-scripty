@@ -1,6 +1,6 @@
 # Math Commands
 
-The JavaScript approach was taken to implement the math command library, there is only one type that is the BigDecimal type. Some unconventional notation was chosen, like the <~ and >~ operators for comparison, this is because using the ''=" here would conflict with Scripty pairs which have the form name=value.
+The JavaScript approach was taken to implement the math command library, there is only one type that is the BigDecimal type.
 
 If you provide strings, they will be converted to numbers first, it is ok to provide string arguments.
 
@@ -26,9 +26,9 @@ Convert to an integer representation.
 
 Test if a number is zero.
 
-**~, >, >~, <, <~**
+**=, >, >=, <, <=**
 
-Numerical comparison. The '~' stands for '=' but the last one cannot be used because it conflicts with Scripty pairs, the Scripty parser will try to create a pair when it encounters a '='.
+Numerical comparison.
 
 **number?**
 

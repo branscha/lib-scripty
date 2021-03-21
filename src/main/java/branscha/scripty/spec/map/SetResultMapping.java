@@ -1,8 +1,8 @@
-/*******************************************************************************
+/* ******************************************************************************
  * The MIT License
  * Copyright (c) 2012 Bruno Ranschaert
  * lib-scripty
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,28 +25,29 @@
 package branscha.scripty.spec.map;
 
 import branscha.scripty.parser.CommandException;
-import branscha.scripty.parser.IContext;
+import branscha.scripty.parser.Context;
 
-public class SetResultMapping
-implements IResultMapping
-{
+/**
+ * Put the result of a command execution into the context. the binding must already exist or otherwise an
+ * exception will be thrown.
+ */
+public class SetResultMapping implements ResultMapping {
+
+    private  static final String ERR010 = "SetResultMapping/010: The result could not be bound to '%s', undefined binding.";
+
     private String binding;
 
-    public SetResultMapping(String aBinding)
-    {
+    public SetResultMapping(String aBinding) {
         binding = aBinding;
     }
 
-    public void map(Object aResult, IContext aContext)
-    throws ResultMappingException
-    {
-        try
-        {
-            aContext.setBinding(binding, aResult);
+    public void map(Object cmdResult, Context ctx)
+    throws ResultMappingException {
+        try {
+            ctx.setBinding(binding, cmdResult);
         }
-        catch (CommandException e)
-        {
-            throw new ResultMappingException(String.format("The result could not be bound to '%s' in the context because the binding does not exist.", binding));
+        catch (CommandException e) {
+            throw new ResultMappingException(String.format(ERR010, binding));
         }
     }
 }
